@@ -3,6 +3,7 @@ package frc.robot.utils;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 public class NetworkTablesUtils {
@@ -15,6 +16,10 @@ public class NetworkTablesUtils {
         table = NetworkTableInstance.getDefault().getTable(tableName);
     }
 
+    private NetworkTablesUtils(NetworkTable table) {
+        this.table = table;
+    }
+
     /**
      * Get a table from NetworkTables
      * @param tableName The table name as it appears in Network Tables
@@ -25,149 +30,163 @@ public class NetworkTablesUtils {
     }
 
     /**
-     * Get an entry from the table
-     * @param key The key as it appears in network tables
-     * @param defaultValue The default value
-     * @return Either default value if the value doesn't exist in network tables or the corresponding value in NT
-     * @param <T> The type of the entry (String, Double, or Boolean)
+     * Get a table from network tables
+     * @param table A {@link NetworkTable}
+     * @return An instance of {@link NetworkTablesUtils}
      */
-    @SuppressWarnings("unchecked")
-    public<T> T getEntry(String key, T defaultValue) {
-        Types type = Types.getFromTypeName(defaultValue.getClass().getTypeName());
-        switch (type) {
-            case DOUBLE -> {
-                return (T) (Double) this.table.getEntry(key).getDouble((Double) defaultValue);
-            }
-            case BOOLEAN -> {
-                return (T) (Boolean) this.table.getEntry(key).getBoolean((Boolean) defaultValue);
-            }
-            case STRING -> {
-                return (T) this.table.getEntry(key).getString((String) defaultValue);
-            }
-            case UNKNOWN -> {
-                System.out.println("Error: Unknown type"); // TODO: Setup an error utils or something
-            }
-            default -> {
-                System.out.println("Error: Use getArrayEntry for array type");
-            }
-        }
-        return defaultValue;
+    public static NetworkTablesUtils getTable(NetworkTable table) {
+        return new NetworkTablesUtils(table);
     }
 
     /**
-     * Get a array entry from the table
-     * @param key The key as it appears in network tables
-     * @param defaultValues The default values
-     * @return Either the default values or the corresponding array in NT
-     * @param <T> The type of the entry (String[], Double[], or Boolean[])
+     * Get a double entry from network tables
+     * @param key The key as it appears in network table
+     * @param defaultValue Default value in case the key is invalid
+     * @return Either the default value or the corresponding value in network tables
      */
-    @SuppressWarnings("unchecked")
-    public<T> T[] getArrayEntry(String key, T[] defaultValues) {
-        Types type = Types.getFromTypeName(defaultValues.getClass().getTypeName());
-        switch (type) {
-            case DOUBLE_ARRAY -> {
-                return (T[]) this.table.getEntry(key).getDoubleArray((Double[]) defaultValues);
-            }
-            case BOOLEAN_ARRAY -> {
-                return (T[]) this.table.getEntry(key).getBooleanArray((Boolean []) defaultValues);
-            }
-            case STRING_ARRAY -> {
-                return (T[]) this.table.getEntry(key).getStringArray((String[]) defaultValues);
-            }
-            case UNKNOWN -> {
-                System.out.println("Error: Unknown type"); // TODO: Setup an error utils or something
-            }
-            default -> {
-                System.out.println("Error: Use getEntry for non-array type");
-            }
-        }
-        return defaultValues;
+    public double getEntry(String key, double defaultValue) {
+        return this.table.getEntry(key).getDouble(defaultValue);
     }
 
     /**
-     * Set an entry in network tables
-     * @param key The key for the entry in network tables
-     * @param value The value to set in NT
-     * @param <T> The type of value (String, Double, or Boolean)
+     * Get a long entry from network tables
+     * @param key The key as it appears in network table
+     * @param defaultValue Default value in case the key is invalid
+     * @return Either the default value or the corresponding value in network tables
      */
-    public<T> void setEntry(String key, T value) {
-        Types type = Types.getFromTypeName(value.getClass().getTypeName());
-        switch (type) {
-            case DOUBLE -> this.table.getEntry(key).setDouble((Double) value);
-            case BOOLEAN -> this.table.getEntry(key).setBoolean((Boolean) value);
-            case STRING -> this.table.getEntry(key).setString((String) value);
-            case UNKNOWN -> System.out.println("Error: Unknown type"); // TODO: Setup an error utils or something
-            default -> System.out.println("Error: Use getArrayEntry for array type");
-
-        }
+    public long getEntry(String key, long defaultValue) {
+        return this.table.getEntry(key).getInteger(defaultValue);
     }
 
     /**
-     * Set an array entry in network tables
-     * @param key The key for the entry in network tables
-     * @param value The value to set in NT
-     * @param <T> The type of value (String[], Double[], or Boolean[])
+     * Get a boolean entry from network tables
+     * @param key The key as it appears in network table
+     * @param defaultValue Default value in case the key is invalid
+     * @return Either the default value or the corresponding value in network tables
      */
-    public<T> void setArrayEntry(String key, T[] value) {
-        Types type = Types.getFromTypeName(value.getClass().getTypeName());
-        switch (type) {
-            case DOUBLE -> this.table.getEntry(key).setDoubleArray((Double[]) value);
-            case BOOLEAN -> this.table.getEntry(key).setBooleanArray((Boolean[]) value);
-            case STRING -> this.table.getEntry(key).setDefaultStringArray((String[]) value);
-            case UNKNOWN -> System.out.println("Error: Unknown type"); // TODO: Setup an error utils or something
-            default -> System.out.println("Error: Use getArrayEntry for array type");
-
-        }
+    public boolean getEntry(String key, boolean defaultValue) {
+        return this.table.getEntry(key).getBoolean(defaultValue);
     }
 
     /**
-     * Enum for different types
+     * Get a String entry from network tables
+     * @param key The key as it appears in network table
+     * @param defaultValue Default value in case the key is invalid
+     * @return Either the default value or the corresponding value in network tables
      */
-    private enum Types {
-        DOUBLE,
-        BOOLEAN,
-        STRING,
-        DOUBLE_ARRAY,
-        BOOLEAN_ARRAY,
-        STRING_ARRAY,
-        UNKNOWN;
+    public String getEntry(String key, String defaultValue) {
+        return this.table.getEntry(key).getString(defaultValue);
+    }
 
-        /**
-         * Gets the type from the getTypeName() function
-         * Example:
-         * <pre>
-         * {@code
-         * T foo = (T) 0.5;
-         * System.out.println(Types.getFromTypeName(foo.getClass.getTypeName());
-         * }
-         * </pre]>
-         * @param typeName The type name of the class
-         * @return The {@link Types} type of the class
-         */
-        public static Types getFromTypeName(String typeName) {
-            switch (typeName) {
-                case "double" -> {
-                    return DOUBLE;
-                }
-                case "boolean" -> {
-                    return BOOLEAN;
-                }
-                case "java.lang.String" -> {
-                    return STRING;
-                }
-                case "double[]" -> {
-                    return DOUBLE_ARRAY;
-                }
-                case "boolean[]" -> {
-                    return BOOLEAN_ARRAY;
-                }
-                case "java.lang.String[]" -> {
-                    return STRING_ARRAY;
-                }
-                default -> {
-                    return UNKNOWN;
-                }
-            }
-        }
+    /**
+     * Get a double array entry from network tables
+     * @param key The key as it appears in network table
+     * @param defaultValues Default values in case the key is invalid
+     * @return Either the default value or the corresponding value in network tables
+     */
+    public double[] getArrayEntry(String key, double[] defaultValues) {
+        return this.table.getEntry(key).getDoubleArray(defaultValues);
+    }
+
+    /**
+     * Get a long array entry from network tables
+     * @param key The key as it appears in network table
+     * @param defaultValues Default values in case the key is invalid
+     * @return Either the default value or the corresponding value in network tables
+     */
+    public long[] getArrayEntry(String key, long[] defaultValues) {
+        return this.table.getEntry(key).getIntegerArray(defaultValues);
+    }
+
+    /**
+     * Get a boolean array entry from network tables
+     * @param key The key as it appears in network table
+     * @param defaultValues Default values in case the key is invalid
+     * @return Either the default value or the corresponding value in network tables
+     */
+    public boolean[] getArrayEntry(String key, boolean[] defaultValues) {
+        return this.table.getEntry(key).getBooleanArray(defaultValues);
+    }
+
+    /**
+     * Get a String array entry from network tables
+     * @param key The key as it appears in network table
+     * @param defaultValues Default values in case the key is invalid
+     * @return Either the default value or the corresponding value in network tables
+     */
+    public String[] getArrayEntry(String key, String[] defaultValues) {
+        return this.table.getEntry(key).getStringArray(defaultValues);
+    }
+
+    /**
+     * Set a double entry in network tables
+     * @param key The key for the value
+     * @param value The value that will be set
+     */
+    public void setEntry(String key, double value) {
+        this.table.getEntry(key).setDouble(value);
+    }
+
+    /**
+     * Set a long entry in network tables
+     * @param key The key for the value
+     * @param value The value that will be set
+     */
+    public void setEntry(String key, long value) {
+        this.table.getEntry(key).setInteger(value);
+    }
+
+    /**
+     * Set a boolean entry in network tables
+     * @param key The key for the value
+     * @param value The value that will be set
+     */
+    public void setEntry(String key, boolean value) {
+        this.table.getEntry(key).setBoolean(value);
+    }
+
+    /**
+     * Set a String entry in network tables
+     * @param key The key for the value
+     * @param value The value that will be set
+     */
+    public void setEntry(String key, String value) {
+        this.table.getEntry(key).setString(value);
+    }
+
+    /**
+     * Set a double array entry in network tables
+     * @param key The key for the value
+     * @param value The value that will be set
+     */
+    public void setArrayEntry(String key, double[] value) {
+        this.table.getEntry(key).setDoubleArray(value);
+    }
+
+    /**
+     * Set a long array entry in network tables
+     * @param key The key for the value
+     * @param value The value that will be set
+     */
+    public void setArrayEntry(String key, long[] value) {
+        this.table.getEntry(key).setIntegerArray(value);
+    }
+
+    /**
+     * Set a boolean array entry in network tables
+     * @param key The key for the value
+     * @param value The value that will be set
+     */
+    public void setArrayEntry(String key, boolean[] value) {
+        this.table.getEntry(key).setBooleanArray(value);
+    }
+
+    /**
+     * Set a String array entry in network tables
+     * @param key The key for the value
+     * @param value The value that will be set
+     */
+    public void setArrayEntry(String key, String[] value) {
+        this.table.getEntry(key).setStringArray(value);
     }
 }

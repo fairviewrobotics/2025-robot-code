@@ -7,7 +7,6 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.Timer;
-import org.apache.commons.lang3.ArrayUtils;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 
@@ -80,7 +79,7 @@ public class Camera {
         assert this.limelightTable.isPresent();
         String key = "botpose_wpiblue";
 
-        double[] rawPose = ArrayUtils.toPrimitive(this.limelightTable.get().getArrayEntry(key, ArrayUtils.toObject(new double[0])));
+        double[] rawPose = this.limelightTable.get().getArrayEntry(key, new double[0]);
         if (rawPose.length == 0) return Optional.empty();
 
         return Optional.of(new Pose3d(
