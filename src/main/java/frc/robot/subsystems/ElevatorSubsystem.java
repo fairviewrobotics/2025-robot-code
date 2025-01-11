@@ -10,6 +10,8 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.ElevatorConstants;
 
+import java.util.function.BooleanSupplier;
+
 
 public class ElevatorSubsystem extends SubsystemBase {
 
@@ -50,6 +52,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         SparkFlexConfig rightElevatorMotorConfig = new SparkFlexConfig();
         SparkFlexConfig leftElevatorMotorConfig = new SparkFlexConfig();
 
+        elevatorPID.setTolerance(ElevatorConstants.ELEVATOR_TOLERANCE);
+
         rightElevatorMotorConfig.inverted(true);
 
         rightElevatorMotor.configure(rightElevatorMotorConfig, SparkBase.ResetMode.kNoResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
@@ -68,11 +72,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public void setPosition(double position) {
-
-        double pidCalc = elevatorPID.calculate(getElevatorPosition(), position);
-        double ffCalc = elevatorFF.calculate(getElevatorPosition());
-        setVoltage(pidCalc+ffCalc);
-        //Combines calculations for voltage calculation.
+        elevatorPID.setGoal(position);
     }
     public void resetPID() {
         elevatorPID.reset(getElevatorPosition());
@@ -88,13 +88,28 @@ public class ElevatorSubsystem extends SubsystemBase {
         //Calculates average pos
         return encoderAverageVel * ElevatorConstants.ROTATIONS_TO_METERS;
     }
+    public boolean atPosition() {
+        if (elevatorPID.atSetpoint()) {
+            return true;
+        }
+        return false;
+
+    }
 
 
     @Override
     public void periodic(){
 
         if(!elevatorZeroed) {
-            setVoltage(ElevatorConstants.ELEVATOR_ZEROING_VOLTAGE);
+            if ((leftElevatorMotor.getOutputCurrent() + rightElevatorMotor.getOutputCurrent())/2 > ElevatorConstants.CURRENT_MAX){
+                elevatorZeroed = true;
+                leftEncoder.setPosition(ElevatorConstants.HARD_STOP_LEVEL);
+                rightEncoder.setPosition(ElevatorConstants.HARD_STOP_LEVEL);
+                setVoltage(0);
+            }
+            else{
+                setVoltage(ElevatorConstants.ELEVATOR_ZEROING_VOLTAGE);
+            }
         }
         if(bottomLineBreak.get()) {
 
@@ -103,13 +118,19 @@ public class ElevatorSubsystem extends SubsystemBase {
                 leftEncoder.setPosition(0);
                 rightEncoder.setPosition(0);
                 elevatorZeroed = true;
-
                 setVoltage(0);
-
             }
+        }
+        if(elevatorZeroed) {
+
+            double pidCalc = elevatorPID.calculate(getElevatorPosition());
+            double ffCalc = elevatorFF.calculate(getElevatorPosition());
+            setVoltage(pidCalc+ffCalc);
+
         }
         //Elevator zeroing
     }
 
 
 }
+//TODO Add elevator timeout, add boolean position,

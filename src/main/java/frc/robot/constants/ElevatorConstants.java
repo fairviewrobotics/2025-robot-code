@@ -25,4 +25,8 @@ public class ElevatorConstants {
     public static final double ELEVATOR_ZEROING_VOLTAGE = 0;
 
     public static final double ROTATIONS_TO_METERS = 1;
+
+    public static final double CURRENT_MAX = 20;
+
+    public static final double HARD_STOP_LEVEL = -0.1;
 }
