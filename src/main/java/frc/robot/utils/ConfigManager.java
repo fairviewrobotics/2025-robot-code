@@ -18,14 +18,14 @@ public class ConfigManager {
 
     private JSONObject json;
 
-    private NetworkTableUtils NTTune = new NetworkTableUtils("Tune");
+    private NetworkTablesUtils NTTune = NetworkTablesUtils.getTable("Tune");
 
     /**
      * Get the instance of the config manager
      *
      * @return Instance of config manager
      */
-    public static ConfigManager getInstance() {
+    public static synchronized ConfigManager getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new ConfigManager();
         }
@@ -53,18 +53,17 @@ public class ConfigManager {
     /** Add a listener to network tables for a change in one of the tuning values */
     @SuppressWarnings("unchecked")
     private void initListener() {
-        NTTune.getTable()
-                .addListener(
-                        (EnumSet.of(NetworkTableEvent.Kind.kValueAll)),
-                        (table, key1, event) -> {
-                            this.json.put(key1, table.getValue(key1).getValue());
-                            System.out.println(
-                                    "[DEBUG] Updated ["
-                                            + key1
-                                            + "] to "
-                                            + table.getEntry(key1).getDouble(-1));
-                            this.saveConfig();
-                        });
+        NTTune.addListener(
+                (EnumSet.of(NetworkTableEvent.Kind.kValueAll)),
+                (table, key1, event) -> {
+                    this.json.put(key1, table.getValue(key1).getValue());
+                    System.out.println(
+                            "[DEBUG] Updated ["
+                                    + key1
+                                    + "] to "
+                                    + table.getEntry(key1).getDouble(-1));
+                    this.saveConfig();
+                });
     }
 
     /**
@@ -98,31 +97,83 @@ public class ConfigManager {
     }
 
     /**
-     * Get a value from the config
+     * Get a integer value from the config
      *
      * @param key The key in the json
      * @param defaultValue A default value in case we fail to get the key
      * @return The value from the key
      */
-    @SuppressWarnings("unchecked")
-    public <T> T get(String key, Class<T> type, T defaultValue) {
-        if (!NTTune.getTable().getEntry(key).exists()) {
+    public long get(String key, long defaultValue) {
+        if (!NTTune.keyExists(key)) {
             System.out.println(
-                    "[WARN] "
+                    "[INFO] "
                             + key
                             + " does not exist in network tables, creating a setting to "
                             + defaultValue);
-            NTTune.setEntry(key, type, defaultValue);
-        }
-        if (type.equals(Double.class) || type.equals(Integer.class)) {
-            return (T) getDouble(key, (double) defaultValue);
-        } else if (type.equals(String.class)) {
-            return (T) getString(key, (String) defaultValue);
-        } else if (type.equals(Boolean.class)) {
-            return (T) getBoolean(key, (boolean) defaultValue);
-        }
 
-        return defaultValue;
+            NTTune.setEntry(key, defaultValue);
+        }
+        return getInteger(key, defaultValue);
+    }
+
+    /**
+     * Get a double value from the config
+     *
+     * @param key The key in the json
+     * @param defaultValue A default value in case we fail to get the key
+     * @return The value from the key
+     */
+    public double get(String key, double defaultValue) {
+        if (!NTTune.keyExists(key)) {
+            System.out.println(
+                    "[INFO] "
+                            + key
+                            + " does not exist in network tables, creating a setting to "
+                            + defaultValue);
+
+            NTTune.setEntry(key, defaultValue);
+        }
+        return getDouble(key, defaultValue);
+    }
+
+    /**
+     * Get a String value from the config
+     *
+     * @param key The key in the json
+     * @param defaultValue A default value in case we fail to get the key
+     * @return The value from the key
+     */
+    public String get(String key, String defaultValue) {
+        if (!NTTune.keyExists(key)) {
+            System.out.println(
+                    "[INFO] "
+                            + key
+                            + " does not exist in network tables, creating a setting to "
+                            + defaultValue);
+
+            NTTune.setEntry(key, defaultValue);
+        }
+        return getString(key, defaultValue);
+    }
+
+    /**
+     * Get a boolean value from the config
+     *
+     * @param key The key in the json
+     * @param defaultValue A default value in case we fail to get the key
+     * @return The value from the key
+     */
+    public boolean get(String key, boolean defaultValue) {
+        if (!NTTune.keyExists(key)) {
+            System.out.println(
+                    "[INFO] "
+                            + key
+                            + " does not exist in network tables, creating a setting to "
+                            + defaultValue);
+
+            NTTune.setEntry(key, defaultValue);
+        }
+        return getBoolean(key, defaultValue);
     }
 
     /**
@@ -132,12 +183,30 @@ public class ConfigManager {
      * @param defaultValue A default value
      * @return A double (as an {@link Object})
      */
-    private Object getDouble(String key, double defaultValue) {
+    private double getDouble(String key, double defaultValue) {
         double res = defaultValue;
         try {
             res = (double) this.json.get(key);
         } catch (ClassCastException e) {
             System.out.println("[WARN] Failed to get " + key + " as a double");
+        }
+
+        return res;
+    }
+
+    /**
+     * Get an integer from the config
+     *
+     * @param key The key in the json
+     * @param defaultValue A default value
+     * @return A long (as an {@link Object})
+     */
+    private long getInteger(String key, long defaultValue) {
+        long res = defaultValue;
+        try {
+            res = (long) this.json.get(key);
+        } catch (ClassCastException e) {
+            System.out.println("[WARN] Failed to get " + key + " as a long");
         }
 
         return res;
@@ -150,7 +219,7 @@ public class ConfigManager {
      * @param defaultValue A default value
      * @return A boolean (as an {@link Object})
      */
-    private Object getBoolean(String key, boolean defaultValue) {
+    private boolean getBoolean(String key, boolean defaultValue) {
         boolean res = defaultValue;
         try {
             res = (boolean) this.json.get(key);
@@ -168,7 +237,7 @@ public class ConfigManager {
      * @param defaultValue A default value
      * @return A string (as an {@link Object})
      */
-    private Object getString(String key, String defaultValue) {
+    private String getString(String key, String defaultValue) {
         String res = defaultValue;
         try {
             res = (String) this.json.get(key);
@@ -193,10 +262,8 @@ public class ConfigManager {
 
     /** Save the config to the config file location */
     public void saveConfig() {
-        try {
-            PrintWriter printWriter = new PrintWriter(this.configFile);
+        try (PrintWriter printWriter = new PrintWriter(this.configFile)) {
             printWriter.println(this.json.toJSONString());
-            printWriter.close();
         } catch (FileNotFoundException e) {
             System.out.println("[WARN] Failed to save file: " + configFile + ": " + e);
         }

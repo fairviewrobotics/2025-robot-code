@@ -22,7 +22,7 @@ import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.DrivetrainConstants;
 import frc.robot.controllers.MAXSwerveModule;
-import frc.robot.utils.NetworkTableUtils;
+import frc.robot.utils.NetworkTablesUtils;
 import frc.robot.utils.SwerveUtils;
 
 public class SwerveSubsystem extends SubsystemBase {
@@ -95,7 +95,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     // Network Tables Telemetry
 
-    private final NetworkTableUtils NTUtils = new NetworkTableUtils("Debug");
+    private final NetworkTablesUtils NTUtils = NetworkTablesUtils.getTable("debug");
     private final DoubleArrayEntry setpointsTelemetry =
             NetworkTableInstance.getDefault()
                     .getTable("Swerve")
@@ -150,7 +150,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        NTUtils.setDouble("Gyro Angle", gyro.getAngle());
+        NTUtils.setEntry("Gyro Angle", gyro.getAngle());
 
         // Update the odometry in the periodic block
         poseEstimator.update(

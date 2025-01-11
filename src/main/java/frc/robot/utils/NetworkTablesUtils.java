@@ -2,7 +2,9 @@
 package frc.robot.utils;
 
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import java.util.EnumSet;
 
 public class NetworkTablesUtils {
     private final NetworkTable table;
@@ -38,6 +40,18 @@ public class NetworkTablesUtils {
      */
     public static NetworkTablesUtils getTable(NetworkTable table) {
         return new NetworkTablesUtils(table);
+    }
+
+    /**
+     * Add a listener to the network table
+     *
+     * @param events A {@link EnumSet} of {@link NetworkTableEvent.Kind} for what events to listen
+     *     to
+     * @param listener The {@link NetworkTable.TableEventListener}
+     */
+    public void addListener(
+            EnumSet<NetworkTableEvent.Kind> events, NetworkTable.TableEventListener listener) {
+        this.table.addListener(events, listener);
     }
 
     /**
@@ -206,5 +220,15 @@ public class NetworkTablesUtils {
      */
     public void setArrayEntry(String key, String[] value) {
         this.table.getEntry(key).setStringArray(value);
+    }
+
+    /**
+     * Check if an entry exists in network tables
+     *
+     * @param key The key as it appears in network tables
+     * @return If the key exists
+     */
+    public boolean keyExists(String key) {
+        return this.table.getEntry(key).exists();
     }
 }
