@@ -1,8 +1,10 @@
+/* Black Knights Robotics (C) 2025 */
 package frc.robot.utils;
 
 public class ArmUtils {
     /**
      * converts encoder value to radians
+     *
      * @param encoder
      * @return encoder value in radians
      */

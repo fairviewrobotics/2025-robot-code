@@ -1,3 +1,4 @@
+/* Black Knights Robotics (C) 2025 */
 package frc.robot.constants;
 
 import edu.wpi.first.math.geometry.Translation2d;
@@ -19,11 +20,12 @@ public class DrivetrainConstants {
     // Distance between centers of right and left wheels on robot
     public static final double WHEEL_BASE = Units.inchesToMeters(26.5);
     // Distance between front and back wheels on robot
-    public static final SwerveDriveKinematics DRIVE_KINEMATICS = new SwerveDriveKinematics(
-            new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2),
-            new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2),
-            new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2),
-            new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2));
+    public static final SwerveDriveKinematics DRIVE_KINEMATICS =
+            new SwerveDriveKinematics(
+                    new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2),
+                    new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2),
+                    new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2),
+                    new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2));
 
     // Angular offsets of the modules relative to the chassis in radians
     public static final double FRONT_LEFT_CHASSIS_ANGULAR_OFFSET = -Math.PI / 2;
@@ -44,10 +46,7 @@ public class DrivetrainConstants {
 
     public static final boolean GYRO_REVERSED = false;
 
-
-
-
-    //MODULE CONSTANTS
+    // MODULE CONSTANTS
 
     // The MAXSwerve module can be configured with one of three pinion gears: 12T,
     // 13T, or 14T. This changes the drive speed of the module (a pinion gear with
@@ -57,17 +56,18 @@ public class DrivetrainConstants {
     public static final int FIRST_STAGE_SPUR_GEAR_TEETH = 22;
     public static final int BEVEL_PINION_TEETH = 15;
 
-
-
     public static final int DRIVING_MOTOR_FREE_SPEED = 6784;
 
     // Calculations required for driving motor conversion factors and feed forward
-    public static final double DRIVING_MOTOR_FREE_SPEED_RPS = (double) DRIVING_MOTOR_FREE_SPEED / 60;
+    public static final double DRIVING_MOTOR_FREE_SPEED_RPS =
+            (double) DRIVING_MOTOR_FREE_SPEED / 60;
     public static final double WHEEL_DIAMETER_METERS = 0.0762;
     public static final double WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
     // 45 teeth on the wheel's bevel gear, 22 teeth on the first-stage spur gear, 15
     // teeth on the bevel pinion
-    public static final double DRIVING_MOTOR_REDUCTION = (double) (BEVEL_GEAR_TEETH * FIRST_STAGE_SPUR_GEAR_TEETH) / (DRIVING_MOTOR_PINION_TEETH * BEVEL_PINION_TEETH);
-    public static final double DRIVE_WHEEL_FREE_SPEED_RPS = (DRIVING_MOTOR_FREE_SPEED_RPS * WHEEL_CIRCUMFERENCE_METERS)
-            / DRIVING_MOTOR_REDUCTION;
+    public static final double DRIVING_MOTOR_REDUCTION =
+            (double) (BEVEL_GEAR_TEETH * FIRST_STAGE_SPUR_GEAR_TEETH)
+                    / (DRIVING_MOTOR_PINION_TEETH * BEVEL_PINION_TEETH);
+    public static final double DRIVE_WHEEL_FREE_SPEED_RPS =
+            (DRIVING_MOTOR_FREE_SPEED_RPS * WHEEL_CIRCUMFERENCE_METERS) / DRIVING_MOTOR_REDUCTION;
 }

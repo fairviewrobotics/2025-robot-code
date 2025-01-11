@@ -1,15 +1,13 @@
+/* Black Knights Robotics (C) 2025 */
 package frc.robot.utils;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import java.util.Arrays;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class NetworkTableUtilsTest {
     private final NetworkTablesUtils utils;
@@ -25,10 +23,11 @@ public class NetworkTableUtilsTest {
         Mockito.when(entry.getBoolean(false)).thenReturn(true);
         Mockito.when(entry.getString("wrong")).thenReturn("right");
 
-        Mockito.when(entry.getDoubleArray(new double[]{0.0})).thenReturn(new double[]{1.0});
-        Mockito.when(entry.getIntegerArray(new long[]{0})).thenReturn(new long[]{1});
-        Mockito.when(entry.getStringArray(new String[]{"wrong"})).thenReturn(new String[]{"right"});
-        Mockito.when(entry.getBooleanArray(new boolean[]{false})).thenReturn(new boolean[]{true});
+        Mockito.when(entry.getDoubleArray(new double[] {0.0})).thenReturn(new double[] {1.0});
+        Mockito.when(entry.getIntegerArray(new long[] {0})).thenReturn(new long[] {1});
+        Mockito.when(entry.getStringArray(new String[] {"wrong"}))
+                .thenReturn(new String[] {"right"});
+        Mockito.when(entry.getBooleanArray(new boolean[] {false})).thenReturn(new boolean[] {true});
 
         this.utils = NetworkTablesUtils.getTable(table);
     }
@@ -59,25 +58,25 @@ public class NetworkTableUtilsTest {
 
     @Test
     public void testGetArrayEntryDouble() {
-        double[] res = this.utils.getArrayEntry("test", new double[]{0.0});
+        double[] res = this.utils.getArrayEntry("test", new double[] {0.0});
         assertEquals(1.0, res[0]);
     }
 
     @Test
     public void testGetArrayEntryInteger() {
-        long[] res = this.utils.getArrayEntry("test", new long[]{0});
+        long[] res = this.utils.getArrayEntry("test", new long[] {0});
         assertEquals(1L, res[0]);
     }
 
     @Test
     public void testGetEntryArrayBoolean() {
-        boolean[] res = this.utils.getArrayEntry("test", new boolean[]{false});
+        boolean[] res = this.utils.getArrayEntry("test", new boolean[] {false});
         assertTrue(res[0]);
     }
 
     @Test
     public void testGetArrayEntryString() {
-        String[] res = this.utils.getArrayEntry("test", new String[]{"wrong"});
+        String[] res = this.utils.getArrayEntry("test", new String[] {"wrong"});
         assertTrue("right".equalsIgnoreCase(res[0]));
     }
 }

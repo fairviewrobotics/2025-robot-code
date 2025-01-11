@@ -1,15 +1,15 @@
+/* Black Knights Robotics (C) 2025 */
 package frc.robot.utils;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
-import java.util.Arrays;
-import java.util.Optional;
-
 public class NetworkTablesUtils {
     private final NetworkTable table;
+
     /**
      * Construct a NetworkTablesUtils
+     *
      * @param tableName The name of the table as it appears in network tables
      */
     private NetworkTablesUtils(String tableName) {
@@ -22,6 +22,7 @@ public class NetworkTablesUtils {
 
     /**
      * Get a table from NetworkTables
+     *
      * @param tableName The table name as it appears in Network Tables
      * @return An instance of {@link NetworkTablesUtils} for the specified table
      */
@@ -31,6 +32,7 @@ public class NetworkTablesUtils {
 
     /**
      * Get a table from network tables
+     *
      * @param table A {@link NetworkTable}
      * @return An instance of {@link NetworkTablesUtils}
      */
@@ -40,6 +42,7 @@ public class NetworkTablesUtils {
 
     /**
      * Get a double entry from network tables
+     *
      * @param key The key as it appears in network table
      * @param defaultValue Default value in case the key is invalid
      * @return Either the default value or the corresponding value in network tables
@@ -50,6 +53,7 @@ public class NetworkTablesUtils {
 
     /**
      * Get a long entry from network tables
+     *
      * @param key The key as it appears in network table
      * @param defaultValue Default value in case the key is invalid
      * @return Either the default value or the corresponding value in network tables
@@ -60,6 +64,7 @@ public class NetworkTablesUtils {
 
     /**
      * Get a boolean entry from network tables
+     *
      * @param key The key as it appears in network table
      * @param defaultValue Default value in case the key is invalid
      * @return Either the default value or the corresponding value in network tables
@@ -70,6 +75,7 @@ public class NetworkTablesUtils {
 
     /**
      * Get a String entry from network tables
+     *
      * @param key The key as it appears in network table
      * @param defaultValue Default value in case the key is invalid
      * @return Either the default value or the corresponding value in network tables
@@ -80,6 +86,7 @@ public class NetworkTablesUtils {
 
     /**
      * Get a double array entry from network tables
+     *
      * @param key The key as it appears in network table
      * @param defaultValues Default values in case the key is invalid
      * @return Either the default value or the corresponding value in network tables
@@ -90,6 +97,7 @@ public class NetworkTablesUtils {
 
     /**
      * Get a long array entry from network tables
+     *
      * @param key The key as it appears in network table
      * @param defaultValues Default values in case the key is invalid
      * @return Either the default value or the corresponding value in network tables
@@ -100,6 +108,7 @@ public class NetworkTablesUtils {
 
     /**
      * Get a boolean array entry from network tables
+     *
      * @param key The key as it appears in network table
      * @param defaultValues Default values in case the key is invalid
      * @return Either the default value or the corresponding value in network tables
@@ -110,6 +119,7 @@ public class NetworkTablesUtils {
 
     /**
      * Get a String array entry from network tables
+     *
      * @param key The key as it appears in network table
      * @param defaultValues Default values in case the key is invalid
      * @return Either the default value or the corresponding value in network tables
@@ -120,6 +130,7 @@ public class NetworkTablesUtils {
 
     /**
      * Set a double entry in network tables
+     *
      * @param key The key for the value
      * @param value The value that will be set
      */
@@ -129,6 +140,7 @@ public class NetworkTablesUtils {
 
     /**
      * Set a long entry in network tables
+     *
      * @param key The key for the value
      * @param value The value that will be set
      */
@@ -138,6 +150,7 @@ public class NetworkTablesUtils {
 
     /**
      * Set a boolean entry in network tables
+     *
      * @param key The key for the value
      * @param value The value that will be set
      */
@@ -147,6 +160,7 @@ public class NetworkTablesUtils {
 
     /**
      * Set a String entry in network tables
+     *
      * @param key The key for the value
      * @param value The value that will be set
      */
@@ -156,6 +170,7 @@ public class NetworkTablesUtils {
 
     /**
      * Set a double array entry in network tables
+     *
      * @param key The key for the value
      * @param value The value that will be set
      */
@@ -165,6 +180,7 @@ public class NetworkTablesUtils {
 
     /**
      * Set a long array entry in network tables
+     *
      * @param key The key for the value
      * @param value The value that will be set
      */
@@ -174,6 +190,7 @@ public class NetworkTablesUtils {
 
     /**
      * Set a boolean array entry in network tables
+     *
      * @param key The key for the value
      * @param value The value that will be set
      */
@@ -183,6 +200,7 @@ public class NetworkTablesUtils {
 
     /**
      * Set a String array entry in network tables
+     *
      * @param key The key for the value
      * @param value The value that will be set
      */
