@@ -7,9 +7,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -19,22 +17,12 @@ import edu.wpi.first.networktables.DoubleArrayEntry;
 import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.WPIUtilJNI;
-import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.DrivetrainConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.controllers.MAXSwerveModule;
 import com.studica.frc.AHRS;
 import frc.robot.utils.NetworkTableUtils;
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import frc.robot.utils.SwerveUtils;
-import frc.robot.utils.VisionUtils;
-import org.photonvision.EstimatedRobotPose;
-import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonPoseEstimator;
-
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.Optional;
 
 public class SwerveSubsystem extends SubsystemBase {
     // Create MAXSwerveModules
@@ -96,11 +84,6 @@ public class SwerveSubsystem extends SubsystemBase {
     public SwerveSubsystem() {
         // Usage reporting for MAXSwerve template
         HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
-        try {
-            aprilTagFieldLayout = new AprilTagFieldLayout(Paths.get("/home/lvuser/deploy/apriltag_layout.json"));
-        } catch (IOException e) {
-            System.out.println("Failed to load AprilTag Field Layout: " + e.getMessage());
-        }
     }
 
     // Network Tables Telemetry
@@ -133,15 +116,6 @@ public class SwerveSubsystem extends SubsystemBase {
 
 
 
-    //Vision
-    private final PhotonCamera cam = VisionUtils.getPhotonAprilCamera();
-
-    AprilTagFieldLayout aprilTagFieldLayout; //TODO: Load from official field layout
-    Transform3d robotToCam = VisionUtils.getPhotonAprilRobotToCamera();
-    PhotonPoseEstimator photonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCam);
-
-
-
     @Override
     public void periodic() {
         NTUtils.setDouble("Gyro Angle", gyro.getAngle());
@@ -155,32 +129,6 @@ public class SwerveSubsystem extends SubsystemBase {
                         rearLeft.getPosition(),
                         rearRight.getPosition()
                 });
-
-        Optional<EstimatedRobotPose> estimatedRobotPose = VisionUtils.getEstimatedGlobalPose(photonPoseEstimator, poseEstimator.getEstimatedPosition());
-
-        // Add vision measurement to odometry
-        Optional<Pose3d> visionMeasurement = VisionUtils.getBotPoseFieldSpace();
-
-        if ((visionMeasurement.isPresent() && VisionUtils.getDistanceFromTagLimelight() < 3) || estimatedRobotPose.isPresent()) {
-            visionMeasurement.ifPresent(robotPose -> {
-                if (VisionUtils.getDistanceFromTagLimelight() > 3) return;
-                poseEstimator.addVisionMeasurement(
-                        robotPose.toPose2d(),
-                        Timer.getFPGATimestamp() - (VisionUtils.getLatencyPipeline()/1000.0) - (VisionUtils.getLatencyCapture()/1000.0)
-                );
-            });
-
-            estimatedRobotPose.ifPresent(robotPose -> {
-
-                if (cam.getCameraTable().getEntry("targetPose").getDoubleArray(new double[]{})[0] - 0.4 > 4 ) return;
-
-                poseEstimator.addVisionMeasurement(
-                        robotPose.estimatedPose.toPose2d(),
-                        robotPose.timestampSeconds
-                );
-            });
-
-        }
 
         frontrightpos.set(frontRight.getPosition().angle.getRadians());
         frontleftpos.set(frontLeft.getPosition().angle.getRadians());
