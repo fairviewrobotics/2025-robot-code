@@ -6,6 +6,9 @@ import edu.wpi.first.wpilibj.Filesystem;
 import java.io.*;
 import java.nio.file.Path;
 import java.util.EnumSet;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -19,6 +22,8 @@ public class ConfigManager {
     private JSONObject json;
 
     private NetworkTablesUtils NTTune = NetworkTablesUtils.getTable("Tune");
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * Get the instance of the config manager
@@ -38,12 +43,12 @@ public class ConfigManager {
     public ConfigManager() {
         try {
             if (configFile.createNewFile() || configFile.length() == 0) {
-                System.out.println("[INFO] Created tuning file");
+                LOGGER.info("Created config file");
                 this.json = this.getDefault();
                 this.saveConfig();
             }
         } catch (IOException e) {
-            System.out.println("[WARN] Failed to create config file: " + e);
+            LOGGER.warn("Failed to create config file", e);
         }
 
         this.json = parseConfig();
@@ -57,11 +62,7 @@ public class ConfigManager {
                 (EnumSet.of(NetworkTableEvent.Kind.kValueAll)),
                 (table, key1, event) -> {
                     this.json.put(key1, table.getValue(key1).getValue());
-                    System.out.println(
-                            "[DEBUG] Updated ["
-                                    + key1
-                                    + "] to "
-                                    + table.getEntry(key1).getDouble(-1));
+                    LOGGER.debug("Updated [{}] to `{}`", key1, table.getEntry(key1).getDouble(-1));
                     this.saveConfig();
                 });
     }
@@ -97,7 +98,7 @@ public class ConfigManager {
     }
 
     /**
-     * Get a integer value from the config
+     * Get an integer value from the config
      *
      * @param key The key in the json
      * @param defaultValue A default value in case we fail to get the key
@@ -105,12 +106,7 @@ public class ConfigManager {
      */
     public long get(String key, long defaultValue) {
         if (!NTTune.keyExists(key)) {
-            System.out.println(
-                    "[INFO] "
-                            + key
-                            + " does not exist in network tables, creating a setting to "
-                            + defaultValue);
-
+            LOGGER.info("{} does not exist in network tables, creating a setting to {}", key, defaultValue);
             NTTune.setEntry(key, defaultValue);
         }
         return getInteger(key, defaultValue);
@@ -125,12 +121,7 @@ public class ConfigManager {
      */
     public double get(String key, double defaultValue) {
         if (!NTTune.keyExists(key)) {
-            System.out.println(
-                    "[INFO] "
-                            + key
-                            + " does not exist in network tables, creating a setting to "
-                            + defaultValue);
-
+            LOGGER.info("{} does not exist in network tables, creating a setting to {}", key, defaultValue);
             NTTune.setEntry(key, defaultValue);
         }
         return getDouble(key, defaultValue);
@@ -145,12 +136,7 @@ public class ConfigManager {
      */
     public String get(String key, String defaultValue) {
         if (!NTTune.keyExists(key)) {
-            System.out.println(
-                    "[INFO] "
-                            + key
-                            + " does not exist in network tables, creating a setting to "
-                            + defaultValue);
-
+            LOGGER.info("{} does not exist in network tables, creating a setting to {}", key, defaultValue);
             NTTune.setEntry(key, defaultValue);
         }
         return getString(key, defaultValue);
@@ -165,12 +151,7 @@ public class ConfigManager {
      */
     public boolean get(String key, boolean defaultValue) {
         if (!NTTune.keyExists(key)) {
-            System.out.println(
-                    "[INFO] "
-                            + key
-                            + " does not exist in network tables, creating a setting to "
-                            + defaultValue);
-
+            LOGGER.info("{} does not exist in network tables, creating a setting to {}", key, defaultValue);
             NTTune.setEntry(key, defaultValue);
         }
         return getBoolean(key, defaultValue);
@@ -188,7 +169,7 @@ public class ConfigManager {
         try {
             res = (double) this.json.get(key);
         } catch (ClassCastException e) {
-            System.out.println("[WARN] Failed to get " + key + " as a double");
+            LOGGER.warn("Failed to get {} as a double", key, e);
         }
 
         return res;
@@ -206,7 +187,7 @@ public class ConfigManager {
         try {
             res = (long) this.json.get(key);
         } catch (ClassCastException e) {
-            System.out.println("[WARN] Failed to get " + key + " as a long");
+            LOGGER.warn("Failed to get {} as a long", key, e);
         }
 
         return res;
@@ -224,7 +205,7 @@ public class ConfigManager {
         try {
             res = (boolean) this.json.get(key);
         } catch (ClassCastException e) {
-            System.out.println("[WARN] Failed to get " + key + " as a boolean");
+            LOGGER.warn("Failed to get {} as a boolean", key, e);
         }
 
         return res;
@@ -242,7 +223,7 @@ public class ConfigManager {
         try {
             res = (String) this.json.get(key);
         } catch (ClassCastException e) {
-            System.out.println("[WARN] Failed to get " + key + " as a string");
+            LOGGER.warn("Failed to get {} as a string", key, e);
         }
 
         return res;
@@ -265,7 +246,7 @@ public class ConfigManager {
         try (PrintWriter printWriter = new PrintWriter(this.configFile)) {
             printWriter.println(this.json.toJSONString());
         } catch (FileNotFoundException e) {
-            System.out.println("[WARN] Failed to save file: " + configFile + ": " + e);
+            LOGGER.warn("Failed to save file: {}", configFile, e);
         }
     }
 
@@ -281,7 +262,7 @@ public class ConfigManager {
             Object obj = parser.parse(new FileReader(this.configFile));
             jObj = (JSONObject) obj;
         } catch (IOException | ParseException e) {
-            System.out.println("[ERROR] An error occurred: " + e);
+            LOGGER.error("An error occurred while parsing the config file", e);
         }
         return jObj;
     }

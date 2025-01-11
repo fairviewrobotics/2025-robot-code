@@ -36,16 +36,13 @@ public class RobotContainer {
                         swerveSubsystem,
                         () ->
                                 primaryController.getLeftY()
-                                        * DrivetrainConstants.MAX_SPEED_METERS_PER_SECOND
-                                        / 1.0,
+                                        * DrivetrainConstants.MAX_SPEED_METERS_PER_SECOND,
                         () ->
                                 primaryController.getLeftX()
-                                        * DrivetrainConstants.MAX_SPEED_METERS_PER_SECOND
-                                        / 1.0,
+                                        * DrivetrainConstants.MAX_SPEED_METERS_PER_SECOND,
                         () ->
                                 primaryController.getRightX()
-                                        * DrivetrainConstants.MAX_ANGULAR_SPEED
-                                        / 1.0,
+                                        * DrivetrainConstants.MAX_ANGULAR_SPEED,
                         true,
                         true));
     }

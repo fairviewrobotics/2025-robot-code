@@ -11,10 +11,15 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.DrivetrainConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.utils.Camera;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.ArrayList;
 
 public class OdometrySubsystem extends SubsystemBase {
     private final ArrayList<Camera> cameras;
+
+    private final static Logger LOGGER = LogManager.getLogger();
 
     private SwerveDrivePoseEstimator3d poseEstimator =
             new SwerveDrivePoseEstimator3d(
@@ -61,7 +66,7 @@ public class OdometrySubsystem extends SubsystemBase {
     public void addWheelOdometry(
             Rotation3d gyroRotation, SwerveModulePosition[] swerveModulePositions) {
         if (swerveModulePositions.length != 4) {
-            System.out.println("Error: Wrong length for module positions");
+            LOGGER.error("Wrong length for module positions");
             return;
         }
 
@@ -72,7 +77,8 @@ public class OdometrySubsystem extends SubsystemBase {
     public void periodic() {
         for (Camera c : this.cameras) {
             if (c.getPoseFieldSpace(this.getRobotPose()).isPresent()) {
-                if (c.getDistanceFromTag() > 3) return; // TODO: Tune
+                if (c.getDistanceFromTag() > 3) return;
+                LOGGER.debug("Added vision measurement from `{}`", c.getName());
                 this.poseEstimator.addVisionMeasurement(
                         c.getPoseFieldSpace(this.getRobotPose()).get(), c.getTimestamp());
             }

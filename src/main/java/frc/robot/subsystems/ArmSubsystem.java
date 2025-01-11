@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.ArmConstants;
 import frc.robot.utils.ArmUtils;
+import frc.robot.utils.ConfigManager;
 
 public class ArmSubsystem extends SubsystemBase {
     private final SparkFlex pivotMotor =
@@ -55,7 +56,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     public ArmSubsystem() {
 
-        pivotPID.setTolerance(ArmConstants.PIVOT_TOLERANCE);
+        pivotPID.setTolerance(ConfigManager.getInstance().get("arm_tolerance", ArmConstants.PIVOT_TOLERANCE));
 
         leftMotor.setInverted(false);
         rightMotor.setInverted(true);
