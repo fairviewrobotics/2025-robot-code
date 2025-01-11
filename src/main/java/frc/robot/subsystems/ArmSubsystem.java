@@ -31,18 +31,11 @@ public class ArmSubsystem extends SubsystemBase {
             ArmConstants.PIVOT_KA
     );
 
-    private final ProfiledPIDController handPID = new ProfiledPIDController(
-            ArmConstants.HAND_P,
-            ArmConstants.HAND_I,
-            ArmConstants.HAND_D,
-            ArmConstants.HAND_CONSTRAINTS
-    );
-
     /**
      * sets hand motor speed
      * @param speed
      */
-    private void setSpeed(double speed) {
+    private void setHandSpeed(double speed) {
         leftMotor.set(speed);
         rightMotor.set(speed);
     }
