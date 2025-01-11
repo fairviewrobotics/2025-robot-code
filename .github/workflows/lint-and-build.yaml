@@ -7,6 +7,13 @@ jobs:
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
+
+      - name: Setup JDK 21
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'jetbrains' 
+          java-version: '21'
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
@@ -22,5 +29,6 @@ jobs:
 
       - name: Spotless linting
         run: ./gradlew spotlessCheck
+
       - name: Gradle building
         run: ./gradlew build
