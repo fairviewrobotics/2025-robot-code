@@ -8,6 +8,7 @@ import frc.robot.commands.*;
 import frc.robot.constants.*;
 import frc.robot.subsystems.*;
 import frc.robot.utils.Controller;
+import frc.robot.utils.NetworkTablesUtils;
 
 public class RobotContainer {
     // Subsystems
@@ -17,7 +18,7 @@ public class RobotContainer {
     Controller primaryController = new Controller(0);
     Controller secondaryController = new Controller(1);
 
-    private final NetworkTableUtils NTTune = new NetworkTableUtils("Tune");
+    private final NetworkTablesUtils NTTune = NetworkTablesUtils.getTable("debug");
 
     // Auto Chooser
     SendableChooser<Command> superSecretMissileTech = new SendableChooser<>();
