@@ -35,7 +35,7 @@ public class ArmSubsystem extends SubsystemBase {
      * sets hand motor speed
      * @param speed
      */
-    private void setHandSpeed(double speed) {
+    public void setHandSpeed(double speed) {
         leftMotor.set(speed);
         rightMotor.set(speed);
     }
@@ -60,7 +60,7 @@ public class ArmSubsystem extends SubsystemBase {
      * sets pivot motor speed
      * @param speed
      */
-    private void setPivotSpeed(double speed) {
+    public void setPivotSpeed(double speed) {
         pivotMotor.set(speed);
     }
 
