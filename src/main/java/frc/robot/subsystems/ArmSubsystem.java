@@ -7,6 +7,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.ArmConstants;
@@ -16,6 +17,7 @@ public class ArmSubsystem extends SubsystemBase {
     private final SparkFlex pivotMotor = new SparkFlex(ArmConstants.PIVOT_MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
     private final WPI_TalonSRX leftMotor = new WPI_TalonSRX(ArmConstants.LEFT_MOTOR_ID);
     private final WPI_TalonSRX rightMotor = new WPI_TalonSRX(ArmConstants.RIGHT_MOTOR_ID);
+    private final DigitalInput gamePieceLineBreak = new DigitalInput(ArmConstants.HAND_LINEBREAK_ID);
 
     private final ProfiledPIDController pivotPID = new ProfiledPIDController(
             ArmConstants.PIVOT_P,
@@ -62,6 +64,14 @@ public class ArmSubsystem extends SubsystemBase {
      */
     public void setPivotSpeed(double speed) {
         pivotMotor.set(speed);
+    }
+
+    /**
+     * Checks if the hand has a game piece
+     * @return returns if the hand has a game piece
+     */
+    public boolean hasGamePiece() {
+        return !gamePieceLineBreak.get();
     }
 
     /**
