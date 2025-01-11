@@ -1,3 +1,4 @@
+/* Black Knights Robotics (C) 2025 */
 package frc.robot.constants;
 
 public class VisionConstants {

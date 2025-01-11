@@ -10,7 +10,7 @@ java {
 }
 
 repositories {
-    mavenCentral()
+	mavenCentral()
 }
 
 
@@ -57,7 +57,7 @@ def includeDesktopSupport = false
 
 
 configurations {
-    mockitoAgent
+	mockitoAgent
 }
 // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
 // Also defines JUnit 5.
@@ -81,20 +81,20 @@ dependencies {
 	simulationRelease wpi.sim.enableRelease()
 
 	testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
-  testImplementation 'org.mockito:mockito-core:5.15.2'
-  testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-   
-   mockitoAgent(libs.mockito) {
-      transitive = false
-  }
+testImplementation 'org.mockito:mockito-core:5.15.2'
+testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+mockitoAgent(libs.mockito) {
+	transitive = false
+}
 }
 
 test {
 	useJUnitPlatform()
 	systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
-   
-  jvmArgs += "-javaagent:${configurations.mockitoAgent.asPath}"
-  
+
+jvmArgs += "-javaagent:${configurations.mockitoAgent.asPath}"
+
 }
 
 // Simulation configuration (e.g. environment variables).

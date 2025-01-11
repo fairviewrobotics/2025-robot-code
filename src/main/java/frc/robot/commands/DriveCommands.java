@@ -1,9 +1,9 @@
+/* Black Knights Robotics (C) 2025 */
 package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.SwerveSubsystem;
-
 import java.util.function.DoubleSupplier;
 
 public class DriveCommands extends Command {
@@ -15,6 +15,7 @@ public class DriveCommands extends Command {
 
     /**
      * This class contains all the drive commands for swerve
+     *
      * @param swerveSubsystem SwerveSubsystem instance for controlling the swerve drive
      * @param forward The target forward meters/second
      * @param sideways The target sideways meters/second
@@ -22,7 +23,13 @@ public class DriveCommands extends Command {
      * @param fieldRelative If the swerve should be relative to the robot or the field
      * @param limited If we are limiting the motors
      */
-    public DriveCommands(SwerveSubsystem swerveSubsystem, DoubleSupplier forward, DoubleSupplier sideways, DoubleSupplier radians, boolean fieldRelative, boolean limited) {
+    public DriveCommands(
+            SwerveSubsystem swerveSubsystem,
+            DoubleSupplier forward,
+            DoubleSupplier sideways,
+            DoubleSupplier radians,
+            boolean fieldRelative,
+            boolean limited) {
         this.swerveSubsystem = swerveSubsystem;
         this.forward = forward;
         this.sideways = sideways;
@@ -38,14 +45,12 @@ public class DriveCommands extends Command {
         double sidewaysDesired = MathUtil.applyDeadband(sideways.getAsDouble(), 0.06);
         double radiansDesired = MathUtil.applyDeadband(radians.getAsDouble(), 0.06);
 
-        swerveSubsystem.drive(forwardDesired, sidewaysDesired, radiansDesired, fieldRelativeFromButton, true);
+        swerveSubsystem.drive(
+                forwardDesired, sidewaysDesired, radiansDesired, fieldRelativeFromButton, true);
     }
 
     @Override
     public void end(boolean interrupted) {
         swerveSubsystem.drive(0.0, 0.0, 0.0, true, true);
     }
-
-
-
 }

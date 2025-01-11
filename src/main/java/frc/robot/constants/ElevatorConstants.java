@@ -1,3 +1,4 @@
+/* Black Knights Robotics (C) 2025 */
 package frc.robot.constants;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -17,7 +18,8 @@ public class ElevatorConstants {
     public static final double ELEVATOR_KG = 0;
     public static final double ELEVATOR_KA = 0;
 
-    public static final TrapezoidProfile.Constraints CONSTRAINTS = new TrapezoidProfile.Constraints(1, 0.5);
+    public static final TrapezoidProfile.Constraints CONSTRAINTS =
+            new TrapezoidProfile.Constraints(1, 0.5);
 
     public static final int TOP_LINEBREAK_ID = 0;
     public static final int BOTTOM_LINEBREAK_ID = 0;
