@@ -40,9 +40,7 @@ public class RobotContainer {
                         () ->
                                 primaryController.getLeftX()
                                         * DrivetrainConstants.MAX_SPEED_METERS_PER_SECOND,
-                        () ->
-                                primaryController.getRightX()
-                                        * DrivetrainConstants.MAX_ANGULAR_SPEED,
+                        () -> primaryController.getRightX() * DrivetrainConstants.MAX_ANGULAR_SPEED,
                         true,
                         true));
     }

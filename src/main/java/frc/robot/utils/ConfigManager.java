@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj.Filesystem;
 import java.io.*;
 import java.nio.file.Path;
 import java.util.EnumSet;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONObject;
@@ -106,7 +105,10 @@ public class ConfigManager {
      */
     public long get(String key, long defaultValue) {
         if (!NTTune.keyExists(key)) {
-            LOGGER.info("{} does not exist in network tables, creating a setting to {}", key, defaultValue);
+            LOGGER.info(
+                    "{} does not exist in network tables, creating a setting to {}",
+                    key,
+                    defaultValue);
             NTTune.setEntry(key, defaultValue);
         }
         return getInteger(key, defaultValue);
@@ -121,7 +123,10 @@ public class ConfigManager {
      */
     public double get(String key, double defaultValue) {
         if (!NTTune.keyExists(key)) {
-            LOGGER.info("{} does not exist in network tables, creating a setting to {}", key, defaultValue);
+            LOGGER.info(
+                    "{} does not exist in network tables, creating a setting to {}",
+                    key,
+                    defaultValue);
             NTTune.setEntry(key, defaultValue);
         }
         return getDouble(key, defaultValue);
@@ -136,7 +141,10 @@ public class ConfigManager {
      */
     public String get(String key, String defaultValue) {
         if (!NTTune.keyExists(key)) {
-            LOGGER.info("{} does not exist in network tables, creating a setting to {}", key, defaultValue);
+            LOGGER.info(
+                    "{} does not exist in network tables, creating a setting to {}",
+                    key,
+                    defaultValue);
             NTTune.setEntry(key, defaultValue);
         }
         return getString(key, defaultValue);
@@ -151,7 +159,10 @@ public class ConfigManager {
      */
     public boolean get(String key, boolean defaultValue) {
         if (!NTTune.keyExists(key)) {
-            LOGGER.info("{} does not exist in network tables, creating a setting to {}", key, defaultValue);
+            LOGGER.info(
+                    "{} does not exist in network tables, creating a setting to {}",
+                    key,
+                    defaultValue);
             NTTune.setEntry(key, defaultValue);
         }
         return getBoolean(key, defaultValue);

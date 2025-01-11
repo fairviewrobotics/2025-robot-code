@@ -11,6 +11,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.ElevatorConstants;
+import frc.robot.utils.ConfigManager;
 
 public class ElevatorSubsystem extends SubsystemBase {
 
@@ -48,14 +49,14 @@ public class ElevatorSubsystem extends SubsystemBase {
                     ElevatorConstants.ELEVATOR_KV,
                     ElevatorConstants.ELEVATOR_KA);
 
-    /**
-     * Subsystem for the elevator
-     */
+    /** Subsystem for the elevator */
     public ElevatorSubsystem() {
         SparkFlexConfig rightElevatorMotorConfig = new SparkFlexConfig();
         SparkFlexConfig leftElevatorMotorConfig = new SparkFlexConfig();
 
-        elevatorPID.setTolerance(ElevatorConstants.ELEVATOR_TOLERANCE);
+        elevatorPID.setTolerance(
+                ConfigManager.getInstance()
+                        .get("elevator_pid_tolerance", ElevatorConstants.ELEVATOR_TOLERANCE));
 
         rightElevatorMotorConfig.inverted(true);
 
@@ -102,9 +103,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         elevatorPID.setGoal(position);
     }
 
-    /**
-     * Reset elevator PID
-     */
+    /** Reset elevator PID */
     public void resetPID() {
         elevatorPID.reset(getElevatorPosition());
     }
@@ -145,13 +144,18 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         if (!elevatorZeroed) {
             if ((leftElevatorMotor.getOutputCurrent() + rightElevatorMotor.getOutputCurrent()) / 2
-                    > ElevatorConstants.CURRENT_MAX) {
+                    > ConfigManager.getInstance()
+                            .get("elevator_current_max", ElevatorConstants.CURRENT_MAX)) {
                 elevatorZeroed = true;
                 leftEncoder.setPosition(ElevatorConstants.HARD_STOP_LEVEL);
                 rightEncoder.setPosition(ElevatorConstants.HARD_STOP_LEVEL);
                 setVoltage(0);
             } else {
-                setVoltage(ElevatorConstants.ELEVATOR_ZEROING_VOLTAGE);
+                setVoltage(
+                        ConfigManager.getInstance()
+                                .get(
+                                        "elevator_zeroing_voltage",
+                                        ElevatorConstants.ELEVATOR_ZEROING_VOLTAGE));
             }
         }
         if (bottomLineBreak.get()) {
