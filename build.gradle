@@ -93,8 +93,7 @@ test {
 	useJUnitPlatform()
 	systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
 
-jvmArgs += "-javaagent:${configurations.mockitoAgent.asPath}"
-
+	jvmArgs += "-javaagent:${configurations.mockitoAgent.asPath}"
 }
 
 // Simulation configuration (e.g. environment variables).
