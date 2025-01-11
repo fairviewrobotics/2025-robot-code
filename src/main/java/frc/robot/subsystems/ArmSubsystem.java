@@ -38,11 +38,19 @@ public class ArmSubsystem extends SubsystemBase {
             ArmConstants.HAND_CONSTRAINTS
     );
 
+    /**
+     * sets hand motor speed
+     * @param speed
+     */
     private void setSpeed(double speed) {
         leftMotor.set(speed);
         rightMotor.set(speed);
     }
 
+    /**
+     * Checks if the arm is at set angle
+     * @return if the arm is at set angle
+     */
     public boolean atTargetAngle() {
         return this.pivotPID.atSetpoint();
     }
@@ -55,18 +63,30 @@ public class ArmSubsystem extends SubsystemBase {
         rightMotor.setInverted(true);
     }
 
-    private void runPivotVolts(double volts) {
-        pivotMotor.set(volts);
+    /**
+     * sets pivot motor speed
+     * @param speed
+     */
+    private void setPivotSpeed(double speed) {
+        pivotMotor.set(speed);
     }
 
+    /**
+     * moves arm to a set angle
+     * @param angle
+     */
     public void setPivotAngle(double angle) {
         angle = MathUtil.clamp(angle, ArmConstants.PIVOT_MIN_ANGLE, ArmConstants.PIVOT_MAX_ANGLE);
         double pidValue = pivotPID.calculate(getPivotAngle(), angle);
         double ffValue = pivotFF.calculate(angle, 0);
 
-        pivotMotor.setVoltage(pidValue + ffValue);
+        setPivotSpeed(pidValue + ffValue);
     }
 
+    /**
+     * Get the angle of the arm motor
+     * @return arm angle
+     */
     public double getPivotAngle() {
         return ArmUtils.encoderToRad(pivotMotor.getEncoder().getPosition());
     }
