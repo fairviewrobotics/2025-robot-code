@@ -124,7 +124,7 @@ tasks.withType(JavaCompile) {
 // Spotless linter
 spotless {
 	format 'misc', {
-		target '*.gradle', '.gitignore'
+		target '*.gradle', '.gitignore', '*.json'
 
 		trimTrailingWhitespace()
 		leadingSpacesToTabs()

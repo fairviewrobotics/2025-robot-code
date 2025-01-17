@@ -14,13 +14,18 @@ import frc.robot.utils.Camera;
 import java.util.ArrayList;
 
 public class OdometrySubsystem extends SubsystemBase {
-    private final ArrayList<Camera> cameras;
+    private ArrayList<Camera> cameras = new ArrayList<>();
 
     private SwerveDrivePoseEstimator3d poseEstimator =
             new SwerveDrivePoseEstimator3d(
                     DrivetrainConstants.DRIVE_KINEMATICS,
                     new Rotation3d(),
-                    new SwerveModulePosition[4],
+                    new SwerveModulePosition[] {
+                        new SwerveModulePosition(),
+                        new SwerveModulePosition(),
+                        new SwerveModulePosition(),
+                        new SwerveModulePosition()
+                    },
                     new Pose3d(),
                     new Matrix<>(
                             Nat.N4(),
@@ -28,7 +33,8 @@ public class OdometrySubsystem extends SubsystemBase {
                             new double[] {
                                 VisionConstants.WHEEL_TRUST,
                                 VisionConstants.WHEEL_TRUST,
-                                Math.toRadians(5)
+                                Math.toRadians(5),
+                                1
                             }),
                     new Matrix<>(
                             Nat.N4(),
@@ -36,11 +42,14 @@ public class OdometrySubsystem extends SubsystemBase {
                             new double[] {
                                 VisionConstants.VISION_TRUST,
                                 VisionConstants.VISION_TRUST,
-                                Math.toRadians(5)
+                                Math.toRadians(5),
+                                1
                             }));
 
-    public OdometrySubsystem(ArrayList<Camera> cameras) {
-        this.cameras = cameras;
+    public OdometrySubsystem() {}
+
+    public void addCamera(Camera camera) {
+        this.cameras.add(camera);
     }
 
     /**
@@ -49,7 +58,7 @@ public class OdometrySubsystem extends SubsystemBase {
      * @return A {@link Pose3d} of the robot
      */
     public Pose3d getRobotPose() {
-        return poseEstimator.getEstimatedPosition();
+        return this.poseEstimator.getEstimatedPosition();
     }
 
     /**
