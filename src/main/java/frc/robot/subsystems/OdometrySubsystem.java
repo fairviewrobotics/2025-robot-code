@@ -11,12 +11,17 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.DrivetrainConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.utils.Camera;
+import frc.robot.utils.ConfigManager;
 import java.util.ArrayList;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class OdometrySubsystem extends SubsystemBase {
     private final ArrayList<Camera> cameras;
 
-    private SwerveDrivePoseEstimator3d poseEstimator =
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    private final SwerveDrivePoseEstimator3d poseEstimator =
             new SwerveDrivePoseEstimator3d(
                     DrivetrainConstants.DRIVE_KINEMATICS,
                     new Rotation3d(),
@@ -26,17 +31,23 @@ public class OdometrySubsystem extends SubsystemBase {
                             Nat.N4(),
                             Nat.N1(),
                             new double[] {
-                                VisionConstants.WHEEL_TRUST,
-                                VisionConstants.WHEEL_TRUST,
-                                Math.toRadians(5)
+                                ConfigManager.getInstance()
+                                        .get("odom_wheel_trust", VisionConstants.WHEEL_TRUST),
+                                ConfigManager.getInstance()
+                                        .get("odom_wheel_trust", VisionConstants.WHEEL_TRUST),
+                                ConfigManager.getInstance()
+                                        .get("odom_wheel_trust_theta", Math.toRadians(5))
                             }),
                     new Matrix<>(
                             Nat.N4(),
                             Nat.N1(),
                             new double[] {
-                                VisionConstants.VISION_TRUST,
-                                VisionConstants.VISION_TRUST,
-                                Math.toRadians(5)
+                                ConfigManager.getInstance()
+                                        .get("odom_vision_trust", VisionConstants.VISION_TRUST),
+                                ConfigManager.getInstance()
+                                        .get("odom_vision_trust", VisionConstants.VISION_TRUST),
+                                ConfigManager.getInstance()
+                                        .get("odom_vision_trust_theta", Math.toRadians(5))
                             }));
 
     public OdometrySubsystem(ArrayList<Camera> cameras) {
@@ -61,7 +72,7 @@ public class OdometrySubsystem extends SubsystemBase {
     public void addWheelOdometry(
             Rotation3d gyroRotation, SwerveModulePosition[] swerveModulePositions) {
         if (swerveModulePositions.length != 4) {
-            System.out.println("Error: Wrong length for module positions");
+            LOGGER.error("Wrong length for module positions");
             return;
         }
 
@@ -72,7 +83,9 @@ public class OdometrySubsystem extends SubsystemBase {
     public void periodic() {
         for (Camera c : this.cameras) {
             if (c.getPoseFieldSpace(this.getRobotPose()).isPresent()) {
-                if (c.getDistanceFromTag() > 3) return; // TODO: Tune
+                if (c.getDistanceFromTag()
+                        > ConfigManager.getInstance().get("vision_cutoff_distance", 3)) return;
+                LOGGER.debug("Added vision measurement from `{}`", c.getName());
                 this.poseEstimator.addVisionMeasurement(
                         c.getPoseFieldSpace(this.getRobotPose()).get(), c.getTimestamp());
             }

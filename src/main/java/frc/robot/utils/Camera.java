@@ -20,8 +20,8 @@ public class Camera {
     private Optional<PhotonPoseEstimator> photonPoseEstimator;
 
     private Transform3d camOffset;
-
     private double photonTimestamp;
+    private String name;
 
     private final CameraType camType;
 
@@ -34,6 +34,7 @@ public class Camera {
     public Camera(String name, CameraType camType, Transform3d camOffset) {
         this.camType = camType;
         this.camOffset = camOffset;
+        this.name = name;
 
         switch (this.camType) {
             case PHOTONVISION -> {
@@ -137,7 +138,8 @@ public class Camera {
                                 .getCameraTable()
                                 .getEntry("TargetPose")
                                 .getDoubleArray(new double[] {})[0]
-                        - 0.4; // TODO: This is stupid
+                        - ConfigManager.getInstance()
+                                .get("photon_camera_offset", 0.4); // TODO: This is stupid
             }
             case LIMELIGHT -> {
                 assert this.getPose3dLimelight().isPresent();
@@ -148,6 +150,15 @@ public class Camera {
         }
 
         return -1;
+    }
+
+    /**
+     * Get the name of the camera
+     *
+     * @return The name of the camera
+     */
+    public String getName() {
+        return this.name;
     }
 
     public enum CameraType {

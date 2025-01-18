@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.ArmConstants;
 import frc.robot.utils.ArmUtils;
+import frc.robot.utils.ConfigManager;
 
 public class ArmSubsystem extends SubsystemBase {
     private final SparkFlex pivotMotor =
@@ -35,9 +36,9 @@ public class ArmSubsystem extends SubsystemBase {
                     ArmConstants.PIVOT_KA);
 
     /**
-     * sets hand motor speed
+     * Sets hand motor speed
      *
-     * @param speed
+     * @param speed Target motor speed
      */
     public void setHandSpeed(double speed) {
         leftMotor.set(speed);
@@ -55,16 +56,17 @@ public class ArmSubsystem extends SubsystemBase {
 
     public ArmSubsystem() {
 
-        pivotPID.setTolerance(ArmConstants.PIVOT_TOLERANCE);
+        pivotPID.setTolerance(
+                ConfigManager.getInstance().get("arm_tolerance", ArmConstants.PIVOT_TOLERANCE));
 
         leftMotor.setInverted(false);
         rightMotor.setInverted(true);
     }
 
     /**
-     * sets pivot motor speed
+     * Sets pivot motor speed
      *
-     * @param speed
+     * @param speed Target pivot speed
      */
     public void setPivotSpeed(double speed) {
         pivotMotor.set(speed);
@@ -82,10 +84,16 @@ public class ArmSubsystem extends SubsystemBase {
     /**
      * moves arm to a set angle
      *
-     * @param angle
+     * @param angle Target pivot angle
      */
     public void setPivotAngle(double angle) {
-        angle = MathUtil.clamp(angle, ArmConstants.PIVOT_MIN_ANGLE, ArmConstants.PIVOT_MAX_ANGLE);
+        angle =
+                MathUtil.clamp(
+                        angle,
+                        ConfigManager.getInstance()
+                                .get("arm_pivot_min_angle", ArmConstants.PIVOT_MIN_ANGLE),
+                        ConfigManager.getInstance()
+                                .get("arm_pivot_max_angle", ArmConstants.PIVOT_MAX_ANGLE));
         double pidValue = pivotPID.calculate(getPivotAngle(), angle);
         double ffValue = pivotFF.calculate(angle, 0);
 
