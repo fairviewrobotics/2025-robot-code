@@ -86,17 +86,19 @@ dependencies {
 	testImplementation 'org.mockito:mockito-core:5.15.2'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-mockitoAgent(libs.mockito) {
-	transitive = false
-}
+	mockitoAgent(libs.mockito) {
+		transitive = false
+	}
+
+	def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
+	annotationProcessor "org.littletonrobotics.akit:akit-autolog:$akitJson.version"
 }
 
 test {
 	useJUnitPlatform()
 	systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
 
-jvmArgs += "-javaagent:${configurations.mockitoAgent.asPath}"
-
+	jvmArgs += "-javaagent:${configurations.mockitoAgent.asPath}"
 }
 
 // Simulation configuration (e.g. environment variables).
@@ -122,6 +124,14 @@ wpi.java.configureTestTasks(test)
 tasks.withType(JavaCompile) {
 	options.compilerArgs.add '-XDstringConcat=inline'
 }
+
+task(replayWatch, type: JavaExec) {
+	mainClass = "org.littletonrobotics.junction.ReplayWatch"
+	classpath = sourceSets.main.runtimeClasspath
+}
+
+
+
 
 // Spotless linter
 spotless {
