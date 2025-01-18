@@ -1,3 +1,4 @@
+/* Black Knights Robotics (C) 2025 */
 package frc.robot.constants;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -12,7 +13,7 @@ public class ClimberConstants {
     public static final double JOINT_P = 0;
     public static final double JOINT_I = 0;
     public static final double JOINT_D = 0;
-    //sgva
+    // sgva
     public static final double JOINT_S = 0;
     public static final double JOINT_G = 0;
     public static final double JOINT_V = 0;
@@ -20,10 +21,8 @@ public class ClimberConstants {
 
     public static final double CURRENT_MAX = 0;
     public static final double CLIMBER_TOLERANCE = 0;
-    //Current as in electricity.
+    // Current as in electricity.
 
-
-
-//
+    //
 
 }
