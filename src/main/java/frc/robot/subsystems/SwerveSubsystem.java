@@ -22,6 +22,7 @@ import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.DrivetrainConstants;
 import frc.robot.controllers.MAXSwerveModule;
+import frc.robot.utils.ConfigManager;
 import frc.robot.utils.NetworkTablesUtils;
 import frc.robot.utils.SwerveUtils;
 
@@ -61,9 +62,17 @@ public class SwerveSubsystem extends SubsystemBase {
 
     // Slew Rate Limiters
     private final SlewRateLimiter magnitudeLimiter =
-            new SlewRateLimiter(DrivetrainConstants.MAGNITUDE_SLEW_RATE);
+            new SlewRateLimiter(
+                    ConfigManager.getInstance()
+                            .get(
+                                    "drive_magnitude_slew_rate",
+                                    DrivetrainConstants.MAGNITUDE_SLEW_RATE));
     private final SlewRateLimiter rotationLimiter =
-            new SlewRateLimiter(DrivetrainConstants.ROTATIONAL_SLEW_RATE);
+            new SlewRateLimiter(
+                    ConfigManager.getInstance()
+                            .get(
+                                    "drive_rotational_slew_rate",
+                                    DrivetrainConstants.ROTATIONAL_SLEW_RATE));
 
     // Slew Rate Time
     private double previousTime = WPIUtilJNI.now() * 1e-6;
