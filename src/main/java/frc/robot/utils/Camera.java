@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.Timer;
 import java.util.Optional;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.targeting.PhotonPipelineResult;
 
 /** */
 public class Camera {
@@ -69,10 +70,17 @@ public class Camera {
                 assert this.photonPoseEstimator.isPresent();
                 assert this.photonCamera.isPresent();
 
+                PhotonPipelineResult res;
+                try {
+                    res = this.photonCamera.get().getAllUnreadResults().get(0);
+                } catch (Exception e) {
+                    return Optional.empty();
+                }
+
                 this.photonPoseEstimator.get().setReferencePose(prevPosition);
                 return photonPoseEstimator
                         .get()
-                        .update(this.photonCamera.get().getAllUnreadResults().getFirst())
+                        .update(res)
                         .map(
                                 (e) -> {
                                     this.photonTimestamp = e.timestampSeconds;

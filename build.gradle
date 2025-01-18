@@ -1,6 +1,6 @@
 plugins {
 	id "java"
-	id "edu.wpi.first.GradleRIO" version "2025.1.1"
+	id "edu.wpi.first.GradleRIO" version "2025.2.1"
 	id "com.diffplug.spotless" version "7.0.1"
 }
 
@@ -136,7 +136,7 @@ task(replayWatch, type: JavaExec) {
 // Spotless linter
 spotless {
 	format 'misc', {
-		target '*.gradle', '.gitignore'
+		target '*.gradle', '.gitignore', '*.json'
 
 		trimTrailingWhitespace()
 		leadingSpacesToTabs()

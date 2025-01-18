@@ -17,7 +17,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class OdometrySubsystem extends SubsystemBase {
-    private final ArrayList<Camera> cameras;
+    private ArrayList<Camera> cameras = new ArrayList<>();
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -25,7 +25,12 @@ public class OdometrySubsystem extends SubsystemBase {
             new SwerveDrivePoseEstimator3d(
                     DrivetrainConstants.DRIVE_KINEMATICS,
                     new Rotation3d(),
-                    new SwerveModulePosition[4],
+                    new SwerveModulePosition[] {
+                        new SwerveModulePosition(),
+                        new SwerveModulePosition(),
+                        new SwerveModulePosition(),
+                        new SwerveModulePosition()
+                    },
                     new Pose3d(),
                     new Matrix<>(
                             Nat.N4(),
@@ -36,7 +41,8 @@ public class OdometrySubsystem extends SubsystemBase {
                                 ConfigManager.getInstance()
                                         .get("odom_wheel_trust", VisionConstants.WHEEL_TRUST),
                                 ConfigManager.getInstance()
-                                        .get("odom_wheel_trust_theta", Math.toRadians(5))
+                                        .get("odom_wheel_trust_theta", Math.toRadians(5)),
+                              1
                             }),
                     new Matrix<>(
                             Nat.N4(),
@@ -47,11 +53,14 @@ public class OdometrySubsystem extends SubsystemBase {
                                 ConfigManager.getInstance()
                                         .get("odom_vision_trust", VisionConstants.VISION_TRUST),
                                 ConfigManager.getInstance()
-                                        .get("odom_vision_trust_theta", Math.toRadians(5))
+                                        .get("odom_vision_trust_theta", Math.toRadians(5)),
+                              1
                             }));
 
-    public OdometrySubsystem(ArrayList<Camera> cameras) {
-        this.cameras = cameras;
+    public OdometrySubsystem() {}
+
+    public void addCamera(Camera camera) {
+        this.cameras.add(camera);
     }
 
     /**
@@ -60,7 +69,7 @@ public class OdometrySubsystem extends SubsystemBase {
      * @return A {@link Pose3d} of the robot
      */
     public Pose3d getRobotPose() {
-        return poseEstimator.getEstimatedPosition();
+        return this.poseEstimator.getEstimatedPosition();
     }
 
     /**
