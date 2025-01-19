@@ -12,7 +12,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 public class Robot extends LoggedRobot {
-    private Command m_autonomousCommand;
+    private Command autonomousCommand;
 
     private final RobotContainer robotContainer;
 
@@ -36,13 +36,12 @@ public class Robot extends LoggedRobot {
         }
 
         Logger.start();
-
-        m_robotContainer = new RobotContainer();
     }
 
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
+        robotContainer.robotPeriodic();
     }
 
     @Override

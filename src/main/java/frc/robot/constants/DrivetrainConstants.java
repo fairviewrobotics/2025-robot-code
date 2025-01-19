@@ -16,9 +16,9 @@ public class DrivetrainConstants {
     public static final double ROTATIONAL_SLEW_RATE = 30.0; // meters/second (1 = 100%)
 
     // Chassis configuration
-    public static final double TRACK_WIDTH = Units.inchesToMeters(26.5);
+    public static final double TRACK_WIDTH = Units.inchesToMeters(30);
     // Distance between centers of right and left wheels on robot
-    public static final double WHEEL_BASE = Units.inchesToMeters(26.5);
+    public static final double WHEEL_BASE = Units.inchesToMeters(30);
     // Distance between front and back wheels on robot
     public static final SwerveDriveKinematics DRIVE_KINEMATICS =
             new SwerveDriveKinematics(
@@ -29,20 +29,20 @@ public class DrivetrainConstants {
 
     // Angular offsets of the modules relative to the chassis in radians
     public static final double FRONT_LEFT_CHASSIS_ANGULAR_OFFSET = 0.104 + Math.PI / 2;
-    public static final double FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = 1.029 + Math.PI;
+    public static final double FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = 3.151;
     public static final double REAR_LEFT_CHASSIS_ANGULAR_OFFSET = 1.943;
     public static final double REAR_RIGHT_CHASSIS_ANGULAR_OFFSET = 1.146 - Math.PI / 2;
 
     // SPARK MAX CAN IDs
     public static final int FRONT_LEFT_DRIVING_CAN_ID = 3;
     public static final int REAR_LEFT_DRIVING_CAN_ID = 5;
-    public static final int FRONT_RIGHT_DRIVING_CAN_ID = 1;
-    public static final int REAR_RIGHT_DRIVING_CAN_ID = 7;
+    public static final int FRONT_RIGHT_DRIVING_CAN_ID = 7; // 1
+    public static final int REAR_RIGHT_DRIVING_CAN_ID = 1; // 7
 
     public static final int FRONT_LEFT_TURNING_CAN_ID = 4;
     public static final int REAR_LEFT_TURNING_CAN_ID = 6;
-    public static final int FRONT_RIGHT_TURNING_CAN_ID = 2;
-    public static final int REAR_RIGHT_TURNING_CAN_ID = 8;
+    public static final int FRONT_RIGHT_TURNING_CAN_ID = 8; // 2
+    public static final int REAR_RIGHT_TURNING_CAN_ID = 2; // 8
 
     public static final boolean GYRO_REVERSED = false;
 

@@ -7,20 +7,28 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator3d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.DrivetrainConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.utils.Camera;
 import frc.robot.utils.ConfigManager;
+import frc.robot.utils.NetworkTablesUtils;
 import java.util.ArrayList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class OdometrySubsystem extends SubsystemBase {
+public class OdometrySubsystem {
+    /** List of cameras used for vision-based measurements to refine odometry. */
     private ArrayList<Camera> cameras = new ArrayList<>();
 
+    /** Singleton instance of the OdometrySubsystem. */
+    private static OdometrySubsystem INSTANCE = null;
+
+    /** Logger for recording debug and error messages related to odometry subsystem operations. */
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private final NetworkTablesUtils NTTelemetry = NetworkTablesUtils.getTable("Telemetry");
+
+    /** Pose estimator for the robot, combining wheel-based odometry and vision measurements. */
     private final SwerveDrivePoseEstimator3d poseEstimator =
             new SwerveDrivePoseEstimator3d(
                     DrivetrainConstants.DRIVE_KINEMATICS,
@@ -42,7 +50,7 @@ public class OdometrySubsystem extends SubsystemBase {
                                         .get("odom_wheel_trust", VisionConstants.WHEEL_TRUST),
                                 ConfigManager.getInstance()
                                         .get("odom_wheel_trust_theta", Math.toRadians(5)),
-                              1
+                                1
                             }),
                     new Matrix<>(
                             Nat.N4(),
@@ -54,11 +62,28 @@ public class OdometrySubsystem extends SubsystemBase {
                                         .get("odom_vision_trust", VisionConstants.VISION_TRUST),
                                 ConfigManager.getInstance()
                                         .get("odom_vision_trust_theta", Math.toRadians(5)),
-                              1
+                                1
                             }));
 
-    public OdometrySubsystem() {}
+    private OdometrySubsystem() {}
 
+    /**
+     * Get the instance of OdometrySubsystem, creating a new one if it doesn't exist
+     *
+     * @return The instance
+     */
+    public static OdometrySubsystem getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new OdometrySubsystem();
+        }
+        return INSTANCE;
+    }
+
+    /**
+     * Add a camera to the odometry subsystem for vision-based localization.
+     *
+     * @param camera The {@link Camera} to add to the system.
+     */
     public void addCamera(Camera camera) {
         this.cameras.add(camera);
     }
@@ -88,8 +113,14 @@ public class OdometrySubsystem extends SubsystemBase {
         this.poseEstimator.update(gyroRotation, swerveModulePositions);
     }
 
-    @Override
     public void periodic() {
+        NTTelemetry.setArrayEntry(
+                "Pose",
+                new double[] {
+                    this.getRobotPose().getX(),
+                    this.getRobotPose().getY(),
+                    this.getRobotPose().getZ()
+                });
         for (Camera c : this.cameras) {
             if (c.getPoseFieldSpace(this.getRobotPose()).isPresent()) {
                 if (c.getDistanceFromTag()

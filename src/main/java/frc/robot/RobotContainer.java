@@ -1,6 +1,7 @@
 /* Black Knights Robotics (C) 2025 */
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -21,10 +22,11 @@ public class RobotContainer {
     Controller secondaryController = new Controller(1);
 
     private final NetworkTablesUtils NTTune = NetworkTablesUtils.getTable("debug");
+    private final Transform3d cameraOffset = new Transform3d(0.38, 0, 0.13, new Rotation3d());
     private final Camera testCamera =
-            new Camera("testCam", Camera.CameraType.PHOTONVISION, new Transform3d());
+            new Camera("testCam", Camera.CameraType.PHOTONVISION, cameraOffset);
 
-    private OdometrySubsystem odometrySubsystem = new OdometrySubsystem();
+    private OdometrySubsystem odometrySubsystem = OdometrySubsystem.getInstance();
     // Auto Chooser
     SendableChooser<Command> superSecretMissileTech = new SendableChooser<>();
 
@@ -47,11 +49,15 @@ public class RobotContainer {
                                         * DrivetrainConstants.MAX_SPEED_METERS_PER_SECOND,
                         () -> primaryController.getRightX() * DrivetrainConstants.MAX_ANGULAR_SPEED,
                         true,
-                        true));
+                        false));
     }
 
     public void robotInit() {
         odometrySubsystem.addCamera(testCamera);
+    }
+
+    public void robotPeriodic() {
+        odometrySubsystem.periodic();
     }
 
     public Command getAutonomousCommand() {

@@ -5,15 +5,15 @@
             <PatternLayout pattern="%d{HH:mm:ss} [%t] %-5level %logger{36} - %msg%n"/>
         </Console>
 
-        <Socket name="NetworkAppender" host="10.20.36.5" port="5801">
-            <SerializedLayout/>
-        </Socket>
+<!--        <Socket name="NetworkAppender" host="10.20.36.5" port="5801" reconnectDelayMillis="5000">-->
+<!--            <SerializedLayout/>-->
+<!--        </Socket>-->
     </Appenders>
 
     <Loggers>
         <Root level="info">
             <AppenderRef ref="Console"/>
-            <AppenderRef ref="NetworkAppender"/>
+<!--            <AppenderRef ref="NetworkAppender"/>-->
         </Root>
     </Loggers>
 </Configuration>
