@@ -40,4 +40,7 @@ public class ArmConstants {
             new TrapezoidProfile.Constraints(HAND_MAX_VELOCITY, HAND_MAX_ACCELERATION);
 
     public static final int HAND_LINEBREAK_ID = 0;
+
+    public static final double INTAKE_ANGLE = 0;
+    public static final double PLACE_ANGLE = 0;
 }

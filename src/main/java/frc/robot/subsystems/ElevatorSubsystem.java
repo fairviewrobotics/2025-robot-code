@@ -70,16 +70,6 @@ public class ElevatorSubsystem extends SubsystemBase {
                 SparkBase.PersistMode.kPersistParameters);
     }
 
-    /**
-     * Set the elevator speed in percent
-     *
-     * @param speed Target percent
-     */
-    public void setElevatorSpeed(double speed) {
-        leftElevatorMotor.set(speed);
-        rightElevatorMotor.set(speed);
-    }
-
     // TODO We need to LEFT_ELEVATOR_ID do something for L1, L2, L3
     // NO absolute encoders
 
