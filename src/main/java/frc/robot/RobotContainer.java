@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.*;
+import frc.robot.commands.PickAndPlaceCommands.Position;
 import frc.robot.constants.*;
 import frc.robot.subsystems.*;
 import frc.robot.utils.Camera;
@@ -15,6 +16,8 @@ import frc.robot.utils.NetworkTablesUtils;
 public class RobotContainer {
     // Subsystems
     SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
+    ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
+    ArmSubsystem armSubsystem = new ArmSubsystem();
 
     // Controllers
     Controller primaryController = new Controller(0);
@@ -48,6 +51,10 @@ public class RobotContainer {
                         () -> primaryController.getRightX() * DrivetrainConstants.MAX_ANGULAR_SPEED,
                         true,
                         true));
+
+        elevatorSubsystem.setDefaultCommand(
+            new PickAndPlaceCommands(elevatorSubsystem, armSubsystem, Position.INTAKE)
+        );
     }
 
     public void robotInit() {
