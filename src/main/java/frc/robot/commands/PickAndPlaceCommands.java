@@ -64,7 +64,7 @@ public class PickAndPlaceCommands extends Command {
 
     @Override
     public void execute() {
-        elevatorSubsystem.setPosition(position.getHeight());
+        elevatorSubsystem.setTargetPosition(position.getHeight());
         armSubsystem.setPivotAngle(position.getAngle());
     }
 }
