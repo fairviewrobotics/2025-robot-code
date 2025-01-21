@@ -9,7 +9,7 @@ import frc.robot.utils.ConfigManager;
 
 
 
-class PickAndPlaceCommands extends Command {
+public class PickAndPlaceCommands extends Command {
     private final ElevatorSubsystem elevatorSubsystem;
     private final ArmSubsystem armSubsystem;
 
