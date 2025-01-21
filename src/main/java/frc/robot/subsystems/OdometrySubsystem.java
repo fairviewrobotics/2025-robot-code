@@ -42,7 +42,7 @@ public class OdometrySubsystem extends SubsystemBase {
                                         .get("odom_wheel_trust", VisionConstants.WHEEL_TRUST),
                                 ConfigManager.getInstance()
                                         .get("odom_wheel_trust_theta", Math.toRadians(5)),
-                              1
+                                1
                             }),
                     new Matrix<>(
                             Nat.N4(),
@@ -54,7 +54,7 @@ public class OdometrySubsystem extends SubsystemBase {
                                         .get("odom_vision_trust", VisionConstants.VISION_TRUST),
                                 ConfigManager.getInstance()
                                         .get("odom_vision_trust_theta", Math.toRadians(5)),
-                              1
+                                1
                             }));
 
     public OdometrySubsystem() {}

@@ -53,8 +53,7 @@ public class RobotContainer {
                         true));
 
         elevatorSubsystem.setDefaultCommand(
-            new PickAndPlaceCommands(elevatorSubsystem, armSubsystem, Position.INTAKE)
-        );
+                new PickAndPlaceCommands(elevatorSubsystem, armSubsystem, Position.INTAKE));
     }
 
     public void robotInit() {
