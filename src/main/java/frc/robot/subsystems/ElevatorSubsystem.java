@@ -66,11 +66,6 @@ public class ElevatorSubsystem extends SubsystemBase {
                 SparkBase.PersistMode.kPersistParameters);
     }
 
-    public void moveElevator(double speed) {
-        leftElevatorMotor.set(speed);
-        rightElevatorMotor.set(speed);
-    }
-
     // TODO We need to LEFT_ELEVATOR_ID do something for L1, L2, L3
     // NO absolute encoders
     public void setVoltage(double voltage) {

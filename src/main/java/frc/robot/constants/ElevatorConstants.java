@@ -31,4 +31,10 @@ public class ElevatorConstants {
     public static final double CURRENT_MAX = 20;
 
     public static final double HARD_STOP_LEVEL = -0.1;
+
+    public static final double INTAKE_HEIGHT = 0;
+    public static final double L1_HEIGHT = 0;
+    public static final double L2_HEIGHT = 0;
+    public static final double L3_HEIGHT = 0;
+    public static final double L4_HEIGHT = 0;
 }
