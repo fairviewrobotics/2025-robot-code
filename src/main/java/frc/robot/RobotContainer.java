@@ -59,6 +59,9 @@ public class RobotContainer {
 
         elevatorSubsystem.setDefaultCommand(
                 new PickAndPlaceCommands(elevatorSubsystem, armSubsystem, Position.INTAKE));
+
+        primaryController.rightTrigger.whileTrue(new ElevatorCommand(elevatorSubsystem, 1));
+        primaryController.leftTrigger.whileTrue(new ElevatorCommand(elevatorSubsystem, -1));
     }
 
     public Command getAutonomousCommand() {
