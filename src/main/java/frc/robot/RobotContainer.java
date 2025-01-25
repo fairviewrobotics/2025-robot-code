@@ -3,11 +3,9 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.*;
 import frc.robot.commands.PickAndPlaceCommands.Position;
 import frc.robot.constants.*;
@@ -60,8 +58,6 @@ public class RobotContainer {
 
         elevatorSubsystem.setDefaultCommand(
                 new PickAndPlaceCommands(elevatorSubsystem, armSubsystem, Position.INTAKE));
-<<<<<<< HEAD
-=======
 
         new JoystickButton(primaryController, XboxController.Button.kX.value).whileTrue(
                 new PickAndPlaceCommands(elevatorSubsystem, armSubsystem, Position.L1)
@@ -71,8 +67,6 @@ public class RobotContainer {
                 new PickAndPlaceCommands(elevatorSubsystem, armSubsystem, Position.INTAKE)
                 );
     }
->>>>>>> 4f5221a (bs the values)
-
         primaryController.rightTrigger.whileTrue(new ElevatorCommand(elevatorSubsystem, 1));
         primaryController.leftTrigger.whileTrue(new ElevatorCommand(elevatorSubsystem, -1));
     }
