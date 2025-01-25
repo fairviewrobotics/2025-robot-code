@@ -1,5 +1,5 @@
 /* Black Knights Robotics (C) 2025 */
-package frc.robot.subsystems;
+package frc.robot.framework;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
@@ -16,7 +16,9 @@ import java.util.ArrayList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class OdometrySubsystem extends SubsystemBase {
+public class Odometry extends SubsystemBase {
+    private static Odometry INSTANCE = null;
+
     private ArrayList<Camera> cameras = new ArrayList<>();
 
     private static final Logger LOGGER = LogManager.getLogger();
@@ -42,7 +44,7 @@ public class OdometrySubsystem extends SubsystemBase {
                                         .get("odom_wheel_trust", VisionConstants.WHEEL_TRUST),
                                 ConfigManager.getInstance()
                                         .get("odom_wheel_trust_theta", Math.toRadians(5)),
-                              1
+                                1
                             }),
                     new Matrix<>(
                             Nat.N4(),
@@ -54,13 +56,21 @@ public class OdometrySubsystem extends SubsystemBase {
                                         .get("odom_vision_trust", VisionConstants.VISION_TRUST),
                                 ConfigManager.getInstance()
                                         .get("odom_vision_trust_theta", Math.toRadians(5)),
-                              1
+                                1
                             }));
 
-    public OdometrySubsystem() {}
+    private Odometry() {}
 
     public void addCamera(Camera camera) {
         this.cameras.add(camera);
+    }
+
+    public static Odometry getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new Odometry();
+        }
+
+        return INSTANCE;
     }
 
     /**
