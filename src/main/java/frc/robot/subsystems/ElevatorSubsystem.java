@@ -131,39 +131,39 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-
-        if (!elevatorZeroed) {
-            if ((leftElevatorMotor.getOutputCurrent() + rightElevatorMotor.getOutputCurrent()) / 2
-                    > ConfigManager.getInstance()
-                            .get("elevator_current_max", ElevatorConstants.CURRENT_MAX) || bottomLineBreak.get()) {
-                elevatorZeroed = true;
-                leftEncoder.setPosition(ElevatorConstants.HARD_STOP_LEVEL);
-                rightEncoder.setPosition(ElevatorConstants.HARD_STOP_LEVEL);
-                setVoltage(0);
-            } else {
-                setVoltage(
-                        ConfigManager.getInstance()
-                                .get(
-                                        "elevator_zeroing_voltage",
-                                        ElevatorConstants.ELEVATOR_ZEROING_VOLTAGE));
-            }
-        }
-        if (bottomLineBreak.get()) {
-
             if (!elevatorZeroed) {
-                leftEncoder.setPosition(0);
-                rightEncoder.setPosition(0);
-                elevatorZeroed = true;
-                setVoltage(0);
+                if ((leftElevatorMotor.getOutputCurrent() + rightElevatorMotor.getOutputCurrent()) / 2
+                                > ConfigManager.getInstance()
+                                        .get("elevator_current_max", ElevatorConstants.CURRENT_MAX)
+                        || bottomLineBreak.get()) {
+                    elevatorZeroed = true;
+                    leftEncoder.setPosition(ElevatorConstants.HARD_STOP_LEVEL);
+                    rightEncoder.setPosition(ElevatorConstants.HARD_STOP_LEVEL);
+                    setVoltage(0);
+                } else {
+                    setVoltage(
+                            ConfigManager.getInstance()
+                                    .get(
+                                            "elevator_zeroing_voltage",
+                                            ElevatorConstants.ELEVATOR_ZEROING_VOLTAGE));
+                }
             }
-        }
-        if (elevatorZeroed) {
+            if (bottomLineBreak.get()) {
 
-            double pidCalc = elevatorPID.calculate(getElevatorPosition());
-            double ffCalc = elevatorFF.calculate(getElevatorPosition());
-            setVoltage(pidCalc + ffCalc);
-        }
-        // Elevator zeroing
+                if (!elevatorZeroed) {
+                    leftEncoder.setPosition(0);
+                    rightEncoder.setPosition(0);
+                    elevatorZeroed = true;
+                    setVoltage(0);
+                }
+            }
+            if (elevatorZeroed) {
+
+                double pidCalc = elevatorPID.calculate(getElevatorPosition());
+                double ffCalc = elevatorFF.calculate(getElevatorPosition());
+                setVoltage(pidCalc + ffCalc);
+            }
+            // Elevator zeroing
     }
 }
 // TODO Add elevator timeout, add boolean position,

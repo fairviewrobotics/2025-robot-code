@@ -5,8 +5,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 
 public class ElevatorConstants {
 
-    public static final int LEFT_MOTOR_ID = 0;
-    public static final int RIGHT_MOTOR_ID = 0;
+    public static final int LEFT_MOTOR_ID = 21;
+    public static final int RIGHT_MOTOR_ID = 20;
 
     public static final double ELEVATOR_P = 0.5;
     public static final double ELEVATOR_I = 0;
@@ -21,7 +21,7 @@ public class ElevatorConstants {
     public static final TrapezoidProfile.Constraints CONSTRAINTS =
             new TrapezoidProfile.Constraints(1, 0.5);
 
-    public static final int TOP_LINEBREAK_ID = 0;
+    public static final int TOP_LINEBREAK_ID = 1;
     public static final int BOTTOM_LINEBREAK_ID = 0;
 
     public static final double ELEVATOR_ZEROING_VOLTAGE = 2;

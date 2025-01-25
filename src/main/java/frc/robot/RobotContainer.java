@@ -11,9 +11,7 @@ import frc.robot.commands.PickAndPlaceCommands.Position;
 import frc.robot.constants.*;
 import frc.robot.framework.Odometry;
 import frc.robot.subsystems.*;
-import frc.robot.utils.Camera;
-import frc.robot.utils.Controller;
-import frc.robot.utils.NetworkTablesUtils;
+import frc.robot.utils.*;
 
 public class RobotContainer {
     // Subsystems
@@ -56,19 +54,12 @@ public class RobotContainer {
                         true,
                         true));
 
-        elevatorSubsystem.setDefaultCommand(
-                new PickAndPlaceCommands(elevatorSubsystem, armSubsystem, Position.INTAKE));
-
-        new JoystickButton(primaryController, XboxController.Button.kX.value).whileTrue(
-                new PickAndPlaceCommands(elevatorSubsystem, armSubsystem, Position.L1)
-        );
-
-        new JoystickButton(primaryController, XboxController.Button.kA.value).whileTrue(
-                new PickAndPlaceCommands(elevatorSubsystem, armSubsystem, Position.INTAKE)
-                );
-    }
         primaryController.rightTrigger.whileTrue(new ElevatorCommand(elevatorSubsystem, 1));
         primaryController.leftTrigger.whileTrue(new ElevatorCommand(elevatorSubsystem, -1));
+    }
+
+    public void robotInit() {
+        //    odometrySubsystem.addCamera(testCamera);
     }
 
     public Command getAutonomousCommand() {
