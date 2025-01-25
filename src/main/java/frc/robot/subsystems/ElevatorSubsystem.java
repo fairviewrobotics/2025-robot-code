@@ -135,7 +135,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         if (!elevatorZeroed) {
             if ((leftElevatorMotor.getOutputCurrent() + rightElevatorMotor.getOutputCurrent()) / 2
                     > ConfigManager.getInstance()
-                            .get("elevator_current_max", ElevatorConstants.CURRENT_MAX)) {
+                            .get("elevator_current_max", ElevatorConstants.CURRENT_MAX) || bottomLineBreak.get()) {
                 elevatorZeroed = true;
                 leftEncoder.setPosition(ElevatorConstants.HARD_STOP_LEVEL);
                 rightEncoder.setPosition(ElevatorConstants.HARD_STOP_LEVEL);
