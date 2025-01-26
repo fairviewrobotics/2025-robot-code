@@ -33,6 +33,7 @@ deploy {
 				// getTargetTypeClass is a shortcut to get the class type using a string
 
 				frcJava(getArtifactTypeClass('FRCJavaArtifact')) {
+					jvmArgs.add("-Xmx250M");
 				}
 
 				// Static files artifact
@@ -114,6 +115,7 @@ jar {
 	from sourceSets.main.allSource
 	manifest edu.wpi.first.gradlerio.GradleRIOPlugin.javaManifest(ROBOT_MAIN_CLASS)
 	duplicatesStrategy = DuplicatesStrategy.INCLUDE
+
 
 	manifest {
 		attributes 'Multi-Release': 'true'

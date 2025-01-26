@@ -60,8 +60,10 @@ public class ConfigManager {
         NTTune.addListener(
                 (EnumSet.of(NetworkTableEvent.Kind.kValueAll)),
                 (table, key1, event) -> {
-                    this.json.put(key1, table.getValue(key1).getValue());
-                    LOGGER.debug("Updated [{}] to `{}`", key1, table.getEntry(key1).getDouble(-1));
+                    Object value = table.getValue(key1).getValue();
+                    this.json.put(key1, value);
+                    LOGGER.debug("Updated [{}] to `{}`", key1, value.toString());
+                    // table.getEntry(key1).getDouble(-1));
                     this.saveConfig();
                 });
     }
@@ -179,7 +181,7 @@ public class ConfigManager {
         double res = defaultValue;
         try {
             res = (double) this.json.get(key);
-        } catch (ClassCastException e) {
+        } catch (Exception e) {
             LOGGER.warn("Failed to get {} as a double", key, e);
         }
 

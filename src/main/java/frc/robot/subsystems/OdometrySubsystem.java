@@ -13,6 +13,7 @@ import frc.robot.utils.Camera;
 import frc.robot.utils.ConfigManager;
 import frc.robot.utils.NetworkTablesUtils;
 import java.util.ArrayList;
+import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -106,7 +107,7 @@ public class OdometrySubsystem {
     public void addWheelOdometry(
             Rotation3d gyroRotation, SwerveModulePosition[] swerveModulePositions) {
         if (swerveModulePositions.length != 4) {
-            LOGGER.error("Wrong length for module positions");
+            // LOGGER.error("Wrong length for module positions");
             return;
         }
 
@@ -122,12 +123,12 @@ public class OdometrySubsystem {
                     this.getRobotPose().getZ()
                 });
         for (Camera c : this.cameras) {
-            if (c.getPoseFieldSpace(this.getRobotPose()).isPresent()) {
+            Optional<Pose3d> pose = c.getPoseFieldSpace(this.getRobotPose());
+            if (pose.isPresent()) {
                 if (c.getDistanceFromTag()
                         > ConfigManager.getInstance().get("vision_cutoff_distance", 3)) return;
                 LOGGER.debug("Added vision measurement from `{}`", c.getName());
-                this.poseEstimator.addVisionMeasurement(
-                        c.getPoseFieldSpace(this.getRobotPose()).get(), c.getTimestamp());
+                this.poseEstimator.addVisionMeasurement(pose.get(), c.getTimestamp());
             }
         }
     }

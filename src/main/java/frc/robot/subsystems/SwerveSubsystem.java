@@ -12,6 +12,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleArrayEntry;
 import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -269,7 +270,7 @@ public class SwerveSubsystem extends SubsystemBase {
                                         xSpeedDelivered,
                                         ySpeedDelivered,
                                         rotationDelivered,
-                                        Rotation2d.fromDegrees(gyro.getAngle()))
+                                        Rotation2d.fromRadians(this.getHeadingRad()))
                                 : new ChassisSpeeds(
                                         xSpeedDelivered, ySpeedDelivered, rotationDelivered));
         SwerveDriveKinematics.desaturateWheelSpeeds(
@@ -318,19 +319,10 @@ public class SwerveSubsystem extends SubsystemBase {
     /**
      * Returns the heading of the robot.
      *
-     * @return the robot's heading in degrees, from -180 to 180
-     */
-    public double getHeadingDeg() {
-        return Rotation2d.fromDegrees(gyro.getAngle()).getDegrees();
-    }
-
-    /**
-     * Returns the heading of the robot.
-     *
      * @return the robot's heading in degrees, from -pi to pi
      */
     public double getHeadingRad() {
-        return Rotation2d.fromDegrees(gyro.getAngle()).getRadians();
+        return Units.degreesToRadians(-1 * (gyro.getAngle() % 360.0));
     }
 
     /**
@@ -339,7 +331,7 @@ public class SwerveSubsystem extends SubsystemBase {
      * @return The turn rate of the robot, in degrees per second
      */
     public double getTurnRate() {
-        return gyro.getRate() * (DrivetrainConstants.GYRO_REVERSED ? -1.0 : 1.0);
+        return -gyro.getRate();
     }
 
     /**

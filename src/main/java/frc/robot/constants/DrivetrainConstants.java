@@ -8,8 +8,8 @@ import edu.wpi.first.math.util.Units;
 public class DrivetrainConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
-    public static final double MAX_SPEED_METERS_PER_SECOND = 4.8;
-    public static final double MAX_ANGULAR_SPEED = 2 * Math.PI; // radians per second
+    public static final double MAX_SPEED_METERS_PER_SECOND = 4.8 / 2;
+    public static final double MAX_ANGULAR_SPEED = 2 * Math.PI / 2; // radians per second
 
     public static final double DIRECTION_SLEW_RATE = 18.0; // rads/sec
     public static final double MAGNITUDE_SLEW_RATE = 22.0; // meters/second (1 = 100%)
@@ -28,21 +28,21 @@ public class DrivetrainConstants {
                     new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2));
 
     // Angular offsets of the modules relative to the chassis in radians
-    public static final double FRONT_LEFT_CHASSIS_ANGULAR_OFFSET = 0.104 + Math.PI / 2;
-    public static final double FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = 3.151;
-    public static final double REAR_LEFT_CHASSIS_ANGULAR_OFFSET = 1.943;
+    public static final double FRONT_LEFT_CHASSIS_ANGULAR_OFFSET = 0.0987 + Math.PI / 2;
+    public static final double FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = 3.145 - Math.PI;
+    public static final double REAR_LEFT_CHASSIS_ANGULAR_OFFSET = 1.949;
     public static final double REAR_RIGHT_CHASSIS_ANGULAR_OFFSET = 1.146 - Math.PI / 2;
 
     // SPARK MAX CAN IDs
     public static final int FRONT_LEFT_DRIVING_CAN_ID = 3;
     public static final int REAR_LEFT_DRIVING_CAN_ID = 5;
-    public static final int FRONT_RIGHT_DRIVING_CAN_ID = 7; // 1
-    public static final int REAR_RIGHT_DRIVING_CAN_ID = 1; // 7
+    public static final int FRONT_RIGHT_DRIVING_CAN_ID = 1; // 1
+    public static final int REAR_RIGHT_DRIVING_CAN_ID = 7; // 7
 
     public static final int FRONT_LEFT_TURNING_CAN_ID = 4;
     public static final int REAR_LEFT_TURNING_CAN_ID = 6;
-    public static final int FRONT_RIGHT_TURNING_CAN_ID = 8; // 2
-    public static final int REAR_RIGHT_TURNING_CAN_ID = 2; // 8
+    public static final int FRONT_RIGHT_TURNING_CAN_ID = 2; // 2
+    public static final int REAR_RIGHT_TURNING_CAN_ID = 8; // 8
 
     public static final boolean GYRO_REVERSED = false;
 

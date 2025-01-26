@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.commands.*;
 import frc.robot.constants.*;
 import frc.robot.subsystems.*;
@@ -22,7 +23,8 @@ public class RobotContainer {
     Controller secondaryController = new Controller(1);
 
     private final NetworkTablesUtils NTTune = NetworkTablesUtils.getTable("debug");
-    private final Transform3d cameraOffset = new Transform3d(0.38, 0, 0.13, new Rotation3d());
+    private final Transform3d cameraOffset =
+            new Transform3d(0.38, 0, 0.13, new Rotation3d(0.0, Math.toRadians(35), 0.0));
     private final Camera testCamera =
             new Camera("testCam", Camera.CameraType.PHOTONVISION, cameraOffset);
 
@@ -50,6 +52,8 @@ public class RobotContainer {
                         () -> primaryController.getRightX() * DrivetrainConstants.MAX_ANGULAR_SPEED,
                         true,
                         false));
+
+        primaryController.yButton.whileTrue(new RunCommand(() -> swerveSubsystem.zeroGyro()));
     }
 
     public void robotInit() {
