@@ -22,9 +22,12 @@ public class Camera {
 
     private Transform3d camOffset;
     private double photonTimestamp;
+    private double camDist;
     private String name;
 
     private final CameraType camType;
+
+    //    private static final Logger  LOGGER = LogManager.getLogger();
 
     /**
      * Util class for cameras
@@ -44,7 +47,7 @@ public class Camera {
                         Optional.of(
                                 new PhotonPoseEstimator(
                                         AprilTagFieldLayout.loadField(
-                                                AprilTagFields.k2024Crescendo),
+                                                AprilTagFields.k2025Reefscape),
                                         PhotonPoseEstimator.PoseStrategy
                                                 .MULTI_TAG_PNP_ON_COPROCESSOR,
                                         this.camOffset));
@@ -73,6 +76,7 @@ public class Camera {
                 PhotonPipelineResult res;
                 try {
                     res = this.photonCamera.get().getAllUnreadResults().get(0);
+                    camDist = res.getBestTarget().getBestCameraToTarget().getX();
                 } catch (Exception e) {
                     return Optional.empty();
                 }
@@ -103,8 +107,9 @@ public class Camera {
 
         return Optional.of(
                 new Pose3d(
-                        new Translation3d(rawPose[0], rawPose[1], rawPose[2]),
-                        new Rotation3d(0.0, 0.0, Math.toRadians(rawPose[5]))));
+                                new Translation3d(rawPose[0], rawPose[1], rawPose[2]),
+                                new Rotation3d(0.0, 0.0, Math.toRadians(rawPose[5])))
+                        .transformBy(camOffset));
     }
 
     /**
@@ -141,11 +146,8 @@ public class Camera {
             case PHOTONVISION -> {
                 assert this.photonCamera.isPresent();
 
-                return this.photonCamera
-                                .get()
-                                .getCameraTable()
-                                .getEntry("TargetPose")
-                                .getDoubleArray(new double[] {})[0]
+                // LOGGER.info(camDist);
+                return camDist
                         - ConfigManager.getInstance()
                                 .get("photon_camera_offset", 0.4); // TODO: This is stupid
             }

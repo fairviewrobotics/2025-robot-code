@@ -5,11 +5,9 @@ import com.studica.frc.AHRS;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -77,25 +75,6 @@ public class SwerveSubsystem extends SubsystemBase {
     // Slew Rate Time
     private double previousTime = WPIUtilJNI.now() * 1e-6;
 
-    // Odometry class for tracking robot pose
-    SwerveDrivePoseEstimator poseEstimator =
-            new SwerveDrivePoseEstimator(
-                    DrivetrainConstants.DRIVE_KINEMATICS,
-                    Rotation2d.fromRadians(gyro.getAngle()),
-                    new SwerveModulePosition[] {
-                        frontLeft.getPosition(),
-                        frontRight.getPosition(),
-                        rearLeft.getPosition(),
-                        rearRight.getPosition()
-                    },
-                    new Pose2d(),
-
-                    // How much we trust the wheel measurements
-                    VecBuilder.fill(0.1, 0.1, Units.degreesToRadians(5)),
-
-                    // How much we trust the vision measurements
-                    VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(10)));
-
     /** Creates a new DriveSubsystem. */
     public SwerveSubsystem() {
         // Usage reporting for MAXSwerve template
@@ -115,17 +94,6 @@ public class SwerveSubsystem extends SubsystemBase {
                     .getTable("Swerve")
                     .getDoubleArrayTopic("Actual")
                     .getEntry(new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0});
-
-    private final DoubleArrayEntry poseTelemetry =
-            NetworkTableInstance.getDefault()
-                    .getTable("Swerve")
-                    .getDoubleArrayTopic("Pose")
-                    .getEntry(
-                            new double[] {
-                                poseEstimator.getEstimatedPosition().getTranslation().getX(),
-                                poseEstimator.getEstimatedPosition().getTranslation().getY(),
-                                poseEstimator.getEstimatedPosition().getRotation().getRadians()
-                            });
 
     private final DoubleEntry gyroHeading =
             NetworkTableInstance.getDefault()
@@ -161,15 +129,15 @@ public class SwerveSubsystem extends SubsystemBase {
     public void periodic() {
         NTUtils.setEntry("Gyro Angle", gyro.getAngle());
 
-        // Update the odometry in the periodic block
-        poseEstimator.update(
-                Rotation2d.fromRadians(gyro.getAngle()),
-                new SwerveModulePosition[] {
-                    frontLeft.getPosition(),
-                    frontRight.getPosition(),
-                    rearLeft.getPosition(),
-                    rearRight.getPosition()
-                });
+        OdometrySubsystem.getInstance()
+                .addWheelOdometry(
+                        new Rotation3d(Rotation2d.fromRadians(gyro.getAngle())),
+                        new SwerveModulePosition[] {
+                            frontLeft.getPosition(),
+                            frontRight.getPosition(),
+                            rearLeft.getPosition(),
+                            rearRight.getPosition()
+                        });
 
         frontrightpos.set(frontRight.getPosition().angle.getRadians());
         frontleftpos.set(frontLeft.getPosition().angle.getRadians());
@@ -201,40 +169,7 @@ public class SwerveSubsystem extends SubsystemBase {
                             rearRight.getState().speedMetersPerSecond
                 });
 
-        poseTelemetry.set(
-                new double[] {
-                    poseEstimator.getEstimatedPosition().getTranslation().getX(),
-                    poseEstimator.getEstimatedPosition().getTranslation().getY(),
-                    poseEstimator.getEstimatedPosition().getRotation().getRadians()
-                });
-
         gyroHeading.set(getHeadingRad());
-    }
-
-    /**
-     * Returns the currently-estimated pose of the robot.
-     *
-     * @return The pose.
-     */
-    public Pose2d getPose() {
-        return poseEstimator.getEstimatedPosition();
-    }
-
-    /**
-     * Resets the odometry to the specified pose.
-     *
-     * @param pose The pose to which to set the odometry.
-     */
-    public void resetOdometry(Pose2d pose) {
-        poseEstimator.resetPosition(
-                Rotation2d.fromRadians(gyro.getAngle()),
-                new SwerveModulePosition[] {
-                    frontLeft.getPosition(),
-                    frontRight.getPosition(),
-                    rearLeft.getPosition(),
-                    rearRight.getPosition()
-                },
-                pose);
     }
 
     /**
@@ -335,7 +270,7 @@ public class SwerveSubsystem extends SubsystemBase {
                                         xSpeedDelivered,
                                         ySpeedDelivered,
                                         rotationDelivered,
-                                        Rotation2d.fromDegrees(gyro.getAngle()))
+                                        Rotation2d.fromRadians(this.getHeadingRad()))
                                 : new ChassisSpeeds(
                                         xSpeedDelivered, ySpeedDelivered, rotationDelivered));
         SwerveDriveKinematics.desaturateWheelSpeeds(
@@ -384,19 +319,10 @@ public class SwerveSubsystem extends SubsystemBase {
     /**
      * Returns the heading of the robot.
      *
-     * @return the robot's heading in degrees, from -180 to 180
-     */
-    public double getHeadingDeg() {
-        return Rotation2d.fromDegrees(gyro.getAngle()).getDegrees();
-    }
-
-    /**
-     * Returns the heading of the robot.
-     *
      * @return the robot's heading in degrees, from -pi to pi
      */
     public double getHeadingRad() {
-        return Rotation2d.fromDegrees(gyro.getAngle()).getRadians();
+        return Units.degreesToRadians(-1 * (gyro.getAngle() % 360.0));
     }
 
     /**
@@ -405,7 +331,7 @@ public class SwerveSubsystem extends SubsystemBase {
      * @return The turn rate of the robot, in degrees per second
      */
     public double getTurnRate() {
-        return gyro.getRate() * (DrivetrainConstants.GYRO_REVERSED ? -1.0 : 1.0);
+        return -gyro.getRate();
     }
 
     /**
@@ -424,11 +350,5 @@ public class SwerveSubsystem extends SubsystemBase {
     /** Reset the gyro */
     public void zeroGyro() {
         gyro.reset();
-    }
-
-    /** Resets Gyro and odometry */
-    public void zeroGyroAndOdometry() {
-        gyro.reset();
-        resetOdometry(new Pose2d(0.0, 0.0, new Rotation2d(0.0)));
     }
 }
