@@ -70,16 +70,6 @@ public class ElevatorSubsystem extends SubsystemBase {
                 SparkBase.PersistMode.kPersistParameters);
     }
 
-    /**
-     * Set the elevator speed in percent
-     *
-     * @param speed Target percent
-     */
-    public void setElevatorSpeed(double speed) {
-        leftElevatorMotor.set(speed);
-        rightElevatorMotor.set(speed);
-    }
-
     // TODO We need to LEFT_ELEVATOR_ID do something for L1, L2, L3
     // NO absolute encoders
 
@@ -141,11 +131,11 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-
         if (!elevatorZeroed) {
             if ((leftElevatorMotor.getOutputCurrent() + rightElevatorMotor.getOutputCurrent()) / 2
-                    > ConfigManager.getInstance()
-                            .get("elevator_current_max", ElevatorConstants.CURRENT_MAX)) {
+                            > ConfigManager.getInstance()
+                                    .get("elevator_current_max", ElevatorConstants.CURRENT_MAX)
+                    || bottomLineBreak.get()) {
                 elevatorZeroed = true;
                 leftEncoder.setPosition(ElevatorConstants.HARD_STOP_LEVEL);
                 rightEncoder.setPosition(ElevatorConstants.HARD_STOP_LEVEL);

@@ -18,20 +18,19 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         robotContainer.robotInit();
-        //        Logger.recordMetadata("ProjectName", "2025_Robot");
-        //
-        //        if (isReal()) {
-        //            Logger.addDataReceiver(new NT4Publisher());
-        //            new PowerDistribution(1, PowerDistribution.ModuleType.kRev);
-        //        } else {
-        //            setUseTiming(false);
-        //            String logPath = LogFileUtil.findReplayLog();
-        //            Logger.setReplaySource(new WPILOGReader(logPath));
-        //            Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath,
-        // "_sim")));
-        //        }
-        //
-        //        Logger.start();
+        Logger.recordMetadata("ProjectName", "2025_Robot");
+
+        if (isReal()) {
+            Logger.addDataReceiver(new NT4Publisher());
+            new PowerDistribution(1, PowerDistribution.ModuleType.kRev);
+        } else {
+            setUseTiming(false);
+            String logPath = LogFileUtil.findReplayLog();
+            Logger.setReplaySource(new WPILOGReader(logPath));
+            Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+        }
+
+        Logger.start();
     }
 
     @Override
