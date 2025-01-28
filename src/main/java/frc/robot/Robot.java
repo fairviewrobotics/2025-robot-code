@@ -30,13 +30,14 @@ public class Robot extends TimedRobot {
         //            Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath,
         // "_sim")));
         //        }
-
-        Logger.start();
+        //
+        //        Logger.start();
     }
 
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
+        robotContainer.robotPeriodic();
     }
 
     @Override

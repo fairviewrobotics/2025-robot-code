@@ -33,6 +33,7 @@ deploy {
 				// getTargetTypeClass is a shortcut to get the class type using a string
 
 				frcJava(getArtifactTypeClass('FRCJavaArtifact')) {
+					jvmArgs.add("-Xmx250M");
 				}
 
 				// Static files artifact
@@ -67,6 +68,7 @@ dependencies {
 	implementation wpi.java.vendor.java()
 	implementation platform('org.apache.logging.log4j:log4j-bom:2.24.3');
 	implementation 'org.apache.logging.log4j:log4j-api:${log4j-api.version}'
+	implementation 'org.apache.logging.log4j:log4j-core:${log4j-core.version}'
 
 	roborioDebug wpi.java.deps.wpilibJniDebug(wpi.platforms.roborio)
 	roborioDebug wpi.java.vendor.jniDebug(wpi.platforms.roborio)
@@ -113,6 +115,11 @@ jar {
 	from sourceSets.main.allSource
 	manifest edu.wpi.first.gradlerio.GradleRIOPlugin.javaManifest(ROBOT_MAIN_CLASS)
 	duplicatesStrategy = DuplicatesStrategy.INCLUDE
+
+
+	manifest {
+		attributes 'Multi-Release': 'true'
+	}
 }
 
 // Configure jar and deploy tasks

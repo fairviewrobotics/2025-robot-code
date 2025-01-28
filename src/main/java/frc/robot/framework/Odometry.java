@@ -7,22 +7,29 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator3d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.DrivetrainConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.utils.Camera;
 import frc.robot.utils.ConfigManager;
+import frc.robot.utils.NetworkTablesUtils;
 import java.util.ArrayList;
+import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class Odometry extends SubsystemBase {
-    private static Odometry INSTANCE = null;
-
+public class Odometry {
+    /** List of cameras used for vision-based measurements to refine odometry. */
     private ArrayList<Camera> cameras = new ArrayList<>();
 
+    /** Singleton instance of the OdometrySubsystem. */
+    private static Odometry INSTANCE = null;
+
+    /** Logger for recording debug and error messages related to odometry subsystem operations. */
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private final NetworkTablesUtils NTTelemetry = NetworkTablesUtils.getTable("Telemetry");
+
+    /** Pose estimator for the robot, combining wheel-based odometry and vision measurements. */
     private final SwerveDrivePoseEstimator3d poseEstimator =
             new SwerveDrivePoseEstimator3d(
                     DrivetrainConstants.DRIVE_KINEMATICS,
@@ -61,16 +68,25 @@ public class Odometry extends SubsystemBase {
 
     private Odometry() {}
 
-    public void addCamera(Camera camera) {
-        this.cameras.add(camera);
-    }
-
+    /**
+     * Get the instance of Odometry, creating a new one if it doesn't exist
+     *
+     * @return The instance
+     */
     public static Odometry getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new Odometry();
         }
-
         return INSTANCE;
+    }
+
+    /**
+     * Add a camera to the Odometry for vision-based localization.
+     *
+     * @param camera The {@link Camera} to add to the system.
+     */
+    public void addCamera(Camera camera) {
+        this.cameras.add(camera);
     }
 
     /**
@@ -100,13 +116,20 @@ public class Odometry extends SubsystemBase {
 
     @Override
     public void periodic() {
+        NTTelemetry.setArrayEntry(
+                "Pose",
+                new double[] {
+                    this.getRobotPose().getX(),
+                    this.getRobotPose().getY(),
+                    this.getRobotPose().getZ()
+                });
         for (Camera c : this.cameras) {
-            if (c.getPoseFieldSpace(this.getRobotPose()).isPresent()) {
+            Optional<Pose3d> pose = c.getPoseFieldSpace(this.getRobotPose());
+            if (pose.isPresent()) {
                 if (c.getDistanceFromTag()
                         > ConfigManager.getInstance().get("vision_cutoff_distance", 3)) return;
                 LOGGER.debug("Added vision measurement from `{}`", c.getName());
-                this.poseEstimator.addVisionMeasurement(
-                        c.getPoseFieldSpace(this.getRobotPose()).get(), c.getTimestamp());
+                this.poseEstimator.addVisionMeasurement(pose.get(), c.getTimestamp());
             }
         }
     }
