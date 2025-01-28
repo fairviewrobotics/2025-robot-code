@@ -1,5 +1,5 @@
 /* Black Knights Robotics (C) 2025 */
-package frc.robot.subsystems;
+package frc.robot.framework;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
@@ -17,12 +17,12 @@ import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class OdometrySubsystem {
+public class Odometry {
     /** List of cameras used for vision-based measurements to refine odometry. */
     private ArrayList<Camera> cameras = new ArrayList<>();
 
     /** Singleton instance of the OdometrySubsystem. */
-    private static OdometrySubsystem INSTANCE = null;
+    private static Odometry INSTANCE = null;
 
     /** Logger for recording debug and error messages related to odometry subsystem operations. */
     private static final Logger LOGGER = LogManager.getLogger();
@@ -66,22 +66,22 @@ public class OdometrySubsystem {
                                 1
                             }));
 
-    private OdometrySubsystem() {}
+    private Odometry() {}
 
     /**
-     * Get the instance of OdometrySubsystem, creating a new one if it doesn't exist
+     * Get the instance of Odometry, creating a new one if it doesn't exist
      *
      * @return The instance
      */
-    public static OdometrySubsystem getInstance() {
+    public static Odometry getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new OdometrySubsystem();
+            INSTANCE = new Odometry();
         }
         return INSTANCE;
     }
 
     /**
-     * Add a camera to the odometry subsystem for vision-based localization.
+     * Add a camera to the Odometry for vision-based localization.
      *
      * @param camera The {@link Camera} to add to the system.
      */
@@ -107,13 +107,14 @@ public class OdometrySubsystem {
     public void addWheelOdometry(
             Rotation3d gyroRotation, SwerveModulePosition[] swerveModulePositions) {
         if (swerveModulePositions.length != 4) {
-            // LOGGER.error("Wrong length for module positions");
+            LOGGER.error("Wrong length for module positions");
             return;
         }
 
         this.poseEstimator.update(gyroRotation, swerveModulePositions);
     }
 
+    @Override
     public void periodic() {
         NTTelemetry.setArrayEntry(
                 "Pose",

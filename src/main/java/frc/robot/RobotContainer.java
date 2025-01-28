@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.commands.*;
 import frc.robot.constants.*;
+import frc.robot.framework.Odometry;
 import frc.robot.subsystems.*;
 import frc.robot.utils.Camera;
 import frc.robot.utils.Controller;
@@ -28,7 +29,7 @@ public class RobotContainer {
     private final Camera testCamera =
             new Camera("testCam", Camera.CameraType.PHOTONVISION, cameraOffset);
 
-    private OdometrySubsystem odometrySubsystem = OdometrySubsystem.getInstance();
+    private Odometry odometry = Odometry.getInstance();
     // Auto Chooser
     SendableChooser<Command> superSecretMissileTech = new SendableChooser<>();
 
@@ -57,11 +58,11 @@ public class RobotContainer {
     }
 
     public void robotInit() {
-        odometrySubsystem.addCamera(testCamera);
+        odometry.addCamera(testCamera);
     }
 
     public void robotPeriodic() {
-        odometrySubsystem.periodic();
+        odometry.periodic();
     }
 
     public Command getAutonomousCommand() {
