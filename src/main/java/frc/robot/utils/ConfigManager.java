@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import java.io.*;
 import java.nio.file.Path;
 import java.util.EnumSet;
+import java.util.Iterator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONObject;
@@ -51,7 +52,19 @@ public class ConfigManager {
         }
 
         this.json = parseConfig();
+        this.initNtValues();
         this.initListener();
+    }
+
+    /** Initialize the network table values */
+    @SuppressWarnings("unchecked")
+    public void initNtValues() {
+        Iterator<String> keys = this.json.keySet().iterator();
+        while (keys.hasNext()) {
+            String key = keys.next();
+            LOGGER.info("Initializing [{}] network table entry", key);
+            this.NTTune.getNetworkTable().getEntry(key).setValue(this.json.get(key));
+        }
     }
 
     /** Add a listener to network tables for a change in one of the tuning values */
@@ -64,6 +77,7 @@ public class ConfigManager {
                     this.json.put(key1, value);
                     LOGGER.debug("Updated [{}] to `{}`", key1, value.toString());
                     // table.getEntry(key1).getDouble(-1));
+
                     this.saveConfig();
                 });
     }
