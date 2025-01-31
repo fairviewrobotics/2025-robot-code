@@ -20,6 +20,7 @@ import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.DrivetrainConstants;
 import frc.robot.controllers.MAXSwerveModule;
+import frc.robot.framework.Odometry;
 import frc.robot.utils.ConfigManager;
 import frc.robot.utils.NetworkTablesUtils;
 import frc.robot.utils.SwerveUtils;
@@ -129,7 +130,7 @@ public class SwerveSubsystem extends SubsystemBase {
     public void periodic() {
         NTUtils.setEntry("Gyro Angle", gyro.getAngle());
 
-        OdometrySubsystem.getInstance()
+        Odometry.getInstance()
                 .addWheelOdometry(
                         new Rotation3d(Rotation2d.fromRadians(gyro.getAngle())),
                         new SwerveModulePosition[] {

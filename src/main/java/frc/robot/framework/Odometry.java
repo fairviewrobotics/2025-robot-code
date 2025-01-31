@@ -114,7 +114,6 @@ public class Odometry {
         this.poseEstimator.update(gyroRotation, swerveModulePositions);
     }
 
-    @Override
     public void periodic() {
         NTTelemetry.setArrayEntry(
                 "Pose",

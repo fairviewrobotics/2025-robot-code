@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.commands.*;
-import frc.robot.constants.*;
 import frc.robot.framework.Odometry;
 import frc.robot.subsystems.*;
 import frc.robot.utils.Camera;
@@ -17,7 +16,9 @@ import frc.robot.utils.NetworkTablesUtils;
 
 public class RobotContainer {
     // Subsystems
-    SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
+    //    SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
+    ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
+    ArmSubsystem armSubsystem = new ArmSubsystem();
 
     // Controllers
     Controller primaryController = new Controller(0);
@@ -41,20 +42,38 @@ public class RobotContainer {
         // PRIMARY CONTROLLER
 
         // Default drive command
-        swerveSubsystem.setDefaultCommand(
-                new DriveCommands(
-                        swerveSubsystem,
-                        () ->
-                                primaryController.getLeftY()
-                                        * DrivetrainConstants.MAX_SPEED_METERS_PER_SECOND,
-                        () ->
-                                primaryController.getLeftX()
-                                        * DrivetrainConstants.MAX_SPEED_METERS_PER_SECOND,
-                        () -> primaryController.getRightX() * DrivetrainConstants.MAX_ANGULAR_SPEED,
-                        true,
-                        false));
+        //        swerveSubsystem.setDefaultCommand(
+        //                new DriveCommands(
+        //                        swerveSubsystem,
+        //                        () ->
+        //                                primaryController.getLeftY()
+        //                                        * DrivetrainConstants.MAX_SPEED_METERS_PER_SECOND,
+        //                        () ->
+        //                                primaryController.getLeftX()
+        //                                        * DrivetrainConstants.MAX_SPEED_METERS_PER_SECOND,
+        //                        () -> primaryController.getRightX() *
+        // DrivetrainConstants.MAX_ANGULAR_SPEED,
+        //                        true,
+        //                        false));
+        //
+        //        primaryController.yButton.whileTrue(new RunCommand(() ->
+        // swerveSubsystem.zeroGyro()));
 
-        primaryController.yButton.whileTrue(new RunCommand(() -> swerveSubsystem.zeroGyro()));
+        //        primaryController.leftBumper.whileTrue(new
+        // ElevatorVoltageCommand(elevatorSubsystem, -1));
+        //        primaryController.rightBumper.whileTrue(new
+        // ElevatorVoltageCommand(elevatorSubsystem, 1));
+        //        primaryController.aButton.whileTrue(new ElevatorPositionCommand(elevatorSubsystem,
+        // 0.4));
+        primaryController.yButton.whileTrue(new RunCommand(() -> armSubsystem.resetEncoder()));
+        primaryController.leftBumper.whileTrue(new ArmPositionCommand(armSubsystem, Math.PI / 5));
+        //        primaryController.bButton.whileTrue(new ArmPositionCommand(armSubsystem, -Math.PI
+        // / 4));
+        //        primaryController.xButton.whileTrue(new ArmPositionCommand(armSubsystem, Math.PI /
+        // 4));
+        primaryController.aButton.whileTrue(new ElevatorPositionCommand(elevatorSubsystem, 0.4));
+
+        //        primaryController.xButton.whileTrue(new )
     }
 
     public void robotInit() {
@@ -65,6 +84,7 @@ public class RobotContainer {
         odometry.periodic();
     }
 
+    // -1.235 for pi/2
     public Command getAutonomousCommand() {
         return Commands.print("No autonomous command configured");
     }

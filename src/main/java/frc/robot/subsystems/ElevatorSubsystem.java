@@ -5,9 +5,12 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel;
+import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.networktables.DoubleEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.ElevatorConstants;
@@ -32,9 +35,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final DigitalInput bottomLineBreak =
             new DigitalInput(ElevatorConstants.BOTTOM_LINEBREAK_ID);
 
-    private boolean elevatorZeroed = false;
-    // Becomes true when we boot up robot and enable.
-
     private final ProfiledPIDController elevatorPID =
             new ProfiledPIDController(
                     ElevatorConstants.ELEVATOR_P,
@@ -49,6 +49,12 @@ public class ElevatorSubsystem extends SubsystemBase {
                     ElevatorConstants.ELEVATOR_KV,
                     ElevatorConstants.ELEVATOR_KA);
 
+    private final DoubleEntry elevatorEncoderPos =
+            NetworkTableInstance.getDefault()
+                    .getTable("Elevator")
+                    .getDoubleTopic("EncoderPos")
+                    .getEntry(getElevatorPosition());
+
     /** Subsystem for the elevator */
     public ElevatorSubsystem() {
         SparkFlexConfig rightElevatorMotorConfig = new SparkFlexConfig();
@@ -59,6 +65,8 @@ public class ElevatorSubsystem extends SubsystemBase {
                         .get("elevator_pid_tolerance", ElevatorConstants.ELEVATOR_TOLERANCE));
 
         rightElevatorMotorConfig.inverted(true);
+        rightElevatorMotorConfig.idleMode(SparkBaseConfig.IdleMode.kBrake);
+        leftElevatorMotorConfig.idleMode(SparkBaseConfig.IdleMode.kBrake);
 
         rightElevatorMotor.configure(
                 rightElevatorMotorConfig,
@@ -68,6 +76,8 @@ public class ElevatorSubsystem extends SubsystemBase {
                 leftElevatorMotorConfig,
                 SparkBase.ResetMode.kResetSafeParameters,
                 SparkBase.PersistMode.kPersistParameters);
+
+        elevatorPID.setGoal(0);
     }
 
     /**
@@ -79,9 +89,6 @@ public class ElevatorSubsystem extends SubsystemBase {
         leftElevatorMotor.set(speed);
         rightElevatorMotor.set(speed);
     }
-
-    // TODO We need to LEFT_ELEVATOR_ID do something for L1, L2, L3
-    // NO absolute encoders
 
     /**
      * Set the voltage of the motors for the elevator
@@ -101,6 +108,9 @@ public class ElevatorSubsystem extends SubsystemBase {
      */
     public void setTargetPosition(double position) {
         elevatorPID.setGoal(position);
+        double pidCalc = elevatorPID.calculate(getElevatorPosition());
+        double ffCalc = elevatorFF.calculate(getElevatorPosition());
+        setVoltage(pidCalc + ffCalc);
     }
 
     /** Reset elevator PID */
@@ -142,37 +152,9 @@ public class ElevatorSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
 
-        if (!elevatorZeroed) {
-            if ((leftElevatorMotor.getOutputCurrent() + rightElevatorMotor.getOutputCurrent()) / 2
-                    > ConfigManager.getInstance()
-                            .get("elevator_current_max", ElevatorConstants.CURRENT_MAX)) {
-                elevatorZeroed = true;
-                leftEncoder.setPosition(ElevatorConstants.HARD_STOP_LEVEL);
-                rightEncoder.setPosition(ElevatorConstants.HARD_STOP_LEVEL);
-                setVoltage(0);
-            } else {
-                setVoltage(
-                        ConfigManager.getInstance()
-                                .get(
-                                        "elevator_zeroing_voltage",
-                                        ElevatorConstants.ELEVATOR_ZEROING_VOLTAGE));
-            }
-        }
-        if (bottomLineBreak.get()) {
+        elevatorEncoderPos.set(getElevatorPosition());
 
-            if (!elevatorZeroed) {
-                leftEncoder.setPosition(0);
-                rightEncoder.setPosition(0);
-                elevatorZeroed = true;
-                setVoltage(0);
-            }
-        }
-        if (elevatorZeroed) {
-
-            double pidCalc = elevatorPID.calculate(getElevatorPosition());
-            double ffCalc = elevatorFF.calculate(getElevatorPosition());
-            setVoltage(pidCalc + ffCalc);
-        }
+        //
         // Elevator zeroing
     }
 }
