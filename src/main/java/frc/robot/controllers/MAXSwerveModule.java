@@ -37,7 +37,7 @@ public class MAXSwerveModule {
         turningSpark = new SparkMax(turningCANId, MotorType.kBrushless);
 
         drivingEncoder = drivingSpark.getEncoder();
-        turningEncoder = turningSpark.getAbsoluteEncoder();
+        turningEncoder = drivingSpark.getAbsoluteEncoder();
 
         drivingClosedLoopController = drivingSpark.getClosedLoopController();
         turningClosedLoopController = turningSpark.getClosedLoopController();

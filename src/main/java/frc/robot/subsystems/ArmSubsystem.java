@@ -6,6 +6,7 @@ import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel;
+import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
@@ -15,7 +16,6 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.ArmConstants;
-import frc.robot.utils.ArmUtils;
 import frc.robot.utils.ConfigManager;
 
 public class ArmSubsystem extends SubsystemBase {
@@ -37,6 +37,12 @@ public class ArmSubsystem extends SubsystemBase {
                     .getDoubleTopic("EncoderPos")
                     .getEntry(getPivotAngle());
 
+    private final DoubleEntry armEncoderVelocity =
+            NetworkTableInstance.getDefault()
+                    .getTable("Arm")
+                    .getDoubleTopic("EncoderVelocity")
+                    .getEntry(getPivotSpeed());
+
     private final ProfiledPIDController pivotPID =
             new ProfiledPIDController(
                     ArmConstants.PIVOT_P,
@@ -56,7 +62,7 @@ public class ArmSubsystem extends SubsystemBase {
      *
      * @param speed Target motor speed
      */
-    public void setHandSpeed(double speed) {
+    public void setIntakeSpeed(double speed) {
         leftMotor.set(speed);
         rightMotor.set(speed);
     }
@@ -67,7 +73,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public void setPivotVoltage(double voltage) {
-        pivotMotor.setVoltage(0);
+        pivotMotor.setVoltage(voltage);
     }
 
     /**
@@ -87,11 +93,17 @@ public class ArmSubsystem extends SubsystemBase {
         rightMotor.setInverted(true);
 
         pivotConfig.inverted(true);
+        pivotConfig.idleMode(SparkBaseConfig.IdleMode.kBrake);
+        pivotConfig
+                .absoluteEncoder
+                .inverted(true)
+                .positionConversionFactor(2 * Math.PI) // radians
+                .velocityConversionFactor(2 * Math.PI / 60.0);
 
         pivotMotor.configure(
                 pivotConfig,
                 SparkBase.ResetMode.kResetSafeParameters,
-                SparkBase.PersistMode.kNoPersistParameters);
+                SparkBase.PersistMode.kPersistParameters);
     }
 
     /**
@@ -132,19 +144,25 @@ public class ArmSubsystem extends SubsystemBase {
      * @return arm angle
      */
     public double getPivotAngle() {
-        //        return pivotAbsEncoder.getPosition() + ArmConstants.PIVOTENCODEROFFSET;
-        return ArmUtils.encoderToRad(pivotMotor.getEncoder().getPosition());
+        return (pivotAbsEncoder.getPosition() >= Math.PI)
+                ? pivotAbsEncoder.getPosition() - 2 * Math.PI - ArmConstants.PIVOTENCODEROFFSET
+                : pivotAbsEncoder.getPosition() - ArmConstants.PIVOTENCODEROFFSET;
+    }
+
+    public double getPivotSpeed() {
+        return pivotAbsEncoder.getVelocity();
     }
 
     public void periodic() {
         armEncoderPos.set(getPivotAngle());
+        armEncoderVelocity.set(getPivotSpeed());
         pivotPID.setP(ConfigManager.getInstance().get("arm_p", ArmConstants.PIVOT_P));
         pivotPID.setI(ConfigManager.getInstance().get("arm_i", ArmConstants.PIVOT_I));
         pivotPID.setD(ConfigManager.getInstance().get("arm_d", ArmConstants.PIVOT_D));
     }
 
     public void resetPID() {
-        pivotPID.reset(getPivotAngle());
+        pivotPID.reset(getPivotAngle(), getPivotSpeed());
     }
 
     public void resetEncoder() {

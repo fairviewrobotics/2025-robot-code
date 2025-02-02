@@ -8,9 +8,9 @@ public class ElevatorConstants {
     public static final int LEFT_MOTOR_ID = 21;
     public static final int RIGHT_MOTOR_ID = 20;
 
-    public static final double ELEVATOR_P = 120.0;
+    public static final double ELEVATOR_P = 100.0;
     public static final double ELEVATOR_I = 0;
-    public static final double ELEVATOR_D = 1;
+    public static final double ELEVATOR_D = 2;
     public static final double ELEVATOR_TOLERANCE = 0.05;
 
     public static final double ELEVATOR_KS = 0.1;
@@ -24,11 +24,12 @@ public class ElevatorConstants {
     public static final int TOP_LINEBREAK_ID = 1;
     public static final int BOTTOM_LINEBREAK_ID = 0;
 
-    public static final double ELEVATOR_ZEROING_VOLTAGE = -0.25;
+    public static final double ELEVATOR_ZEROING_VOLTAGE = -1.75;
     // 12.9 rotations to top, 0.592m to top
     public static final double ROTATIONS_TO_METERS = 0.592 / 12.9;
 
     public static final double CURRENT_MAX = 20;
 
-    public static final double HARD_STOP_LEVEL = -0.1;
+    public static final double ELEVATOR_MIN = 0.0;
+    public static final double ELEVATOR_MAX = 0.59;
 }

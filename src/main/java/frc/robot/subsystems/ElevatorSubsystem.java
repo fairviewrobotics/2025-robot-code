@@ -7,6 +7,7 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.networktables.DoubleEntry;
@@ -54,6 +55,10 @@ public class ElevatorSubsystem extends SubsystemBase {
                     .getTable("Elevator")
                     .getDoubleTopic("EncoderPos")
                     .getEntry(getElevatorPosition());
+
+    public double zeroVoltage =
+            ConfigManager.getInstance()
+                    .get("elevator_zero_voltage", ElevatorConstants.ELEVATOR_ZEROING_VOLTAGE);
 
     /** Subsystem for the elevator */
     public ElevatorSubsystem() {
@@ -107,10 +112,26 @@ public class ElevatorSubsystem extends SubsystemBase {
      * @param position The target position in meters
      */
     public void setTargetPosition(double position) {
+        position =
+                MathUtil.clamp(
+                        position, ElevatorConstants.ELEVATOR_MIN, ElevatorConstants.ELEVATOR_MAX);
         elevatorPID.setGoal(position);
         double pidCalc = elevatorPID.calculate(getElevatorPosition());
-        double ffCalc = elevatorFF.calculate(getElevatorPosition());
+        double ffCalc = elevatorFF.calculate(0.0);
         setVoltage(pidCalc + ffCalc);
+    }
+
+    public void holdPosition() {
+        double ffCalc = elevatorFF.calculate(0.0);
+        setVoltage(ffCalc);
+    }
+
+    public void zeroElevator() {
+        if (getBottomLinebreak()) {
+            setVoltage(0.0);
+        } else {
+            setVoltage(zeroVoltage);
+        }
     }
 
     /** Reset elevator PID */
@@ -140,6 +161,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         return encoderAverageVel * ElevatorConstants.ROTATIONS_TO_METERS;
     }
 
+    public boolean getBottomLinebreak() {
+        return !bottomLineBreak.get();
+    }
+
     /**
      * Check if elevator is at target position
      *
@@ -152,7 +177,17 @@ public class ElevatorSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
 
+        elevatorPID.setP(
+                ConfigManager.getInstance().get("elevator_p", ElevatorConstants.ELEVATOR_P));
+        elevatorPID.setI(
+                ConfigManager.getInstance().get("elevator_i", ElevatorConstants.ELEVATOR_I));
+        elevatorPID.setD(
+                ConfigManager.getInstance().get("elevator_d", ElevatorConstants.ELEVATOR_D));
+
         elevatorEncoderPos.set(getElevatorPosition());
+        zeroVoltage =
+                ConfigManager.getInstance()
+                        .get("elevator_zero_voltage", ElevatorConstants.ELEVATOR_ZEROING_VOLTAGE);
 
         //
         // Elevator zeroing

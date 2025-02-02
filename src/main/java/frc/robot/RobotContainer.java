@@ -6,8 +6,8 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.commands.*;
+import frc.robot.constants.DrivetrainConstants;
 import frc.robot.framework.Odometry;
 import frc.robot.subsystems.*;
 import frc.robot.utils.Camera;
@@ -16,7 +16,7 @@ import frc.robot.utils.NetworkTablesUtils;
 
 public class RobotContainer {
     // Subsystems
-    //    SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
+    SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
     ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
     ArmSubsystem armSubsystem = new ArmSubsystem();
 
@@ -41,37 +41,60 @@ public class RobotContainer {
     private void configureBindings() {
         // PRIMARY CONTROLLER
 
-        // Default drive command
-        //        swerveSubsystem.setDefaultCommand(
-        //                new DriveCommands(
-        //                        swerveSubsystem,
-        //                        () ->
-        //                                primaryController.getLeftY()
-        //                                        * DrivetrainConstants.MAX_SPEED_METERS_PER_SECOND,
-        //                        () ->
-        //                                primaryController.getLeftX()
-        //                                        * DrivetrainConstants.MAX_SPEED_METERS_PER_SECOND,
-        //                        () -> primaryController.getRightX() *
-        // DrivetrainConstants.MAX_ANGULAR_SPEED,
-        //                        true,
-        //                        false));
-        //
-        //        primaryController.yButton.whileTrue(new RunCommand(() ->
-        // swerveSubsystem.zeroGyro()));
+        //         Default drive command
+        swerveSubsystem.setDefaultCommand(
+                new DriveCommands(
+                        swerveSubsystem,
+                        () ->
+                                primaryController.getLeftY()
+                                        * DrivetrainConstants.MAX_SPEED_METERS_PER_SECOND,
+                        () ->
+                                primaryController.getLeftX()
+                                        * DrivetrainConstants.MAX_SPEED_METERS_PER_SECOND,
+                        () -> primaryController.getRightX() * DrivetrainConstants.MAX_ANGULAR_SPEED,
+                        true,
+                        false));
 
-        //        primaryController.leftBumper.whileTrue(new
-        // ElevatorVoltageCommand(elevatorSubsystem, -1));
-        //        primaryController.rightBumper.whileTrue(new
-        // ElevatorVoltageCommand(elevatorSubsystem, 1));
-        //        primaryController.aButton.whileTrue(new ElevatorPositionCommand(elevatorSubsystem,
-        // 0.4));
-        primaryController.yButton.whileTrue(new RunCommand(() -> armSubsystem.resetEncoder()));
-        primaryController.leftBumper.whileTrue(new ArmPositionCommand(armSubsystem, Math.PI / 5));
+        elevatorSubsystem.setDefaultCommand(new BaseCommand(elevatorSubsystem, armSubsystem));
+
+        primaryController.aButton.whileTrue(
+                new ElevatorArmCommand(
+                        elevatorSubsystem,
+                        armSubsystem,
+                        primaryController,
+                        "arm_intake",
+                        "elevator_intake"));
+
+        primaryController.yButton.whileTrue(
+                new ElevatorArmCommand(
+                        elevatorSubsystem,
+                        armSubsystem,
+                        primaryController,
+                        "arm_l3",
+                        "elevator_l3"));
+
+        primaryController.xButton.whileTrue(
+                new ElevatorArmCommand(
+                        elevatorSubsystem,
+                        armSubsystem,
+                        primaryController,
+                        "arm_l2",
+                        "elevator_l2"));
+
+        primaryController.bButton.whileTrue(
+                new ElevatorArmCommand(
+                        elevatorSubsystem,
+                        armSubsystem,
+                        primaryController,
+                        "arm_l1",
+                        "elevator_l1"));
+
         //        primaryController.bButton.whileTrue(new ArmPositionCommand(armSubsystem, -Math.PI
         // / 4));
         //        primaryController.xButton.whileTrue(new ArmPositionCommand(armSubsystem, Math.PI /
         // 4));
-        primaryController.aButton.whileTrue(new ElevatorPositionCommand(elevatorSubsystem, 0.4));
+        //        primaryController.aButton.whileTrue(new ElevatorPositionCommand(elevatorSubsystem,
+        // 0.4));
 
         //        primaryController.xButton.whileTrue(new )
     }
