@@ -1,6 +1,8 @@
 /* Black Knights Robotics (C) 2025 */
 package frc.robot.subsystems;
 
+import com.revrobotics.spark.config.SparkFlexConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import com.studica.frc.AHRS;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
@@ -20,11 +22,16 @@ import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.DrivetrainConstants;
 import frc.robot.controllers.MAXSwerveModule;
+import frc.robot.controllers.MAXSwerveModuleConfig;
+import frc.robot.framework.Odometry;
 import frc.robot.utils.ConfigManager;
 import frc.robot.utils.NetworkTablesUtils;
 import frc.robot.utils.SwerveUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class SwerveSubsystem extends SubsystemBase {
+    private static final Logger log = LogManager.getLogger(SwerveSubsystem.class);
     // Create MAXSwerveModules
     private final MAXSwerveModule frontLeft =
             new MAXSwerveModule(
@@ -79,6 +86,7 @@ public class SwerveSubsystem extends SubsystemBase {
     public SwerveSubsystem() {
         // Usage reporting for MAXSwerve template
         HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
+        gyro.setAngleAdjustment(180);
     }
 
     // Network Tables Telemetry
@@ -125,18 +133,45 @@ public class SwerveSubsystem extends SubsystemBase {
                     .getDoubleTopic("rlpos")
                     .getEntry(rearLeft.getPosition().angle.getRadians());
 
+    public void reconfigure() {
+        ConfigManager cm = ConfigManager.getInstance();
+
+        SparkFlexConfig drivingConfig = MAXSwerveModuleConfig.drivingConfig;
+        SparkMaxConfig turningConfig = MAXSwerveModuleConfig.turningConfig;
+
+        drivingConfig.closedLoop.pid(
+                cm.get("swerve_drive_p", 0.5),
+                cm.get("swerve_drive_i", 0.0),
+                cm.get("swerve_drive_d", 0.0));
+        turningConfig.closedLoop.pid(
+                cm.get("swerve_turning_p", 1),
+                cm.get("swerve_turning_i", 0.0),
+                cm.get("swerve_turning_d", 0.0));
+
+        frontLeft.reconfigure(drivingConfig, turningConfig);
+        rearRight.reconfigure(drivingConfig, turningConfig);
+        rearRight.reconfigure(drivingConfig, turningConfig);
+        rearLeft.reconfigure(drivingConfig, turningConfig);
+    }
+
     @Override
     public void periodic() {
         NTUtils.setEntry("Gyro Angle", gyro.getAngle());
 
-        OdometrySubsystem.getInstance()
+        NTUtils.setEntry(
+                "Gyro Accel",
+                Math.sqrt(
+                        Math.pow(gyro.getWorldLinearAccelX(), 2)
+                                + Math.pow(gyro.getWorldLinearAccelY(), 2)));
+
+        Odometry.getInstance()
                 .addWheelOdometry(
-                        new Rotation3d(Rotation2d.fromRadians(gyro.getAngle())),
+                        new Rotation3d(Rotation2d.fromRadians(this.getHeadingRad())),
                         new SwerveModulePosition[] {
                             frontLeft.getPosition(),
                             frontRight.getPosition(),
-                            rearLeft.getPosition(),
-                            rearRight.getPosition()
+                            rearRight.getPosition(),
+                            rearLeft.getPosition()
                         });
 
         frontrightpos.set(frontRight.getPosition().angle.getRadians());
@@ -182,13 +217,15 @@ public class SwerveSubsystem extends SubsystemBase {
      * @param radiansPerSecond Angular rate of the robot in radians per second.
      * @param fieldRelative Whether the provided x and y speeds are relative to the field.
      * @param rateLimit Whether slew rates should be applied to the commanded speeds.
+     * @param useOdometryRotation Whether to use odometry rotation or raw gyro
      */
     public void drive(
             double forwardMetersPerSecond,
             double sidewaysMetersPerSecond,
             double radiansPerSecond,
             boolean fieldRelative,
-            boolean rateLimit) {
+            boolean rateLimit,
+            boolean useOdometryRotation) { // TODO: We should only need odometry rotation
 
         // Slew Rate Limiting
         double xSpeedCommanded;
@@ -270,7 +307,13 @@ public class SwerveSubsystem extends SubsystemBase {
                                         xSpeedDelivered,
                                         ySpeedDelivered,
                                         rotationDelivered,
-                                        Rotation2d.fromRadians(this.getHeadingRad()))
+                                        Rotation2d.fromRadians(
+                                                useOdometryRotation
+                                                        ? Odometry.getInstance()
+                                                                .getRobotPose()
+                                                                .getRotation()
+                                                                .getZ()
+                                                        : this.getHeadingRad()))
                                 : new ChassisSpeeds(
                                         xSpeedDelivered, ySpeedDelivered, rotationDelivered));
         SwerveDriveKinematics.desaturateWheelSpeeds(
@@ -309,11 +352,6 @@ public class SwerveSubsystem extends SubsystemBase {
         rearLeft.resetEncoders();
         frontRight.resetEncoders();
         rearRight.resetEncoders();
-    }
-
-    /** Zeroes the heading of the robot. */
-    public void zeroHeading() {
-        gyro.reset();
     }
 
     /**

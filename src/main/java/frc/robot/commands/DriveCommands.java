@@ -56,11 +56,16 @@ public class DriveCommands extends Command {
                         ConfigManager.getInstance().get("controller_deadband", 0.06));
 
         swerveSubsystem.drive(
-                forwardDesired, sidewaysDesired, radiansDesired, fieldRelativeFromButton, true);
+                forwardDesired,
+                sidewaysDesired,
+                radiansDesired,
+                fieldRelativeFromButton,
+                true,
+                false);
     }
 
     @Override
     public void end(boolean interrupted) {
-        swerveSubsystem.drive(0.0, 0.0, 0.0, true, true);
+        swerveSubsystem.drive(0.0, 0.0, 0.0, true, true, false);
     }
 }

@@ -90,6 +90,20 @@ public class Odometry {
     }
 
     /**
+     * Get a camera by name
+     *
+     * @param name The name of the camera
+     * @return Either an empty optional if the camera does not exist, or the camera
+     */
+    public Optional<Camera> getCamera(String name) {
+        for (Camera c : this.cameras) {
+            if (c.getName().equalsIgnoreCase(name)) return Optional.of(c);
+        }
+
+        return Optional.empty();
+    }
+
+    /**
      * Get the current estimated pose of the robot
      *
      * @return A {@link Pose3d} of the robot
@@ -114,14 +128,13 @@ public class Odometry {
         this.poseEstimator.update(gyroRotation, swerveModulePositions);
     }
 
-    @Override
     public void periodic() {
         NTTelemetry.setArrayEntry(
                 "Pose",
                 new double[] {
                     this.getRobotPose().getX(),
                     this.getRobotPose().getY(),
-                    this.getRobotPose().getZ()
+                    this.getRobotPose().getRotation().getZ()
                 });
         for (Camera c : this.cameras) {
             Optional<Pose3d> pose = c.getPoseFieldSpace(this.getRobotPose());

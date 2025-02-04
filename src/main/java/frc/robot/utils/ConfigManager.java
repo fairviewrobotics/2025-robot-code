@@ -48,6 +48,7 @@ public class ConfigManager {
                 this.saveConfig();
             }
         } catch (IOException e) {
+
             LOGGER.warn("Failed to create config file", e);
         }
 
@@ -60,6 +61,7 @@ public class ConfigManager {
     @SuppressWarnings("unchecked")
     public void initNtValues() {
         Iterator<String> keys = this.json.keySet().iterator();
+        LOGGER.info(keys);
         while (keys.hasNext()) {
             String key = keys.next();
             LOGGER.info("Initializing [{}] network table entry", key);
@@ -91,19 +93,6 @@ public class ConfigManager {
     public JSONObject getDefault() {
         JSONObject defaultSettings = new JSONObject();
 
-        // INTAKE
-        defaultSettings.put("intake_notein_speed", 0.0);
-        defaultSettings.put("intake_shoot_speed", 0.0);
-
-        // SHOOTER
-        defaultSettings.put("shooter_speaker", 0.0);
-        defaultSettings.put("shooter_high_pass", 0.0);
-        defaultSettings.put("shooter_low_pass", 0.0);
-        defaultSettings.put("shooter_amp", 0.0);
-
-        // ARM
-        defaultSettings.put("placeholder", 0.0);
-
         return defaultSettings;
     }
 
@@ -119,15 +108,15 @@ public class ConfigManager {
      * @param defaultValue A default value in case we fail to get the key
      * @return The value from the key
      */
+    @SuppressWarnings("unchecked")
     public long get(String key, long defaultValue) {
+        double v = (double) defaultValue;
         if (!NTTune.keyExists(key)) {
-            LOGGER.info(
-                    "{} does not exist in network tables, creating a setting to {}",
-                    key,
-                    defaultValue);
-            NTTune.setEntry(key, defaultValue);
+            LOGGER.info("{} does not exist, creating a setting to {}", key, defaultValue);
+            NTTune.setEntry(key, v);
+            this.json.put(key, v);
         }
-        return getInteger(key, defaultValue);
+        return (long) getDouble(key, v);
     }
 
     /**
@@ -137,13 +126,12 @@ public class ConfigManager {
      * @param defaultValue A default value in case we fail to get the key
      * @return The value from the key
      */
+    @SuppressWarnings("unchecked")
     public double get(String key, double defaultValue) {
         if (!NTTune.keyExists(key)) {
-            LOGGER.info(
-                    "{} does not exist in network tables, creating a setting to {}",
-                    key,
-                    defaultValue);
+            LOGGER.info("{} does not exist, creating a setting to {}", key, defaultValue);
             NTTune.setEntry(key, defaultValue);
+            this.json.put(key, defaultValue);
         }
         return getDouble(key, defaultValue);
     }
@@ -155,13 +143,12 @@ public class ConfigManager {
      * @param defaultValue A default value in case we fail to get the key
      * @return The value from the key
      */
+    @SuppressWarnings("unchecked")
     public String get(String key, String defaultValue) {
         if (!NTTune.keyExists(key)) {
-            LOGGER.info(
-                    "{} does not exist in network tables, creating a setting to {}",
-                    key,
-                    defaultValue);
+            LOGGER.info("{} does not exist, creating a setting to {}", key, defaultValue);
             NTTune.setEntry(key, defaultValue);
+            this.json.put(key, defaultValue);
         }
         return getString(key, defaultValue);
     }
@@ -173,13 +160,12 @@ public class ConfigManager {
      * @param defaultValue A default value in case we fail to get the key
      * @return The value from the key
      */
+    @SuppressWarnings("unchecked")
     public boolean get(String key, boolean defaultValue) {
         if (!NTTune.keyExists(key)) {
-            LOGGER.info(
-                    "{} does not exist in network tables, creating a setting to {}",
-                    key,
-                    defaultValue);
+            LOGGER.info("{} does not exist, creating a setting to {}", key, defaultValue);
             NTTune.setEntry(key, defaultValue);
+            this.json.put(key, defaultValue);
         }
         return getBoolean(key, defaultValue);
     }
@@ -203,24 +189,6 @@ public class ConfigManager {
     }
 
     /**
-     * Get an integer from the config
-     *
-     * @param key The key in the json
-     * @param defaultValue A default value
-     * @return A long (as an {@link Object})
-     */
-    private long getInteger(String key, long defaultValue) {
-        long res = defaultValue;
-        try {
-            res = (long) this.json.get(key);
-        } catch (ClassCastException e) {
-            LOGGER.warn("Failed to get {} as a long", key, e);
-        }
-
-        return res;
-    }
-
-    /**
      * Get a Boolean from the config
      *
      * @param key The key in the json
@@ -231,7 +199,7 @@ public class ConfigManager {
         boolean res = defaultValue;
         try {
             res = (boolean) this.json.get(key);
-        } catch (ClassCastException e) {
+        } catch (Exception e) {
             LOGGER.warn("Failed to get {} as a boolean", key, e);
         }
 

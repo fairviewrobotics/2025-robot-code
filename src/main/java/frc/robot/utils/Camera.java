@@ -9,6 +9,8 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.Timer;
 import java.util.Optional;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.targeting.PhotonPipelineResult;
@@ -27,7 +29,7 @@ public class Camera {
 
     private final CameraType camType;
 
-    //    private static final Logger  LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * Util class for cameras
@@ -80,6 +82,8 @@ public class Camera {
                 } catch (Exception e) {
                     return Optional.empty();
                 }
+
+                if (!res.hasTargets()) return Optional.empty();
 
                 this.photonPoseEstimator.get().setReferencePose(prevPosition);
                 return photonPoseEstimator
@@ -146,7 +150,6 @@ public class Camera {
             case PHOTONVISION -> {
                 assert this.photonCamera.isPresent();
 
-                // LOGGER.info(camDist);
                 return camDist
                         - ConfigManager.getInstance()
                                 .get("photon_camera_offset", 0.4); // TODO: This is stupid
