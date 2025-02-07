@@ -24,7 +24,7 @@ public class Camera {
 
     private Transform3d camOffset;
     private double photonTimestamp;
-    private double camDist;
+    private Pose3d targetPose;
     private String name;
 
     private final CameraType camType;
@@ -78,7 +78,8 @@ public class Camera {
                 PhotonPipelineResult res;
                 try {
                     res = this.photonCamera.get().getAllUnreadResults().get(0);
-                    camDist = res.getBestTarget().getBestCameraToTarget().getX();
+                    Transform3d bestCamToTarget = res.getBestTarget().getBestCameraToTarget();
+                    this.targetPose = new Pose3d(bestCamToTarget.getTranslation(), bestCamToTarget.getRotation()).transformBy(this.camOffset);
                 } catch (Exception e) {
                     return Optional.empty();
                 }
@@ -104,10 +105,15 @@ public class Camera {
 
     private Optional<Pose3d> getPose3dLimelight() {
         assert this.limelightTable.isPresent();
-        String key = "botpose_wpiblue";
 
-        double[] rawPose = this.limelightTable.get().getArrayEntry(key, new double[0]);
-        if (rawPose.length == 0) return Optional.empty();
+        double[] rawPose = this.limelightTable.get().getArrayEntry("botpose_wpiblue", new double[0]);
+        if (rawPose.length != 6) return Optional.empty();
+
+        double[] targetPoseRaw = this.limelightTable.get().getArrayEntry("targetpose_cameraspace", new double[0]);
+        if (targetPoseRaw.length == 6) {
+            Pose3d cameraPose = new Pose3d(targetPoseRaw[0], targetPoseRaw[1], targetPoseRaw[2], new Rotation3d(0.0, 0.0, Math.toRadians(targetPoseRaw[5])));
+            this.targetPose = cameraPose.transformBy(this.camOffset);
+        }
 
         return Optional.of(
                 new Pose3d(
@@ -141,37 +147,19 @@ public class Camera {
     }
 
     /**
-     * Get the distance from the april tag
-     *
-     * @return The distance in meters from the april tag
-     */
-    public double getDistanceFromTag() {
-        switch (this.camType) {
-            case PHOTONVISION -> {
-                assert this.photonCamera.isPresent();
-
-                return camDist
-                        - ConfigManager.getInstance()
-                                .get("photon_camera_offset", 0.4); // TODO: This is stupid
-            }
-            case LIMELIGHT -> {
-                assert this.getPose3dLimelight().isPresent();
-
-                Pose3d pose = this.getPose3dLimelight().get();
-                return pose.getZ();
-            }
-        }
-
-        return -1;
-    }
-
-    /**
      * Get the name of the camera
      *
      * @return The name of the camera
      */
     public String getName() {
         return this.name;
+    }
+
+    /**
+     *
+     */
+    public Pose3d getTargetPose() {
+        return this.targetPose;
     }
 
     public enum CameraType {
