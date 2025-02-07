@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.AlignConstants;
 import frc.robot.framework.Odometry;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.utils.AlignUtils;
 import frc.robot.utils.ConfigManager;
 import frc.robot.utils.NetworkTablesUtils;
 
@@ -111,9 +112,14 @@ public class ReefAlignCommand extends Command {
         switch (step) {
             case 0:
                 {
-                    currTarget =
-                            this.getFirstPose(
+                    Pose2d firstPose =
+                            AlignUtils.getFirstPose(
                                     this.targetPos, configManager.get("align_rough_back", .5));
+
+                    currTarget = new Pose2d(
+                            firstPose.getTranslation(), Rotation2d.fromRadians(AlignUtils.getAngleToTarget(odometry.getRobotPose().toPose2d(), odometry.getTargetPose().toPose2d()))
+                    );
+
                     this.xAxisPid.setTolerance(configManager.get("align_pos_rough_tol", 0.2));
                     this.yAxisPid.setTolerance(configManager.get("align_pos_rough_tol", 0.2));
                     this.rotationPid.setTolerance(
@@ -191,35 +197,5 @@ public class ReefAlignCommand extends Command {
     @Override
     public void end(boolean interrupted) {
         swerveSubsystem.drive(0, 0, 0, false, true, false);
-    }
-
-    /**
-     * Get the pose a distance, dist, back from the original target, as well as the rotation to face
-     * the april tag
-     *
-     * @param targetPose The final target pose
-     * @param dist The distance back from the target pose
-     * @return The new transformed pose
-     */
-    private Pose2d getFirstPose(Pose2d targetPose, double dist) {
-        double theta =
-                Math.atan2(
-                        targetPos.getY() - AlignConstants.REEF_POSE.getY(),
-                        targetPos.getX() - AlignConstants.REEF_POSE.getX());
-
-        double distX = dist * Math.cos(theta);
-        double distY = dist * Math.sin(theta);
-
-        debug.setEntry("align diff y", targetPose.getY() - AlignConstants.REEF_POSE.getY());
-        debug.setEntry("align diff x", targetPose.getX() - AlignConstants.REEF_POSE.getX());
-
-        debug.setEntry("align theta", Math.toDegrees(theta));
-        debug.setEntry("align distx", distX);
-        debug.setEntry("align disty", distY);
-
-        return new Pose2d(
-                targetPose.getX() + distX,
-                targetPose.getY() + distY,
-                Rotation2d.fromRadians(theta));
     }
 }
