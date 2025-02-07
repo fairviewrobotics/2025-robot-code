@@ -231,4 +231,13 @@ public class NetworkTablesUtils {
     public boolean keyExists(String key) {
         return this.table.getEntry(key).exists();
     }
+
+    /**
+     * Return the raw network table
+     *
+     * @return The raw network table
+     */
+    public NetworkTable getNetworkTable() {
+        return this.table;
+    }
 }

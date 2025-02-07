@@ -29,6 +29,8 @@ public class Odometry {
 
     private final NetworkTablesUtils NTTelemetry = NetworkTablesUtils.getTable("Telemetry");
 
+    private Pose3d targetPose = new Pose3d();
+
     /** Pose estimator for the robot, combining wheel-based odometry and vision measurements. */
     private final SwerveDrivePoseEstimator3d poseEstimator =
             new SwerveDrivePoseEstimator3d(
@@ -90,6 +92,20 @@ public class Odometry {
     }
 
     /**
+     * Get a camera by name
+     *
+     * @param name The name of the camera
+     * @return Either an empty optional if the camera does not exist, or the camera
+     */
+    public Optional<Camera> getCamera(String name) {
+        for (Camera c : this.cameras) {
+            if (c.getName().equalsIgnoreCase(name)) return Optional.of(c);
+        }
+
+        return Optional.empty();
+    }
+
+    /**
      * Get the current estimated pose of the robot
      *
      * @return A {@link Pose3d} of the robot
@@ -98,6 +114,13 @@ public class Odometry {
         return this.poseEstimator.getEstimatedPosition();
     }
 
+    /**
+     *
+     * @return
+     */
+    public Pose3d getTargetPose() {
+        return this.targetPose;
+    }
     /**
      * Add odometry data from wheels
      *
@@ -114,21 +137,21 @@ public class Odometry {
         this.poseEstimator.update(gyroRotation, swerveModulePositions);
     }
 
-    @Override
     public void periodic() {
         NTTelemetry.setArrayEntry(
                 "Pose",
                 new double[] {
                     this.getRobotPose().getX(),
                     this.getRobotPose().getY(),
-                    this.getRobotPose().getZ()
+                    this.getRobotPose().getRotation().getZ()
                 });
         for (Camera c : this.cameras) {
             Optional<Pose3d> pose = c.getPoseFieldSpace(this.getRobotPose());
             if (pose.isPresent()) {
-                if (c.getDistanceFromTag()
+                if (1 // FIXME: Fix once
                         > ConfigManager.getInstance().get("vision_cutoff_distance", 3)) return;
                 LOGGER.debug("Added vision measurement from `{}`", c.getName());
+                this.targetPose = c.getTargetPose();
                 this.poseEstimator.addVisionMeasurement(pose.get(), c.getTimestamp());
             }
         }

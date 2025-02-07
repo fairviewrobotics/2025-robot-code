@@ -10,6 +10,8 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkFlexConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -37,7 +39,7 @@ public class MAXSwerveModule {
         turningSpark = new SparkMax(turningCANId, MotorType.kBrushless);
 
         drivingEncoder = drivingSpark.getEncoder();
-        turningEncoder = turningSpark.getAbsoluteEncoder();
+        turningEncoder = drivingSpark.getAbsoluteEncoder();
 
         drivingClosedLoopController = drivingSpark.getClosedLoopController();
         turningClosedLoopController = turningSpark.getClosedLoopController();
@@ -107,6 +109,13 @@ public class MAXSwerveModule {
                 correctedDesiredState.angle.getRadians(), ControlType.kPosition);
 
         this.desiredState = desiredState;
+    }
+
+    public void reconfigure(SparkFlexConfig drivingConfig, SparkMaxConfig turningConfig) {
+        drivingSpark.configure(
+                drivingConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        turningSpark.configure(
+                turningConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     /** Zeroes all the SwerveModule encoders. */
