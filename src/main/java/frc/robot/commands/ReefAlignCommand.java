@@ -116,9 +116,13 @@ public class ReefAlignCommand extends Command {
                             AlignUtils.getFirstPose(
                                     this.targetPos, configManager.get("align_rough_back", .5));
 
-                    currTarget = new Pose2d(
-                            firstPose.getTranslation(), Rotation2d.fromRadians(AlignUtils.getAngleToTarget(odometry.getRobotPose().toPose2d(), odometry.getTargetPose().toPose2d()))
-                    );
+                    currTarget =
+                            new Pose2d(
+                                    firstPose.getTranslation(),
+                                    Rotation2d.fromRadians(
+                                            AlignUtils.getAngleToTarget(
+                                                    odometry.getRobotPose().toPose2d(),
+                                                    odometry.getTargetPose().toPose2d())));
 
                     this.xAxisPid.setTolerance(configManager.get("align_pos_rough_tol", 0.2));
                     this.yAxisPid.setTolerance(configManager.get("align_pos_rough_tol", 0.2));

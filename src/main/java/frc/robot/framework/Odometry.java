@@ -115,12 +115,12 @@ public class Odometry {
     }
 
     /**
-     *
      * @return
      */
     public Pose3d getTargetPose() {
         return this.targetPose;
     }
+
     /**
      * Add odometry data from wheels
      *

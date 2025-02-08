@@ -1,16 +1,11 @@
 /* Black Knights Robotics (C) 2025 */
 package frc.robot.framework;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import frc.robot.utils.ConfigManager;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import frc.robot.constants.CoralQueueConstants;
+import frc.robot.utils.ConfigManager;
+import java.util.ArrayList;
 
 public class CoralQueue {
     private ArrayList<Pose3d> queue;
@@ -20,7 +15,7 @@ public class CoralQueue {
     public void listToQueue(String posStrList) {
         String[] posList = posStrList.split(",");
         for (String i : posList) {
-                addToQueue(i);
+            addToQueue(i);
         }
     }
 
@@ -30,7 +25,9 @@ public class CoralQueue {
     }
 
     public void addToQueue(String posStr) {
-        if (posStr == null || posStr.isEmpty()) { return; }
+        if (posStr == null || posStr.isEmpty()) {
+            return;
+        }
 
         int splitIdx = posStr.length() - 2;
         String heightString = posStr.substring(splitIdx);
@@ -46,7 +43,6 @@ public class CoralQueue {
             posIdxString = posStr.substring(posString.length() - 1, posString.length());
         }
 
-
         int heightIdx = Integer.parseInt(heightIdxString) - 1;
         int posIdx = Integer.parseInt(posIdxString);
 
@@ -54,19 +50,30 @@ public class CoralQueue {
             posIdx = posIdx + 12;
         }
 
-        queue.add(new Pose3d(CoralQueueConstants.CORAL_POSITIONS[posIdx].getX(), CoralQueueConstants.CORAL_POSITIONS[posIdx].getY(), CoralQueueConstants.REEF_HEIGHTS[heightIdx], new Rotation3d (CoralQueueConstants.CORAL_POSITIONS[posIdx].getRotation())));
+        queue.add(
+                new Pose3d(
+                        CoralQueueConstants.CORAL_POSITIONS[posIdx].getX(),
+                        CoralQueueConstants.CORAL_POSITIONS[posIdx].getY(),
+                        CoralQueueConstants.REEF_HEIGHTS[heightIdx],
+                        new Rotation3d(CoralQueueConstants.CORAL_POSITIONS[posIdx].getRotation())));
     }
 
-    public void skipNextValue () {
+    public void skipNextValue() {
         queue.add(queue.get(0));
         queue.remove(0);
     }
 
-    public void addToFront() { queue.add(0, currentPos); }
+    public void addToFront() {
+        queue.add(0, currentPos);
+    }
 
-    public void addToBack() { queue.add(currentPos); }
+    public void addToBack() {
+        queue.add(currentPos);
+    }
 
-    public void clearQueue() { queue.clear(); }
+    public void clearQueue() {
+        queue.clear();
+    }
 
     public void NTaddToQueue() {
         listToQueue(ConfigManager.getInstance().get("Coral_queue", ""));
