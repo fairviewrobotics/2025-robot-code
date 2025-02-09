@@ -28,10 +28,10 @@ public class DrivetrainConstants {
                     new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2));
 
     // Angular offsets of the modules relative to the chassis in radians
-    public static final double FRONT_LEFT_CHASSIS_ANGULAR_OFFSET = 0.098 - Math.PI / 2;
-    public static final double FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = 3.157;
-    public static final double REAR_LEFT_CHASSIS_ANGULAR_OFFSET = 1.962 + Math.PI;
-    public static final double REAR_RIGHT_CHASSIS_ANGULAR_OFFSET = 1.14 + Math.PI / 2;
+    public static final double FRONT_LEFT_CHASSIS_ANGULAR_OFFSET = 5.835 - Math.PI / 2;
+    public static final double FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = 0.931;
+    public static final double REAR_LEFT_CHASSIS_ANGULAR_OFFSET = 1.845 + Math.PI;
+    public static final double REAR_RIGHT_CHASSIS_ANGULAR_OFFSET = 1.127 + Math.PI / 2;
 
     // SPARK MAX CAN IDs
     public static final int FRONT_LEFT_DRIVING_CAN_ID = 3;

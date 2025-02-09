@@ -56,6 +56,18 @@ public class ElevatorSubsystem extends SubsystemBase {
                     .getDoubleTopic("EncoderPos")
                     .getEntry(getElevatorPosition());
 
+    private final DoubleEntry elevatorLEncoderPos =
+            NetworkTableInstance.getDefault()
+                    .getTable("Elevator")
+                    .getDoubleTopic("EncoderLPos")
+                    .getEntry(0.0);
+
+    private final DoubleEntry elevatorREncoderPos =
+            NetworkTableInstance.getDefault()
+                    .getTable("Elevator")
+                    .getDoubleTopic("EncoderRPos")
+                    .getEntry(0.0);
+
     public double zeroVoltage =
             ConfigManager.getInstance()
                     .get("elevator_zero_voltage", ElevatorConstants.ELEVATOR_ZEROING_VOLTAGE);
@@ -75,7 +87,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         rightElevatorMotor.configure(
                 rightElevatorMotorConfig,
-                SparkBase.ResetMode.kNoResetSafeParameters,
+                SparkBase.ResetMode.kResetSafeParameters,
                 SparkBase.PersistMode.kPersistParameters);
         leftElevatorMotor.configure(
                 leftElevatorMotorConfig,
@@ -145,8 +157,10 @@ public class ElevatorSubsystem extends SubsystemBase {
      * @return The elevator position in meters
      */
     public double getElevatorPosition() {
-        double encoderAveragePos = (leftEncoder.getPosition() + rightEncoder.getPosition()) / 2;
+        //        double encoderAveragePos = (leftEncoder.getPosition() +
+        // rightEncoder.getPosition()) / 2;
         // Calculates average pos
+        double encoderAveragePos = leftEncoder.getPosition();
         return encoderAveragePos * ElevatorConstants.ROTATIONS_TO_METERS;
     }
 
@@ -183,6 +197,9 @@ public class ElevatorSubsystem extends SubsystemBase {
                 ConfigManager.getInstance().get("elevator_i", ElevatorConstants.ELEVATOR_I));
         elevatorPID.setD(
                 ConfigManager.getInstance().get("elevator_d", ElevatorConstants.ELEVATOR_D));
+
+        elevatorLEncoderPos.set(leftEncoder.getPosition());
+        elevatorREncoderPos.set(rightEncoder.getPosition());
 
         elevatorEncoderPos.set(getElevatorPosition());
         zeroVoltage =

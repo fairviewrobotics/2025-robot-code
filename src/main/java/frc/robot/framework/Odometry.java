@@ -29,7 +29,7 @@ public class Odometry {
 
     private final NetworkTablesUtils NTTelemetry = NetworkTablesUtils.getTable("Telemetry");
 
-    private Pose3d targetPose = new Pose3d();
+    private Optional<Pose3d> targetPose = Optional.of(new Pose3d());
 
     /** Pose estimator for the robot, combining wheel-based odometry and vision measurements. */
     private final SwerveDrivePoseEstimator3d poseEstimator =
@@ -115,12 +115,12 @@ public class Odometry {
     }
 
     /**
-     *
      * @return
      */
-    public Pose3d getTargetPose() {
+    public Optional<Pose3d> getTargetPose() {
         return this.targetPose;
     }
+
     /**
      * Add odometry data from wheels
      *
@@ -151,8 +151,16 @@ public class Odometry {
                 if (1 // FIXME: Fix once
                         > ConfigManager.getInstance().get("vision_cutoff_distance", 3)) return;
                 LOGGER.debug("Added vision measurement from `{}`", c.getName());
-                this.targetPose = c.getTargetPose();
+                this.targetPose =
+                        Optional.of(
+                                new Pose3d(
+                                        c.getTargetPose().getX() + this.getRobotPose().getX(),
+                                        c.getTargetPose().getY() + this.getRobotPose().getY(),
+                                        c.getTargetPose().getZ(),
+                                        c.getTargetPose().getRotation()));
                 this.poseEstimator.addVisionMeasurement(pose.get(), c.getTimestamp());
+            } else {
+                this.targetPose = Optional.empty();
             }
         }
     }

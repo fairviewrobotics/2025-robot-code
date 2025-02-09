@@ -110,7 +110,7 @@ public class ConfigManager {
      */
     @SuppressWarnings("unchecked")
     public long get(String key, long defaultValue) {
-        double v = (double) defaultValue;
+        double v = Long.valueOf(defaultValue).doubleValue();
         if (!NTTune.keyExists(key)) {
             LOGGER.info("{} does not exist, creating a setting to {}", key, defaultValue);
             NTTune.setEntry(key, v);
