@@ -14,10 +14,11 @@ public class CoralQueue {
     public CoralQueue() {}
 
     /**
-     * Add position string to queue. No spaces, separated by commas. (e.g. B10H2, R1H3, R2H2, B1H1, B5104).
+     * Add position string to queue. No spaces, separated by commas. (e.g. B10H2, R1H3, R2H2, B1H1,
+     * B5104).
+     *
      * @param posStrList
      */
-
     public void listToQueue(String posStrList) {
         String[] posList = posStrList.split(",");
         for (String i : posList) {
@@ -27,9 +28,9 @@ public class CoralQueue {
 
     /**
      * Return next reef position in the queue
+     *
      * @return
      */
-
     public CoralPosition getNext() {
         currentPos = queue.remove(0);
         return this.currentPos;
@@ -37,9 +38,9 @@ public class CoralQueue {
 
     /**
      * Convert reef position IDs to heights and positions.
+     *
      * @param posStr
      */
-
     public void addToQueue(String posStr) {
         if (posStr == null || posStr.isEmpty()) {
             return;
@@ -53,8 +54,6 @@ public class CoralQueue {
 
         String posIdxString = posString.substring(1);
 
-
-
         int heightIdx = Character.getNumericValue(heightIdxChar) - 1;
         int posIdx = Integer.parseInt(posIdxString);
 
@@ -62,50 +61,40 @@ public class CoralQueue {
             posIdx = posIdx + 12;
         }
 
-        queue.add(new CoralPosition(
-                new Pose2d(
-                        CoralQueueConstants.CORAL_POSITIONS[posIdx].getX(),
-                        CoralQueueConstants.CORAL_POSITIONS[posIdx].getY(),
-                        CoralQueueConstants.CORAL_POSITIONS[posIdx].getRotation()),
-                CoralQueueConstants.REEF_HEIGHTS[heightIdx]));
+        queue.add(
+                new CoralPosition(
+                        new Pose2d(
+                                CoralQueueConstants.CORAL_POSITIONS[posIdx].getX(),
+                                CoralQueueConstants.CORAL_POSITIONS[posIdx].getY(),
+                                CoralQueueConstants.CORAL_POSITIONS[posIdx].getRotation()),
+                        CoralQueueConstants.REEF_HEIGHTS[heightIdx]));
     }
 
-    /**
-     * Skip to the next reef position in the queue
-     */
-
+    /** Skip to the next reef position in the queue */
     public void skipNextValue() {
         queue.add(queue.get(0));
         queue.remove(0);
     }
 
-    /**
-     * Add current reef position to the front of the queue.
-     */
-
+    /** Add current reef position to the front of the queue. */
     public void addToFront() {
         queue.add(0, currentPos);
     }
 
-    /**
-     * Add current reef position to the back of the queue.
-     */
+    /** Add current reef position to the back of the queue. */
     public void addToBack() {
         queue.add(currentPos);
     }
 
-    /**
-     * Clear the queue.
-     */
-
+    /** Clear the queue. */
     public void clearQueue() {
         queue.clear();
     }
 
     /**
-     * Input position string and add it to queue via network tables. No spaces, separated by commas. (e.g. B10H2, R1H3, R2H2, B1H1, B5104).
+     * Input position string and add it to queue via network tables. No spaces, separated by commas.
+     * (e.g. B10H2, R1H3, R2H2, B1H1, B5104).
      */
-
     public void loadQueueFromNT() {
         listToQueue(ConfigManager.getInstance().get("coral_queue", ""));
     }
@@ -113,5 +102,5 @@ public class CoralQueue {
     /**
      * @param height TODO: Replace with enum once implemented
      */
-    public record CoralPosition(Pose2d pose2d, double height) { }
+    public record CoralPosition(Pose2d pose2d, double height) {}
 }
