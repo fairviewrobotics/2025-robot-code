@@ -63,4 +63,15 @@ class CoralQueueTest {
                         new Pose2d(5.0, 7.0, Rotation2d.fromDegrees(12.0)), 1.0);
         assertEquals(expected, coralQueue.getNext());
     }
+
+    @Test
+    void testAddToFront() {
+        coralQueue.listToQueue("B10H4,R0H1");
+        coralQueue.getNext();
+        coralQueue.addToFront();
+        CoralQueue.CoralPosition expected =
+                new CoralQueue.CoralPosition(
+                    new Pose2d(13.0, 24.0, Rotation2d.fromDegrees(45.0)), 5.0);
+        assertEquals(expected, coralQueue.getNext());
+    }
 }
