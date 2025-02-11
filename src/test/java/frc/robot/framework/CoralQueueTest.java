@@ -38,7 +38,7 @@ class CoralQueueTest {
         assertEquals(expected, coralQueue.getNext());
         expected = new CoralQueue.CoralPosition(new Pose2d(5.0, 7.0, Rotation2d.fromDegrees(12.0)), 1.0);
         assertEquals(expected, coralQueue.getNext());
-        expected = new CoralQueue.CoralPosition(  new Pose2d(3.0, 12.0, Rotation2d.fromDegrees(9.0)), 5.0);
+        expected = new CoralQueue.CoralPosition(new Pose2d(3.0, 12.0, Rotation2d.fromDegrees(9.0)), 5.0);
         assertEquals(expected, coralQueue.getNext());
     }
 
