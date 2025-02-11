@@ -1,16 +1,17 @@
 /* Black Knights Robotics (C) 2025 */
 package frc.robot.framework;
 
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Pose2d;
 import frc.robot.constants.CoralQueueConstants;
 import frc.robot.utils.ConfigManager;
 import java.util.ArrayList;
 
 public class CoralQueue {
-    private ArrayList<Pose3d> queue;
+    private ArrayList<CoralPosition> queue = new ArrayList<>();
 
-    private Pose3d currentPos = new Pose3d();
+    private CoralPosition currentPos = null;
+
+    public CoralQueue() {}
 
     public void listToQueue(String posStrList) {
         String[] posList = posStrList.split(",");
@@ -19,7 +20,7 @@ public class CoralQueue {
         }
     }
 
-    public Pose3d getNext() {
+    public CoralPosition getNext() {
         currentPos = queue.remove(0);
         return this.currentPos;
     }
@@ -33,29 +34,28 @@ public class CoralQueue {
         String heightString = posStr.substring(splitIdx);
         String posString = posStr.substring(0, splitIdx);
 
-        String heightIdxString = posStr.substring(heightString.length() - 1, heightString.length());
+        char heightIdxChar = heightString.charAt(1);
 
-        String posIdxString;
+        String posIdxString = posString.substring(1, posString.length());
 
-        if (posString.length() == 3) {
-            posIdxString = posStr.substring(posString.length() - 2, posString.length());
-        } else {
-            posIdxString = posStr.substring(posString.length() - 1, posString.length());
-        }
 
-        int heightIdx = Integer.parseInt(heightIdxString) - 1;
+
+        int heightIdx = Character.getNumericValue(heightIdxChar) - 1;
         int posIdx = Integer.parseInt(posIdxString);
 
         if (posString.charAt(0) == 'B') {
             posIdx = posIdx + 12;
         }
 
-        queue.add(
-                new Pose3d(
+        queue.add(new CoralPosition(
+                new Pose2d(
                         CoralQueueConstants.CORAL_POSITIONS[posIdx].getX(),
                         CoralQueueConstants.CORAL_POSITIONS[posIdx].getY(),
-                        CoralQueueConstants.REEF_HEIGHTS[heightIdx],
-                        new Rotation3d(CoralQueueConstants.CORAL_POSITIONS[posIdx].getRotation())));
+                        CoralQueueConstants.CORAL_POSITIONS[posIdx].getRotation()),
+                CoralQueueConstants.REEF_HEIGHTS[heightIdx]));
+
+        posIdx = 0;
+        heightIdx = 0;
     }
 
     public void skipNextValue() {
@@ -78,4 +78,9 @@ public class CoralQueue {
     public void NTaddToQueue() {
         listToQueue(ConfigManager.getInstance().get("Coral_queue", ""));
     }
+
+    /**
+     * @param height TODO: Replace with enum once implemented
+     */
+    public record CoralPosition(Pose2d pose2d, double height) { }
 }
