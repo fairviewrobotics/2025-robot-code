@@ -14,8 +14,7 @@ public class CoralQueue {
     public CoralQueue() {}
 
     /**
-     * Add position string to queue. No spaces, separated by commas. (e.g. B10H2, R1H3, R2H2, B1H1,
-     * B5104).
+     * Add position string to queue. No spaces, separated by commas. (e.g. B10H2,R1H3,R2H2,B1H1,B5H4).
      *
      * @param posStrList
      */
@@ -93,7 +92,7 @@ public class CoralQueue {
 
     /**
      * Input position string and add it to queue via network tables. No spaces, separated by commas.
-     * (e.g. B10H2, R1H3, R2H2, B1H1, B5104).
+     * (e.g. B10H2,R1H3,R2H2,B1H1,B5104).
      */
     public void loadQueueFromNT() {
         listToQueue(ConfigManager.getInstance().get("coral_queue", ""));
