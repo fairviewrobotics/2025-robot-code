@@ -1,18 +1,17 @@
 /* Black Knights Robotics (C) 2025 */
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.commands.*;
+import frc.robot.commands.AlignCommand;
 import frc.robot.constants.DrivetrainConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.framework.Odometry;
 import frc.robot.subsystems.*;
-import frc.robot.utils.Camera;
-import frc.robot.utils.Controller;
-import frc.robot.utils.NetworkTablesUtils;
+import frc.robot.utils.*;
 
 public class RobotContainer {
     // Subsystems
@@ -23,6 +22,8 @@ public class RobotContainer {
     // Controllers
     Controller primaryController = new Controller(0);
     Controller secondaryController = new Controller(1);
+
+    Pose2d targetPose = new Pose2d(12.499, 2.922, Rotation2d.fromRadians(1.020));
 
     private final NetworkTablesUtils NTTune = NetworkTablesUtils.getTable("debug");
 
@@ -68,8 +69,28 @@ public class RobotContainer {
         primaryController.leftBumper.whileTrue(
                 new ArmPositionCommand(armSubsystem, 0, primaryController));
 
-        primaryController.aButton.whileTrue(new ReefAlignCommand(swerveSubsystem));
+        //        primaryController.aButton.whileTrue(
+        //                new SequentialCommandGroup(
+        //                        new AlignCommand(
+        //                                swerveSubsystem,
+        //                                AlignUtils.getFirstPose(
+        //                                        targetPose,
+        //                                        ConfigManager.getInstance().get("Align/Dist_Back",
+        // 0.5)),
+        //                                "Rough"),
+        //                        new ParallelCommandGroup(
+        //                                new AlignCommand(swerveSubsystem, targetPose, "Fine"),
+        //                                new InstantCommand() // TODO: Replace with elevator
+        // command
+        //                                )));
 
+        primaryController.aButton.whileTrue(
+                new AlignCommand(
+                        swerveSubsystem,
+                        AlignUtils.getFirstPose(
+                                targetPose,
+                                ConfigManager.getInstance().get("Align/Dist_Back", 0.5)),
+                        "Rough"));
         primaryController.bButton.whileTrue(new ElevatorPositionCommand(elevatorSubsystem, 0.3));
 
         primaryController.xButton.whileTrue(new ElevatorPositionCommand(elevatorSubsystem, 0.5));

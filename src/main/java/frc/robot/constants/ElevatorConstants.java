@@ -5,8 +5,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 
 public class ElevatorConstants {
 
-    public static final int LEFT_MOTOR_ID = 21;
-    public static final int RIGHT_MOTOR_ID = 20;
+    public static final int LEFT_MOTOR_ID = 20;
+    public static final int RIGHT_MOTOR_ID = 21;
 
     public static final double ELEVATOR_P = 0.0;
     public static final double ELEVATOR_I = 0;
