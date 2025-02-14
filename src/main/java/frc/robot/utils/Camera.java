@@ -79,7 +79,11 @@ public class Camera {
                 try {
                     res = this.photonCamera.get().getAllUnreadResults().get(0);
                     Transform3d bestCamToTarget = res.getBestTarget().getBestCameraToTarget();
-                    this.targetPose = new Pose3d(bestCamToTarget.getTranslation(), bestCamToTarget.getRotation()).transformBy(this.camOffset);
+                    this.targetPose =
+                            new Pose3d(
+                                            bestCamToTarget.getTranslation(),
+                                            bestCamToTarget.getRotation())
+                                    .transformBy(this.camOffset);
                 } catch (Exception e) {
                     return Optional.empty();
                 }
@@ -106,12 +110,19 @@ public class Camera {
     private Optional<Pose3d> getPose3dLimelight() {
         assert this.limelightTable.isPresent();
 
-        double[] rawPose = this.limelightTable.get().getArrayEntry("botpose_wpiblue", new double[0]);
+        double[] rawPose =
+                this.limelightTable.get().getArrayEntry("botpose_wpiblue", new double[0]);
         if (rawPose.length != 6) return Optional.empty();
 
-        double[] targetPoseRaw = this.limelightTable.get().getArrayEntry("targetpose_cameraspace", new double[0]);
+        double[] targetPoseRaw =
+                this.limelightTable.get().getArrayEntry("targetpose_cameraspace", new double[0]);
         if (targetPoseRaw.length == 6) {
-            Pose3d cameraPose = new Pose3d(targetPoseRaw[0], targetPoseRaw[1], targetPoseRaw[2], new Rotation3d(0.0, 0.0, Math.toRadians(targetPoseRaw[5])));
+            Pose3d cameraPose =
+                    new Pose3d(
+                            targetPoseRaw[0],
+                            targetPoseRaw[1],
+                            targetPoseRaw[2],
+                            new Rotation3d(0.0, 0.0, Math.toRadians(targetPoseRaw[5])));
             this.targetPose = cameraPose.transformBy(this.camOffset);
         }
 
@@ -155,9 +166,7 @@ public class Camera {
         return this.name;
     }
 
-    /**
-     *
-     */
+    /** */
     public Pose3d getTargetPose() {
         return this.targetPose;
     }

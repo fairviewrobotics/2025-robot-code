@@ -22,9 +22,8 @@ public class BaseCommand extends Command {
 
     @Override
     public void execute() {
-        System.out.println("BaseCommand running!!!!!");
         armSubsystem.setPivotAngle(-0.1);
-        if (armSubsystem.getPivotAngle() <= -Math.PI / 4 || armSubsystem.getPivotAngle() >= 0) {
+        if (armSubsystem.getPivotAngle() <= -Math.PI / 4 || armSubsystem.getPivotAngle() >= 0.2) {
             elevatorSubsystem.holdPosition();
         } else {
             elevatorSubsystem.zeroElevator();

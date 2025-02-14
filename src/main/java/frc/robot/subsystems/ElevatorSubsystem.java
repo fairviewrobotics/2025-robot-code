@@ -5,8 +5,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel;
-import com.revrobotics.spark.config.SparkBaseConfig;
-import com.revrobotics.spark.config.SparkFlexConfig;
+import com.revrobotics.spark.config.*;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -56,6 +55,30 @@ public class ElevatorSubsystem extends SubsystemBase {
                     .getDoubleTopic("EncoderPos")
                     .getEntry(getElevatorPosition());
 
+    private final DoubleEntry elevatorLEncoderPos =
+            NetworkTableInstance.getDefault()
+                    .getTable("Elevator")
+                    .getDoubleTopic("EncoderLPos")
+                    .getEntry(0.0);
+
+    private final DoubleEntry elevatorREncoderPos =
+            NetworkTableInstance.getDefault()
+                    .getTable("Elevator")
+                    .getDoubleTopic("EncoderRPos")
+                    .getEntry(0.0);
+
+    private final DoubleEntry elevatorCurrent =
+            NetworkTableInstance.getDefault()
+                    .getTable("Elevator")
+                    .getDoubleTopic("Output Current")
+                    .getEntry(rightElevatorMotor.getOutputCurrent());
+
+    private final DoubleEntry elevatorVoltage =
+            NetworkTableInstance.getDefault()
+                    .getTable("Elevator")
+                    .getDoubleTopic("Applied Voltage")
+                    .getEntry(rightElevatorMotor.getAppliedOutput());
+
     public double zeroVoltage =
             ConfigManager.getInstance()
                     .get("elevator_zero_voltage", ElevatorConstants.ELEVATOR_ZEROING_VOLTAGE);
@@ -73,9 +96,14 @@ public class ElevatorSubsystem extends SubsystemBase {
         rightElevatorMotorConfig.idleMode(SparkBaseConfig.IdleMode.kBrake);
         leftElevatorMotorConfig.idleMode(SparkBaseConfig.IdleMode.kBrake);
 
+        rightElevatorMotorConfig.smartCurrentLimit(40, 40);
+        leftElevatorMotorConfig.smartCurrentLimit(40, 40);
+
+        //        rightElevatorMotorConfig.secondaryCurrentLimit(40);
+
         rightElevatorMotor.configure(
                 rightElevatorMotorConfig,
-                SparkBase.ResetMode.kNoResetSafeParameters,
+                SparkBase.ResetMode.kResetSafeParameters,
                 SparkBase.PersistMode.kPersistParameters);
         leftElevatorMotor.configure(
                 leftElevatorMotorConfig,
@@ -118,6 +146,12 @@ public class ElevatorSubsystem extends SubsystemBase {
         elevatorPID.setGoal(position);
         double pidCalc = elevatorPID.calculate(getElevatorPosition());
         double ffCalc = elevatorFF.calculate(0.0);
+
+        if (Math.abs(this.getLeftEncoderPosition() - this.getRightEncoderPosition())
+                > ConfigManager.getInstance().get("max_roation_diff", 1)) {
+            setVoltage(0.0);
+            return;
+        }
         setVoltage(pidCalc + ffCalc);
     }
 
@@ -134,6 +168,14 @@ public class ElevatorSubsystem extends SubsystemBase {
         }
     }
 
+    public double getLeftEncoderPosition() {
+        return leftEncoder.getPosition();
+    }
+
+    public double getRightEncoderPosition() {
+        return rightEncoder.getPosition();
+    }
+
     /** Reset elevator PID */
     public void resetPID() {
         elevatorPID.reset(getElevatorPosition());
@@ -147,6 +189,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     public double getElevatorPosition() {
         double encoderAveragePos = (leftEncoder.getPosition() + rightEncoder.getPosition()) / 2;
         // Calculates average pos
+        //        double encoderAveragePos = leftEncoder.getPosition();
         return encoderAveragePos * ElevatorConstants.ROTATIONS_TO_METERS;
     }
 
@@ -184,10 +227,16 @@ public class ElevatorSubsystem extends SubsystemBase {
         elevatorPID.setD(
                 ConfigManager.getInstance().get("elevator_d", ElevatorConstants.ELEVATOR_D));
 
+        elevatorLEncoderPos.set(leftEncoder.getPosition());
+        elevatorREncoderPos.set(rightEncoder.getPosition());
+
         elevatorEncoderPos.set(getElevatorPosition());
         zeroVoltage =
                 ConfigManager.getInstance()
                         .get("elevator_zero_voltage", ElevatorConstants.ELEVATOR_ZEROING_VOLTAGE);
+
+        elevatorCurrent.set(rightElevatorMotor.getOutputCurrent());
+        elevatorVoltage.set(rightElevatorMotor.getAppliedOutput());
 
         //
         // Elevator zeroing
