@@ -3,6 +3,8 @@ package frc.robot.constants;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CoralQueueConstants {
     public static final Pose2d[] CORAL_POSITIONS =
@@ -33,5 +35,12 @@ public class CoralQueueConstants {
                 new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0.0)) // B11
             };
 
-    public static final double[] REEF_HEIGHTS = new double[] {1.0, 0.0, 0.0, 5.0};
+    public static final double[] REEF_HEIGHTS = new double[] {1.0, 0.0, 0.0, 5.0, 0.0, 0.0};
+
+    public static final Map<String, String[]> PROFILES = new HashMap<>();
+
+    static {
+        PROFILES.put("PROFILE_1", new String[] {"10H4", "9H4", "8H4", "7H4", "6H4", "5H4", "4H4"});
+        PROFILES.put("PROFILE_2", new String[] {"5H3", "4H3", "3H3", "2H3", "1H3"});
+    }
 }
