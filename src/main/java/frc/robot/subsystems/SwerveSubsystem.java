@@ -158,6 +158,8 @@ public class SwerveSubsystem extends SubsystemBase {
     public void periodic() {
         NTUtils.setEntry("Gyro Angle", gyro.getAngle());
 
+        NTUtils.setEntry("Acceleration", frontLeft.getState().speedMetersPerSecond);
+
         NTUtils.setEntry(
                 "Gyro Accel",
                 Math.sqrt(
@@ -174,6 +176,14 @@ public class SwerveSubsystem extends SubsystemBase {
                             rearLeft.getPosition()
                         });
 
+        NTUtils.setArrayEntry(
+                "Speeds",
+                new double[] {
+                    this.getFieldRelativeChassisSpeeds().vxMetersPerSecond,
+                    this.getFieldRelativeChassisSpeeds().vyMetersPerSecond,
+                    this.getFieldRelativeChassisSpeeds().omegaRadiansPerSecond
+                });
+
         frontrightpos.set(frontRight.getPosition().angle.getRadians());
         frontleftpos.set(frontLeft.getPosition().angle.getRadians());
         rearrightpos.set(rearRight.getPosition().angle.getRadians());
@@ -183,25 +193,25 @@ public class SwerveSubsystem extends SubsystemBase {
         actualTelemetry.set(
                 new double[] {
                     frontLeft.getPosition().angle.getRadians(),
-                            frontLeft.getState().speedMetersPerSecond,
+                    frontLeft.getState().speedMetersPerSecond,
                     frontRight.getPosition().angle.getRadians(),
-                            frontRight.getState().speedMetersPerSecond,
+                    frontRight.getState().speedMetersPerSecond,
                     rearLeft.getPosition().angle.getRadians(),
-                            rearLeft.getState().speedMetersPerSecond,
+                    rearLeft.getState().speedMetersPerSecond,
                     rearRight.getPosition().angle.getRadians(),
-                            rearRight.getState().speedMetersPerSecond
+                    rearRight.getState().speedMetersPerSecond
                 });
 
         setpointsTelemetry.set(
                 new double[] {
                     frontLeft.getState().angle.getRadians(),
-                            frontLeft.getState().speedMetersPerSecond,
+                    frontLeft.getState().speedMetersPerSecond,
                     frontRight.getState().angle.getRadians(),
-                            frontRight.getState().speedMetersPerSecond,
+                    frontRight.getState().speedMetersPerSecond,
                     rearLeft.getState().angle.getRadians(),
-                            rearLeft.getState().speedMetersPerSecond,
+                    rearLeft.getState().speedMetersPerSecond,
                     rearRight.getState().angle.getRadians(),
-                            rearRight.getState().speedMetersPerSecond
+                    rearRight.getState().speedMetersPerSecond
                 });
 
         gyroHeading.set(getHeadingRad());
@@ -378,11 +388,34 @@ public class SwerveSubsystem extends SubsystemBase {
      * @return {@link ChassisSpeeds} of the current robots speed
      */
     public ChassisSpeeds getRobotRelativeSpeeds() {
+
         return DrivetrainConstants.DRIVE_KINEMATICS.toChassisSpeeds(
                 frontLeft.getState(),
                 frontRight.getState(),
                 rearLeft.getState(),
                 rearRight.getState());
+    }
+
+    /**
+     * Gets the robots chassis speed relative to the field
+     *
+     * @return Returns robot speed as a {@link ChassisSpeeds} in meters/second
+     */
+    public ChassisSpeeds getFieldRelativeChassisSpeeds() {
+        return new ChassisSpeeds(
+                getRobotRelativeSpeeds().vxMetersPerSecond
+                                * Math.cos(
+                                        Odometry.getInstance().getRobotPose().getRotation().getZ())
+                        - getRobotRelativeSpeeds().vyMetersPerSecond
+                                * Math.sin(
+                                        Odometry.getInstance().getRobotPose().getRotation().getZ()),
+                getRobotRelativeSpeeds().vyMetersPerSecond
+                                * Math.cos(
+                                        Odometry.getInstance().getRobotPose().getRotation().getZ())
+                        + getRobotRelativeSpeeds().vxMetersPerSecond
+                                * Math.sin(
+                                        Odometry.getInstance().getRobotPose().getRotation().getZ()),
+                getRobotRelativeSpeeds().omegaRadiansPerSecond);
     }
 
     /** Reset the gyro */

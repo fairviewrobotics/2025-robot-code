@@ -39,7 +39,6 @@ public class ConfigManager {
     }
 
     /** Util class to allow for good network table tuning */
-    // TODO: Add support for vales besides doubles
     public ConfigManager() {
         try {
             if (configFile.createNewFile() || configFile.length() == 0) {
@@ -64,7 +63,7 @@ public class ConfigManager {
         LOGGER.info(keys);
         while (keys.hasNext()) {
             String key = keys.next();
-            LOGGER.info("Initializing [{}] network table entry", key);
+            LOGGER.info("Initializing [{}] network table entry to [{}]", key, this.json.get(key));
             this.NTTune.getNetworkTable().getEntry(key).setValue(this.json.get(key));
         }
     }
@@ -77,7 +76,7 @@ public class ConfigManager {
                 (table, key1, event) -> {
                     Object value = table.getValue(key1).getValue();
                     this.json.put(key1, value);
-                    LOGGER.debug("Updated [{}] to `{}`", key1, value.toString());
+                    LOGGER.info("Updated [{}] to `{}`", key1, value.toString());
                     // table.getEntry(key1).getDouble(-1));
 
                     this.saveConfig();
@@ -109,14 +108,9 @@ public class ConfigManager {
      * @return The value from the key
      */
     @SuppressWarnings("unchecked")
-    public long get(String key, long defaultValue) {
-        double v = (double) defaultValue;
-        if (!NTTune.keyExists(key)) {
-            LOGGER.info("{} does not exist, creating a setting to {}", key, defaultValue);
-            NTTune.setEntry(key, v);
-            this.json.put(key, v);
-        }
-        return (long) getDouble(key, v);
+    public long get(String key, int defaultValue) {
+        this.checkDefault(key, defaultValue);
+        return (long) getDouble(key, (double) defaultValue);
     }
 
     /**
@@ -128,11 +122,7 @@ public class ConfigManager {
      */
     @SuppressWarnings("unchecked")
     public double get(String key, double defaultValue) {
-        if (!NTTune.keyExists(key)) {
-            LOGGER.info("{} does not exist, creating a setting to {}", key, defaultValue);
-            NTTune.setEntry(key, defaultValue);
-            this.json.put(key, defaultValue);
-        }
+        this.checkDefault(key, defaultValue);
         return getDouble(key, defaultValue);
     }
 
@@ -145,11 +135,7 @@ public class ConfigManager {
      */
     @SuppressWarnings("unchecked")
     public String get(String key, String defaultValue) {
-        if (!NTTune.keyExists(key)) {
-            LOGGER.info("{} does not exist, creating a setting to {}", key, defaultValue);
-            NTTune.setEntry(key, defaultValue);
-            this.json.put(key, defaultValue);
-        }
+        this.checkDefault(key, defaultValue);
         return getString(key, defaultValue);
     }
 
@@ -162,11 +148,7 @@ public class ConfigManager {
      */
     @SuppressWarnings("unchecked")
     public boolean get(String key, boolean defaultValue) {
-        if (!NTTune.keyExists(key)) {
-            LOGGER.info("{} does not exist, creating a setting to {}", key, defaultValue);
-            NTTune.setEntry(key, defaultValue);
-            this.json.put(key, defaultValue);
-        }
+        this.checkDefault(key, defaultValue);
         return getBoolean(key, defaultValue);
     }
 
@@ -180,7 +162,7 @@ public class ConfigManager {
     private double getDouble(String key, double defaultValue) {
         double res = defaultValue;
         try {
-            res = (double) this.json.get(key);
+            res = Double.parseDouble(this.json.get(key).toString());
         } catch (Exception e) {
             LOGGER.warn("Failed to get {} as a double", key, e);
         }
@@ -260,5 +242,14 @@ public class ConfigManager {
             LOGGER.error("An error occurred while parsing the config file", e);
         }
         return jObj;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void checkDefault(String key, Object defaultValue) {
+        if (!NTTune.keyExists(key)) {
+            LOGGER.info("{} does not exist, creating a setting to {}", key, defaultValue);
+            NTTune.getNetworkTable().getEntry(key).setValue(defaultValue);
+            this.json.put(key, defaultValue);
+        }
     }
 }

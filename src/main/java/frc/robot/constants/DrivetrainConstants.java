@@ -8,17 +8,17 @@ import edu.wpi.first.math.util.Units;
 public class DrivetrainConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
-    public static final double MAX_SPEED_METERS_PER_SECOND = 4.8 / 2;
-    public static final double MAX_ANGULAR_SPEED = 2 * Math.PI / 2; // radians per second
+    public static final double MAX_SPEED_METERS_PER_SECOND = Double.MAX_VALUE;
+    public static final double MAX_ANGULAR_SPEED = Double.MAX_VALUE; // radians per second
 
     public static final double DIRECTION_SLEW_RATE = 18.0; // rads/sec
     public static final double MAGNITUDE_SLEW_RATE = 22.0; // meters/second (1 = 100%)
     public static final double ROTATIONAL_SLEW_RATE = 30.0; // meters/second (1 = 100%)
 
     // Chassis configuration
-    public static final double TRACK_WIDTH = Units.inchesToMeters(30);
+    public static final double TRACK_WIDTH = Units.inchesToMeters(26.5);
     // Distance between centers of right and left wheels on robot
-    public static final double WHEEL_BASE = Units.inchesToMeters(30);
+    public static final double WHEEL_BASE = Units.inchesToMeters(26.5);
     // Distance between front and back wheels on robot
     public static final SwerveDriveKinematics DRIVE_KINEMATICS =
             new SwerveDriveKinematics(
@@ -28,10 +28,10 @@ public class DrivetrainConstants {
                     new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2));
 
     // Angular offsets of the modules relative to the chassis in radians
-    public static final double FRONT_LEFT_CHASSIS_ANGULAR_OFFSET = 0.098 - Math.PI / 2;
-    public static final double FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = 3.157;
-    public static final double REAR_LEFT_CHASSIS_ANGULAR_OFFSET = 1.962 + Math.PI;
-    public static final double REAR_RIGHT_CHASSIS_ANGULAR_OFFSET = 1.14 + Math.PI / 2;
+    public static final double FRONT_LEFT_CHASSIS_ANGULAR_OFFSET = 5.835 - Math.PI / 2;
+    public static final double FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = 0.931;
+    public static final double REAR_LEFT_CHASSIS_ANGULAR_OFFSET = 1.845 + Math.PI;
+    public static final double REAR_RIGHT_CHASSIS_ANGULAR_OFFSET = 1.127 + Math.PI / 2;
 
     // SPARK MAX CAN IDs
     public static final int FRONT_LEFT_DRIVING_CAN_ID = 3;
