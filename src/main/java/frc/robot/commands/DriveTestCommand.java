@@ -15,6 +15,7 @@ public class DriveTestCommand extends Command {
 
     @Override
     public void execute() {
+        System.out.println(ConfigManager.getInstance().get("test_drive_x", 0.0));
         swerveSubsystem.drive(
                 ConfigManager.getInstance().get("test_drive_x", 0.0),
                 ConfigManager.getInstance().get("test_drive_y", 0.0),

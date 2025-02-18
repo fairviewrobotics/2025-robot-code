@@ -91,6 +91,10 @@ public class Odometry {
         this.cameras.add(camera);
     }
 
+    public SwerveDrivePoseEstimator3d getPoseEstimator() {
+        return this.poseEstimator;
+    }
+
     /**
      * Get a camera by name
      *
@@ -161,7 +165,7 @@ public class Odometry {
         for (Camera c : this.cameras) {
             Optional<Pose3d> pose = c.getPoseFieldSpace(this.getRobotPose());
             if (pose.isPresent()) {
-                if (1 // FIXME: Fix once
+                if (c.getTargetPose().getZ() // FIXME: Fix once
                         > ConfigManager.getInstance().get("vision_cutoff_distance", 3)) return;
                 LOGGER.debug("Added vision measurement from `{}`", c.getName());
                 this.targetPose =

@@ -8,6 +8,7 @@ import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.utils.ConfigManager;
 import frc.robot.utils.Controller;
+import frc.robot.utils.NetworkTablesUtils;
 
 public class ElevatorArmCommand extends Command {
     public ElevatorSubsystem elevatorSubsystem;
@@ -16,6 +17,8 @@ public class ElevatorArmCommand extends Command {
 
     public String armPosKey;
     public String elevatorPosKey;
+
+    public NetworkTablesUtils elevator = NetworkTablesUtils.getTable("Elevator");
 
     private final BooleanEntry isAtHold =
             NetworkTableInstance.getDefault()
@@ -47,6 +50,8 @@ public class ElevatorArmCommand extends Command {
     public void execute() {
         double elevatorPos = ConfigManager.getInstance().get(elevatorPosKey, 0.0);
         double armPos = ConfigManager.getInstance().get(armPosKey, 0.0);
+
+        elevator.setEntry("setpoint", elevatorPos);
 
         if ((armSubsystem.getPivotAngle() <= -Math.PI / 4 || armSubsystem.getPivotAngle() >= 0)
                 && elevatorSubsystem.getElevatorPosition() <= 0.24
