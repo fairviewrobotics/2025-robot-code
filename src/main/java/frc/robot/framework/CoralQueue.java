@@ -6,19 +6,21 @@ import edu.wpi.first.networktables.*;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.constants.CoralQueueConstants;
 import frc.robot.utils.ConfigManager;
+import frc.robot.utils.NetworkTablesUtils;
 import java.util.ArrayList;
 import java.util.Optional;
 
 public class CoralQueue {
 
     private ArrayList<CoralPosition> coralPositionList = new ArrayList<>();
+
     private int positionListIndex = 0;
-    private CoralPosition currentPos;
+    private CoralPosition currentPos = new CoralPosition("1H1", new Pose2d(), 0.0, false);
     private Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
 
     public CoralQueue() {
-        loadQueueFromDefault(CoralQueueConstants.PROFILES.get("PROFILE_1"));
-        currentPos = coralPositionList.get(1);
+
+        loadQueueFromDefault("PROFILE_2");
     }
 
     /**
@@ -41,25 +43,28 @@ public class CoralQueue {
      */
     public CoralPosition getCurrentPosition() {
         currentPos = coralPositionList.get(positionListIndex);
-        currentReefPoseName.set(currentPos.toString());
-        currentReefPose.set(currentPos.getPoseAsDoubleArray());
-        currentReefHeight.set(currentPos.getBooleanHeights());
-
         return this.currentPos;
     }
 
     public void stepBackwards() {
         positionListIndex -= 1;
+        System.out.println("The button works, silly. -");
         if (positionListIndex < 0) {
             positionListIndex = 0;
         }
+        getCurrentPosition();
     }
 
     public void stepForwards() {
+
         positionListIndex += 1;
-        if (positionListIndex > coralPositionList.size()) {
-            positionListIndex = coralPositionList.size();
+        System.out.print("The button works, silly. +");
+
+        if (positionListIndex > coralPositionList.size() - 1) {
+            positionListIndex = coralPositionList.size() - 1;
         }
+
+        getCurrentPosition();
     }
 
     public void resetListIndex() {
@@ -82,7 +87,7 @@ public class CoralQueue {
 
         char heightIdxChar = heightString.charAt(1);
 
-        String posIdxString = posString.substring(1);
+        String posIdxString = posString.substring(0);
 
         int heightIdx = Character.getNumericValue(heightIdxChar) - 1;
         int posIdx = Integer.parseInt(posIdxString);
@@ -118,7 +123,7 @@ public class CoralQueue {
         listToQueue(ConfigManager.getInstance().get("Coral_Queue", ""));
     }
 
-    public void loadQueueFromDefault(String[] profile) {
+    public void loadQueueFromDefault(String profile) {
         String[] profileChosen = CoralQueueConstants.PROFILES.get(profile);
 
         if (profileChosen == null) {
@@ -130,25 +135,11 @@ public class CoralQueue {
         for (String i : profileChosen) {
             addToList(i);
         }
-
-
     }
 
-    private StringEntry currentReefPoseName =
-            NetworkTableInstance.getDefault()
-                    .getTable("Coral Queue")
-                    .getStringTopic("Current Reef Pose Name")
-                    .getEntry(currentPos.toString());
-    private DoubleArrayEntry currentReefPose =
-            NetworkTableInstance.getDefault()
-                    .getTable("Coral Queue")
-                    .getDoubleArrayTopic("Current Reef Pose")
-                    .getEntry(currentPos.getPoseAsDoubleArray());
-    private BooleanArrayEntry currentReefHeight =
-            NetworkTableInstance.getDefault()
-                    .getTable("Coral Queue")
-                    .getBooleanArrayTopic("Current Reef Height")
-                    .getEntry(currentPos.getBooleanHeights());
+    private final NetworkTablesUtils NTUtils = NetworkTablesUtils.getTable("Coral Queue");
+
+    // private final NetworkTablesUtils NTTelemetry = NetworkTablesUtils.getTable("Telemetry");
 
     public static class CoralPosition {
         private final String poseName;
@@ -195,6 +186,21 @@ public class CoralQueue {
         public String toString() {
             return poseName;
         }
+    }
+
+    public void periodic() {
+
+        NTUtils.setArrayEntry(
+                "Current Reef Pose",
+                new double[] {
+                    this.getCurrentPosition().getPose().getX(),
+                    this.getCurrentPosition().getPose().getY(),
+                    this.getCurrentPosition().getPose().getRotation().getRadians()
+                });
+
+        NTUtils.setEntry("Current Reef Pose Name", currentPos.toString());
+        NTUtils.setArrayEntry("Current Reef Height", currentPos.getBooleanHeights());
+        NTUtils.setEntry("Position Index", positionListIndex);
     }
 
     // public record CoralPosition(Pose2d pose2d, double height, boolean isAlgae) {}

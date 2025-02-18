@@ -4,7 +4,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.commands.*;
 import frc.robot.constants.VisionConstants;
 import frc.robot.framework.*;
@@ -62,7 +62,11 @@ public class RobotContainer {
         //                        false));
 
         //        primaryController.xButton.whileTrue(new DriveTestCommand(swerveSubsystem));
-        primaryController.yButton.whileTrue(new RunCommand(() -> swerveSubsystem.zeroGyro()));
+        // primaryController.yButton.whileTrue(new RunCommand(() -> swerveSubsystem.zeroGyro()));
+
+        primaryController.leftBumper.onTrue(new InstantCommand(() -> coralQueue.stepBackwards()));
+        primaryController.rightBumper.onTrue(new InstantCommand(() -> coralQueue.stepForwards()));
+        primaryController.aButton.onTrue(new InstantCommand(() -> coralQueue.getCurrentPosition()));
         //        primaryController.aButton.whileTrue(new ReefAlignCommand(swerveSubsystem));
 
         //        primaryController.rightBumper.whileTrue(
@@ -120,6 +124,7 @@ public class RobotContainer {
 
     public void robotPeriodic() {
         odometry.periodic();
+        coralQueue.periodic();
     }
 
     public Command getAutonomousCommand() {
