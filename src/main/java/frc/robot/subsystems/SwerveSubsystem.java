@@ -420,8 +420,6 @@ public class SwerveSubsystem extends SubsystemBase {
 
     /** Reset the gyro */
     public void zeroGyro() {
-
-        System.out.print("Yay");
         gyro.reset();
     }
 }
