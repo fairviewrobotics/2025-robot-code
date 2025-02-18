@@ -89,7 +89,12 @@ public class RobotContainer {
                                         "rough"),
                                 new BaseCommand(elevatorSubsystem, armSubsystem)),
                         new ParallelCommandGroup(
-                                new AlignCommand(swerveSubsystem, primaryController, targetPose, true, "fine"),
+                                new AlignCommand(
+                                        swerveSubsystem,
+                                        primaryController,
+                                        targetPose,
+                                        true,
+                                        "fine"),
                                 new ElevatorArmCommand(
                                         elevatorSubsystem,
                                         armSubsystem,
@@ -111,7 +116,12 @@ public class RobotContainer {
                                         "rough"),
                                 new BaseCommand(elevatorSubsystem, armSubsystem)),
                         new ParallelCommandGroup(
-                                new AlignCommand(swerveSubsystem, primaryController, targetPose, true, "fine"),
+                                new AlignCommand(
+                                        swerveSubsystem,
+                                        primaryController,
+                                        targetPose,
+                                        true,
+                                        "fine"),
                                 new ElevatorArmCommand(
                                         elevatorSubsystem,
                                         armSubsystem,
@@ -133,7 +143,12 @@ public class RobotContainer {
                                         "rough"),
                                 new BaseCommand(elevatorSubsystem, armSubsystem)),
                         new ParallelCommandGroup(
-                                new AlignCommand(swerveSubsystem, primaryController, targetPose, true, "fine"),
+                                new AlignCommand(
+                                        swerveSubsystem,
+                                        primaryController,
+                                        targetPose,
+                                        true,
+                                        "fine"),
                                 new ElevatorArmCommand(
                                         elevatorSubsystem,
                                         armSubsystem,

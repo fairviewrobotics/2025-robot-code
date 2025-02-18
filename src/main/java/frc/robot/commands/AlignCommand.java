@@ -202,7 +202,13 @@ public class AlignCommand extends Command {
                 });
 
         if (controller.hasStickInput(0.03) || !odometry.hasSeenTarget()) {
-            swerveSubsystem.drive(controller.getLeftX(), controller.getLeftY(), controller.getRightX(), true, true, false);
+            swerveSubsystem.drive(
+                    controller.getLeftX(),
+                    controller.getLeftY(),
+                    controller.getRightX(),
+                    true,
+                    true,
+                    false);
         } else {
             swerveSubsystem.drive(finalX, finalY, rotationPidCalc, true, true, true);
         }

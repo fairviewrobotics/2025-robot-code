@@ -84,6 +84,14 @@ public class DrivetrainConstants {
     public static final double DRIVE_CURRENT_LIMIT = 40;
     public static final int NUM_MOTORS = 1;
 
-    public static final ModuleConfig ROBOT_MODULE_CONFIG = new ModuleConfig(WHEEL_RADIUS_METERS, MAX_DRIVE_VELOCITY_MPS, WHEEL_COF, DRIVE_MOTOR, DRIVE_CURRENT_LIMIT, NUM_MOTORS);
-    public static final RobotConfig ROBOT_AUTO_CONFIG = new RobotConfig(ROBOT_MASS_KG, ROBOT_MOI, ROBOT_MODULE_CONFIG, TRACK_WIDTH);
+    public static final ModuleConfig ROBOT_MODULE_CONFIG =
+            new ModuleConfig(
+                    WHEEL_RADIUS_METERS,
+                    MAX_DRIVE_VELOCITY_MPS,
+                    WHEEL_COF,
+                    DRIVE_MOTOR,
+                    DRIVE_CURRENT_LIMIT,
+                    NUM_MOTORS);
+    public static final RobotConfig ROBOT_AUTO_CONFIG =
+            new RobotConfig(ROBOT_MASS_KG, ROBOT_MOI, ROBOT_MODULE_CONFIG, TRACK_WIDTH);
 }

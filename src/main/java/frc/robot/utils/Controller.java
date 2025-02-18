@@ -56,6 +56,9 @@ public class Controller extends XboxController {
     }
 
     public boolean hasStickInput(double deadzone) {
-        return Math.abs(getLeftX()) > deadzone || Math.abs(getLeftY()) > deadzone || Math.abs(getRightX()) > deadzone || Math.abs(getRightY()) > deadzone;
+        return Math.abs(getLeftX()) > deadzone
+                || Math.abs(getLeftY()) > deadzone
+                || Math.abs(getRightX()) > deadzone
+                || Math.abs(getRightY()) > deadzone;
     }
 }
