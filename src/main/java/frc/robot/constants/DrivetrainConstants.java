@@ -1,8 +1,11 @@
 /* Black Knights Robotics (C) 2025 */
 package frc.robot.constants;
 
+import com.pathplanner.lib.config.ModuleConfig;
+import com.pathplanner.lib.config.RobotConfig;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 
 public class DrivetrainConstants {
@@ -70,4 +73,17 @@ public class DrivetrainConstants {
                     / (DRIVING_MOTOR_PINION_TEETH * BEVEL_PINION_TEETH);
     public static final double DRIVE_WHEEL_FREE_SPEED_RPS =
             (DRIVING_MOTOR_FREE_SPEED_RPS * WHEEL_CIRCUMFERENCE_METERS) / DRIVING_MOTOR_REDUCTION;
+
+    public static final double ROBOT_MASS_KG = 50;
+    public static final double ROBOT_MOI = 1.0;
+
+    public static final double WHEEL_RADIUS_METERS = 0.0508;
+    public static final double MAX_DRIVE_VELOCITY_MPS = 3;
+    public static final double WHEEL_COF = 0.5;
+    public static final DCMotor DRIVE_MOTOR = new DCMotor(0, 0, 0, 0, 0, 1);
+    public static final double DRIVE_CURRENT_LIMIT = 40;
+    public static final int NUM_MOTORS = 1;
+
+    public static final ModuleConfig ROBOT_MODULE_CONFIG = new ModuleConfig(WHEEL_RADIUS_METERS, MAX_DRIVE_VELOCITY_MPS, WHEEL_COF, DRIVE_MOTOR, DRIVE_CURRENT_LIMIT, NUM_MOTORS);
+    public static final RobotConfig ROBOT_AUTO_CONFIG = new RobotConfig(ROBOT_MASS_KG, ROBOT_MOI, ROBOT_MODULE_CONFIG, TRACK_WIDTH);
 }

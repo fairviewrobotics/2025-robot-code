@@ -114,6 +114,19 @@ public class Odometry {
         return this.poseEstimator.getEstimatedPosition();
     }
 
+
+    public void resetPose(Pose3d pose) {
+        this.poseEstimator.resetPosition(
+                new Rotation3d(),
+                new SwerveModulePosition[] {
+                    new SwerveModulePosition(),
+                    new SwerveModulePosition(),
+                    new SwerveModulePosition(),
+                    new SwerveModulePosition()
+                },
+                pose);
+    }
+
     /**
      * @return
      */

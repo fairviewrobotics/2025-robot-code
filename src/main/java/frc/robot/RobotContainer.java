@@ -65,10 +65,12 @@ public class RobotContainer {
 
         elevatorSubsystem.setDefaultCommand(new BaseCommand(elevatorSubsystem, armSubsystem));
 
-        primaryController.leftBumper.whileTrue(
-                new ArmPositionCommand(armSubsystem, 0, primaryController));
+//        primaryController.leftBumper.whileTrue(
+//                new ArmPositionCommand(armSubsystem, 0, primaryController));
 
-        primaryController.aButton.whileTrue(new ReefAlignCommand(swerveSubsystem));
+//        primaryController.aButton.whileTrue(new ReefAlignCommand(swerveSubsystem));
+
+        primaryController.aButton.whileTrue(new ElevatorArmCommand(elevatorSubsystem, armSubsystem, primaryController, ))
 
         primaryController.bButton.whileTrue(new ElevatorPositionCommand(elevatorSubsystem, 0.3));
 
