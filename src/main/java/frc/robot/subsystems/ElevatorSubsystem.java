@@ -92,7 +92,7 @@ public class ElevatorSubsystem extends SubsystemBase {
                 ConfigManager.getInstance()
                         .get("elevator_pid_tolerance", ElevatorConstants.ELEVATOR_TOLERANCE));
 
-        rightElevatorMotorConfig.inverted(true);
+        leftElevatorMotorConfig.inverted(true);
         rightElevatorMotorConfig.idleMode(SparkBaseConfig.IdleMode.kBrake);
         leftElevatorMotorConfig.idleMode(SparkBaseConfig.IdleMode.kBrake);
 
