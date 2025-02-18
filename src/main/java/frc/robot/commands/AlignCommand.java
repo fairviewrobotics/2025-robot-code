@@ -39,26 +39,33 @@ public class AlignCommand extends Command {
     private final Odometry odometry = Odometry.getInstance();
     private final ConfigManager configManager = ConfigManager.getInstance();
 
-    private final Pose2d targetPos;
+    private Pose2d targetPos;
     private final String profile;
 
     private final NetworkTablesUtils debug = NetworkTablesUtils.getTable("debug");
 
     private double timeSenseFinished = -1;
+    private boolean doUpdate = true;
+    private boolean stopWhenFinished;
 
-    public AlignCommand(SwerveSubsystem swerveSubsystem, Pose2d targetPose, String profile) {
+    public AlignCommand(
+            SwerveSubsystem swerveSubsystem,
+            Pose2d targetPose,
+            boolean stopWhenFinished,
+            String profile) {
         this.swerveSubsystem = swerveSubsystem;
         this.targetPos = targetPose;
+        this.stopWhenFinished = stopWhenFinished;
         this.profile = profile;
 
         this.xAxisPid.setTolerance(
-                configManager.get(String.format("Align/%s/Pos_Tolerance", this.profile), 0.05));
+                configManager.get(String.format("align_%s_pos_tolerance", this.profile), 0.05));
         this.yAxisPid.setTolerance(
-                configManager.get(String.format("Align/%s/Pos_Tolerance", this.profile), 0.05));
+                configManager.get(String.format("align_%s_pos_tolerance", this.profile), 0.05));
         this.rotationPid.setTolerance(
                 Math.toRadians(
                         configManager.get(
-                                String.format("Align/%s/Rotation_Tolerance", this.profile), 1)));
+                                String.format("align_%s_rotation_tolerance", this.profile), 1)));
 
         this.rotationPid.enableContinuousInput(-Math.PI, Math.PI);
 
@@ -68,82 +75,82 @@ public class AlignCommand extends Command {
     @Override
     public void initialize() {
         this.timeSenseFinished = -1;
-        //        this.targetPos =
-        //                new Pose2d(
-        //                        new Translation2d(
-        //                                configManager.get(String.format("Align/%s/Target_X",
-        // this.profile), 12.499),
-        //                                configManager.get(String.format("Align/%s/Target_Y",
-        // this.profile), 2.922)),
-        //
-        // Rotation2d.fromRadians(configManager.get(String.format("Align/%s/Target_Rads",
-        // this.profile), 1.020)));
-        // Reset PIDs to starting pose
+        this.doUpdate = true;
 
         Pose3d robotPose = odometry.getRobotPose();
-        this.xAxisPid.reset(robotPose.getX());
-        this.yAxisPid.reset(robotPose.getY());
-        this.rotationPid.reset(robotPose.getRotation().getZ());
+        //        this.xAxisPid.reset(robotPose.getX());
+        //        this.yAxisPid.reset(robotPose.getY());
+        //        this.rotationPid.reset(robotPose.getRotation().getZ());
 
         // PID updates
-        this.xAxisPid.setP(
-                configManager.get(String.format("Align/%s/X_Axis_P", this.profile), 0.5));
-        this.yAxisPid.setP(
-                configManager.get(String.format("Align/%s/Y_Axis_P", this.profile), 0.5));
-        this.rotationPid.setP(
-                configManager.get(String.format("Align/%s/Rot_P", this.profile), 0.5));
+        this.xAxisPid.setP(configManager.get("align_x_axis_p", 3));
+        this.yAxisPid.setP(configManager.get("align_y_axis_p", 3));
+        this.rotationPid.setP(configManager.get("align_rot_p", 7.3));
 
-        this.xAxisPid.setD(
-                configManager.get(String.format("Align/%s/X_Axis_D", this.profile), 0.5));
-        this.yAxisPid.setD(
-                configManager.get(String.format("Align/%s/Y_Axis_D", this.profile), 0.5));
-        this.rotationPid.setD(
-                configManager.get(String.format("Align/%s/Rot_D", this.profile), 0.5));
+        this.xAxisPid.setD(configManager.get("align_x_axis_d", .25));
+        this.yAxisPid.setD(configManager.get("align_y_axis_d", .25));
+        this.rotationPid.setD(configManager.get("align_rot_d", 0.5));
 
-        this.xAxisPid.setI(
-                configManager.get(String.format("Align/%s/X_Axis_I", this.profile), 0.0));
-        this.yAxisPid.setI(
-                configManager.get(String.format("Align/%s/Y_Axis_I", this.profile), 0.0));
-        this.rotationPid.setI(
-                configManager.get(String.format("Align/%s/Rot_I", this.profile), 0.0));
+        this.xAxisPid.setI(configManager.get("align_x_axis_i", 0.0));
+        this.yAxisPid.setI(configManager.get("align_y_axis_i", 0.0));
+        this.rotationPid.setI(configManager.get("align_rot_i", 0.0));
 
         this.xAxisPid.setConstraints(
                 new TrapezoidProfile.Constraints(
-                        configManager.get(String.format("Align/%s/X_Max_Vel_M", this.profile), 1.0),
+                        configManager.get(String.format("align_%s_x_max_vel_m", this.profile), 3.0),
                         configManager.get(
-                                String.format("Align/%s/X_Max_Accel_Mps", this.profile), 1.0)));
+                                String.format("align_%s_x_max_accel_mps", this.profile), 2.5)));
         this.yAxisPid.setConstraints(
                 new TrapezoidProfile.Constraints(
-                        configManager.get(String.format("Align/%s/Y_Max_Vel_M", this.profile), 1.0),
+                        configManager.get(String.format("align_%s_y_max_vel_m", this.profile), 3.0),
                         configManager.get(
-                                String.format("Align/%s/Y_Max_Accel_Mps", this.profile), 1.0)));
+                                String.format("align_%s_y_max_accel_mps", this.profile), 2.5)));
         this.rotationPid.setConstraints(
                 new TrapezoidProfile.Constraints(
                         Math.toRadians(
                                 configManager.get(
-                                        String.format("Align/%s/Rot_Max_Vel_Deg", this.profile),
-                                        1.0)),
+                                        String.format("align_%s_rot_max_vel_deg", this.profile),
+                                        360)),
                         Math.toRadians(
                                 configManager.get(
-                                        String.format("Align/%s/Rot_Max_Accel_Degps", this.profile),
-                                        180))));
+                                        String.format("align_%s_rot_max_accel_degps", this.profile),
+                                        360))));
 
         this.xAxisPid.setTolerance(
-                configManager.get(String.format("Align/%s/Pos_Tolerance", this.profile), 0.05));
+                configManager.get(String.format("align_%s_pos_tolerance", this.profile), 0.05));
         this.yAxisPid.setTolerance(
-                configManager.get(String.format("Align/%s/Pos_Tolerance", this.profile), 0.05));
+                configManager.get(String.format("align_%s_pos_tolerance", this.profile), 0.05));
         this.rotationPid.setTolerance(
                 Math.toRadians(
                         configManager.get(
-                                String.format("Align/%s/Rotation_Tolerance", this.profile), 1)));
+                                String.format("align_%s_rotation_tolerance", this.profile), 1)));
+
+        this.xAxisPid.reset(
+                robotPose.getX(),
+                swerveSubsystem.getFieldRelativeChassisSpeeds().vxMetersPerSecond);
+        this.yAxisPid.reset(
+                robotPose.getY(),
+                swerveSubsystem.getFieldRelativeChassisSpeeds().vyMetersPerSecond);
+        this.rotationPid.reset(
+                robotPose.getRotation().getZ(),
+                swerveSubsystem.getFieldRelativeChassisSpeeds().omegaRadiansPerSecond);
+
+        this.xAxisPid.setGoal(robotPose.getX());
+        this.yAxisPid.setGoal(robotPose.getY());
+        this.rotationPid.setGoal(robotPose.getRotation().getZ());
+
+        this.xAxisPid.calculate(robotPose.getX());
+        this.xAxisPid.calculate(robotPose.getY());
+        this.rotationPid.calculate(robotPose.getRotation().getZ());
+
+        this.xAxisPid.setGoal(targetPos.getX());
+        this.yAxisPid.setGoal(targetPos.getY());
+        this.rotationPid.setGoal(targetPos.getRotation().getRadians());
     }
 
     @Override
     public void execute() {
         // Set PIDs to target
-        this.xAxisPid.setGoal(this.targetPos.getX());
-        this.yAxisPid.setGoal(this.targetPos.getY());
-        this.rotationPid.setGoal(this.targetPos.getRotation().getRadians());
 
         Pose3d robotPose = odometry.getRobotPose();
 
@@ -163,17 +170,19 @@ public class AlignCommand extends Command {
 
         debug.setEntry("Rot Pid setpoint", this.rotationPid.atSetpoint());
         debug.setEntry("Rot Pid goal", this.rotationPid.atGoal());
+        debug.setEntry("Robot rotation: ", robotPose.getRotation().getZ());
+        debug.setEntry("Rot setpoint", this.rotationPid.getSetpoint().position);
 
         double finalX =
                 xAxisCalc
-                        + (Math.signum(xAxisCalc)
-                                * configManager.get(
-                                        String.format("Align/%s/ff", this.profile), 0.1));
+                        + (xAxisPid.atGoal() || xAxisPid.atSetpoint()
+                                ? 0
+                                : Math.signum(xAxisCalc) * configManager.get("align_ff", 0.1));
         double finalY =
                 yAxisCalc
-                        + (Math.signum(yAxisCalc)
-                                * configManager.get(
-                                        String.format("Align/%s/ff", this.profile), 0.1));
+                        + (xAxisPid.atGoal() || xAxisPid.atSetpoint()
+                                ? 0
+                                : Math.signum(yAxisCalc) * configManager.get("align_ff", 0.1));
 
         debug.setEntry("Xms", finalX);
         debug.setEntry("Yms", finalY);
@@ -189,8 +198,10 @@ public class AlignCommand extends Command {
 
         swerveSubsystem.drive(finalX, finalY, rotationPidCalc, true, true, true);
 
-        if (xAxisPid.atGoal() && yAxisPid.atGoal() && rotationPid.atGoal())
+        if (xAxisPid.atGoal() && yAxisPid.atGoal() && rotationPid.atGoal() && this.doUpdate) {
             this.timeSenseFinished = Timer.getFPGATimestamp() * 1000;
+            this.doUpdate = false;
+        }
     }
 
     @Override
@@ -200,11 +211,15 @@ public class AlignCommand extends Command {
                 && rotationPid.atGoal()
                 && Timer.getFPGATimestamp() * 1000 - this.timeSenseFinished
                         > configManager.get(
-                                String.format("Align/%s/Finish_Time", this.profile), 200.0);
+                                String.format("align_%s_finish_time", this.profile), 200.0);
     }
 
     @Override
     public void end(boolean interrupted) {
-        swerveSubsystem.drive(0, 0, 0, false, true, false);
+        if (stopWhenFinished) swerveSubsystem.drive(0, 0, 0, false, true, false);
+        //        else
+        //            swerveSubsystem.drive(
+        //                    configManager.get("align_end_forward", 1.0), 0.0, 0.0, false, false,
+        // false);
     }
 }
