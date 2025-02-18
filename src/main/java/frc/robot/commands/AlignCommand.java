@@ -10,10 +10,13 @@ import frc.robot.constants.AlignConstants;
 import frc.robot.framework.Odometry;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.utils.ConfigManager;
+import frc.robot.utils.Controller;
 import frc.robot.utils.NetworkTablesUtils;
 
 public class AlignCommand extends Command {
     private final SwerveSubsystem swerveSubsystem;
+
+    private final Controller controller;
 
     private final ProfiledPIDController xAxisPid =
             new ProfiledPIDController(
@@ -50,10 +53,12 @@ public class AlignCommand extends Command {
 
     public AlignCommand(
             SwerveSubsystem swerveSubsystem,
+            Controller controller,
             Pose2d targetPose,
             boolean stopWhenFinished,
             String profile) {
         this.swerveSubsystem = swerveSubsystem;
+        this.controller = controller;
         this.targetPos = targetPose;
         this.stopWhenFinished = stopWhenFinished;
         this.profile = profile;
@@ -196,7 +201,11 @@ public class AlignCommand extends Command {
                     this.targetPos.getRotation().getRadians()
                 });
 
-        swerveSubsystem.drive(finalX, finalY, rotationPidCalc, true, true, true);
+        if (controller.hasStickInput(0.03) || !odometry.hasSeenTarget()) {
+            swerveSubsystem.drive(controller.getLeftX(), controller.getLeftY(), controller.getRightX(), true, true, false);
+        } else {
+            swerveSubsystem.drive(finalX, finalY, rotationPidCalc, true, true, true);
+        }
 
         if (xAxisPid.atGoal() && yAxisPid.atGoal() && rotationPid.atGoal() && this.doUpdate) {
             this.timeSenseFinished = Timer.getFPGATimestamp() * 1000;

@@ -54,4 +54,8 @@ public class Controller extends XboxController {
         dpadLeft = new POVButton(this, 270);
         dpadRight = new POVButton(this, 90);
     }
+
+    public boolean hasStickInput(double deadzone) {
+        return Math.abs(getLeftX()) > deadzone || Math.abs(getLeftY()) > deadzone || Math.abs(getRightX()) > deadzone || Math.abs(getRightY()) > deadzone;
+    }
 }
