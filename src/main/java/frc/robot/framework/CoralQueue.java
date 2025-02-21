@@ -23,7 +23,7 @@ public class CoralQueue {
     private CoralPosition currentPos = new CoralPosition();
 
     /** Create a new instance of coral queue Should <strong>ONLY</strong> be used for testing */
-    public CoralQueue() {}
+    protected CoralQueue() {}
 
     /**
      * Get the instance of coral queue, or create a new instance if one does not exist

@@ -10,21 +10,21 @@ public class ScoringConstants {
     public static final Pose2d[] CORAL_POSITIONS =
             new Pose2d[] {
                 new Pose2d(5.0, 7.0, Rotation2d.fromDegrees(12.0)), // R0
-                new Pose2d(9.0, 0.0, Rotation2d.fromDegrees(0.0)), // R1
-                new Pose2d(5.0, 0.0, Rotation2d.fromDegrees(0.0)), // R2
+                new Pose2d(9.0, 0.0, Rotation2d.fromDegrees(5.0)), // R1
+                new Pose2d(5.0, 0.0, Rotation2d.fromDegrees(0.1)), // R2
                 new Pose2d(0.5, 0.0, Rotation2d.fromDegrees(0.0)), // R3
-                new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0.0)), // R4
+                new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0.1)), // R4
                 new Pose2d(0.5, 0.5, Rotation2d.fromDegrees(0.0)), // R5
                 new Pose2d(6.0, 1.0, Rotation2d.fromDegrees(0.0)), // R6
                 new Pose2d(4.0, 10.0, Rotation2d.fromDegrees(0.0)), // R7
                 new Pose2d(5.0, 4.0, Rotation2d.fromDegrees(0.0)), // R8
                 new Pose2d(2.0, 3.0, Rotation2d.fromDegrees(0.0)), // R9
                 new Pose2d(3.0, 2.0, Rotation2d.fromDegrees(0.0)), // R10
-                new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0.0)), // R11
-                new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0.0)), // B0
-                new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0.0)), // B1
+                new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0.2)), // R11
+                new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0.3)), // B0
+                new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0.4)), // B1
                 new Pose2d(3.0, 12.0, Rotation2d.fromDegrees(9.0)), // B2
-                new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0.0)), // B3
+                new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0.5)), // B3
                 new Pose2d(1.0, 0.0, Rotation2d.fromDegrees(0.0)), // B4
                 new Pose2d(5.0, 0.0, Rotation2d.fromDegrees(0.0)), // B5
                 new Pose2d(9.0, 0.0, Rotation2d.fromDegrees(0.0)), // B6
