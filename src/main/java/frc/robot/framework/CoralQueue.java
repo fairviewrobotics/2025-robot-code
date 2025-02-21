@@ -9,9 +9,12 @@ import frc.robot.utils.NetworkTablesUtils;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class CoralQueue {
     private static CoralQueue INSTANCE = null;
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private final ArrayList<CoralPosition> coralPositionList = new ArrayList<>();
     private final NetworkTablesUtils NTUtils = NetworkTablesUtils.getTable("Coral Queue");
@@ -19,10 +22,12 @@ public class CoralQueue {
     private int positionListIndex = 0;
     private CoralPosition currentPos = new CoralPosition();
 
-    private CoralQueue() {}
+    /** Create a new instance of coral queue Should <strong>ONLY</strong> be used for testing */
+    public CoralQueue() {}
 
     /**
      * Get the instance of coral queue, or create a new instance if one does not exist
+     *
      * @return The instance of {@link CoralQueue}
      */
     public static CoralQueue getInstance() {
@@ -56,6 +61,7 @@ public class CoralQueue {
 
     /**
      * Return the next position to goto and increment the position in queue
+     *
      * @return The next position
      */
     public CoralPosition getNext() {
@@ -64,9 +70,7 @@ public class CoralQueue {
         return pos;
     }
 
-    /**
-     * Step backwards in the queue
-     */
+    /** Step backwards in the queue */
     public void stepBackwards() {
         this.positionListIndex -= 1;
         if (positionListIndex < 0) {
@@ -75,9 +79,7 @@ public class CoralQueue {
         getCurrentPosition();
     }
 
-    /**
-     * Step forwards in the queue
-     */
+    /** Step forwards in the queue */
     public void stepForwards() {
         positionListIndex += 1;
         if (positionListIndex > coralPositionList.size() - 1) {
@@ -89,6 +91,7 @@ public class CoralQueue {
 
     /**
      * Interrupt the queue with a different position, the resume afterward
+     *
      * @param position The position to inserted
      */
     public void interruptQueue(CoralPosition position) {
@@ -98,6 +101,7 @@ public class CoralQueue {
 
     /**
      * Turn a string into a {@link CoralPosition}
+     *
      * @param posStr The string position
      * @return The corresponding {@link CoralPosition}
      */
@@ -139,6 +143,7 @@ public class CoralQueue {
 
         CoralPosition pos = getCoralPosition(posStr);
         if (pos == null) {
+            LOGGER.warn("getCoralPosition() returned null pose");
             return;
         }
 
@@ -173,16 +178,14 @@ public class CoralQueue {
         }
     }
 
-    /**
-     * Runs every 20ms to update NT position
-     */
+    /** Runs every 20ms to update NT position */
     public void periodic() {
         NTUtils.setArrayEntry(
                 "Current Reef Pose",
                 new double[] {
-                        this.getCurrentPosition().getPose().getX(),
-                        this.getCurrentPosition().getPose().getY(),
-                        this.getCurrentPosition().getPose().getRotation().getRadians()
+                    this.getCurrentPosition().getPose().getX(),
+                    this.getCurrentPosition().getPose().getY(),
+                    this.getCurrentPosition().getPose().getRotation().getRadians()
                 });
 
         NTUtils.setEntry("Current Reef Pose Name", currentPos.toString());
@@ -191,7 +194,8 @@ public class CoralQueue {
     }
 
     /**
-     * Represents a position to score including the String id, {@link Pose2d}, and {@link ScoringConstants.ScoringHeights}
+     * Represents a position to score including the String id, {@link Pose2d}, and {@link
+     * ScoringConstants.ScoringHeights}
      */
     public static class CoralPosition {
         private final String stringId;
@@ -200,6 +204,7 @@ public class CoralQueue {
 
         /**
          * Create a new coral position
+         *
          * @param stringId The string ID for the pose
          * @param pose A {@link Pose2d} for the soring position
          * @param height The target height
@@ -210,9 +215,7 @@ public class CoralQueue {
             this.height = height;
         }
 
-        /**
-         * Create an empty coral position
-         */
+        /** Create an empty coral position */
         public CoralPosition() {
             this.stringId = "";
             this.pose = new Pose2d();
@@ -221,6 +224,7 @@ public class CoralQueue {
 
         /**
          * Get the scoring {@link Pose2d}
+         *
          * @return The scoring pose
          */
         public Pose2d getPose() {
@@ -229,15 +233,16 @@ public class CoralQueue {
 
         /**
          * Get the height
+         *
          * @return The elevator height as a {@link ScoringConstants.ScoringHeights}
          */
         public ScoringConstants.ScoringHeights getHeight() {
             return this.height;
         }
 
-
         /**
          * Return the pose as a double array
+         *
          * @return The pose as a double array with a len of 3 (x, y, rads)
          */
         public double[] getPoseAsDoubleArray() {
@@ -272,9 +277,9 @@ public class CoralQueue {
             if (this == obj) return true;
             if (obj == null || getClass() != obj.getClass()) return false;
             CoralPosition that = (CoralPosition) obj;
-            return Objects.equals(this.stringId, that.stringId) &&
-                    Objects.equals(this.pose, that.pose) &&
-                    this.height == that.height;
+            return Objects.equals(this.stringId, that.stringId)
+                    && Objects.equals(this.pose, that.pose)
+                    && this.height == that.height;
         }
     }
 }

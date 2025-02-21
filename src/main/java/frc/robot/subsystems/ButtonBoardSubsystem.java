@@ -2,7 +2,6 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.framework.CoralQueue;
 
@@ -13,6 +12,7 @@ public class ButtonBoardSubsystem extends SubsystemBase {
 
     /**
      * Create a new Instance of the subsystem for the button board
+     *
      * @param hidDevice A {@link GenericHID} corresponding to the button board
      */
     public ButtonBoardSubsystem(GenericHID hidDevice) {
@@ -21,6 +21,7 @@ public class ButtonBoardSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // TODO: Watch for events on every button, then call this.coralQueue.interruptQueue() with the corresponding pose
+        // TODO: Watch for events on every button, then call this.coralQueue.interruptQueue() with
+        // the corresponding pose
     }
 }
