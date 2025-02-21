@@ -1,4 +1,6 @@
+/* Black Knights Robotics (C) 2025 */
 package frc.robot.framework;
+
 import edu.wpi.first.wpilibj.GenericHID;
 
 public class ButtonBoard {
@@ -17,7 +19,7 @@ public class ButtonBoard {
     }
 
     public void periodic() {
-        for(int i = 0; i<=3; i++) {
+        for (int i = 0; i <= 3; i++) {
             if (buttonBoard.getRawButtonPressed(i)) {
                 coralHeightString = "H" + i;
                 break;
@@ -31,11 +33,13 @@ public class ButtonBoard {
             }
         }
 
-        if (lastCoralPosition != null && lastCoralPosition.toString().equals(currentCoralPosition.toString())) return;
+        if (lastCoralPosition != null
+                && lastCoralPosition.toString().equals(currentCoralPosition.toString())) return;
 
         coralHeightString = "";
         coralPositionString = "";
         lastCoralPosition = currentCoralPosition;
-        currentCoralPosition = CoralQueue.getCoralPosition(currentCoralPosition + coralHeightString);
+        currentCoralPosition =
+                CoralQueue.getCoralPosition(currentCoralPosition + coralHeightString);
     }
 }
