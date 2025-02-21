@@ -38,7 +38,7 @@ public class RobotContainer {
                     Camera.CameraType.PHOTONVISION,
                     VisionConstants.CENTER_CAM_TRANSFORM);
 
-    private Odometry odometry = Odometry.getInstance();
+    private final Odometry odometry = Odometry.getInstance();
     // Auto Chooser
     SendableChooser<Command> superSecretMissileTech = new SendableChooser<>();
 
