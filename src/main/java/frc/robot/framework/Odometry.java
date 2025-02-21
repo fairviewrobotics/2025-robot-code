@@ -31,6 +31,8 @@ public class Odometry {
 
     private Optional<Pose3d> targetPose = Optional.of(new Pose3d());
 
+    private boolean hasSeenTarget = false;
+
     /** Pose estimator for the robot, combining wheel-based odometry and vision measurements. */
     private final SwerveDrivePoseEstimator3d poseEstimator =
             new SwerveDrivePoseEstimator3d(
@@ -118,11 +120,30 @@ public class Odometry {
         return this.poseEstimator.getEstimatedPosition();
     }
 
+    public void resetPose(Pose3d pose) {
+        this.poseEstimator.resetPosition(
+                new Rotation3d(),
+                new SwerveModulePosition[] {
+                    new SwerveModulePosition(),
+                    new SwerveModulePosition(),
+                    new SwerveModulePosition(),
+                    new SwerveModulePosition()
+                },
+                pose);
+    }
+
     /**
      * @return
      */
     public Optional<Pose3d> getTargetPose() {
         return this.targetPose;
+    }
+
+    /**
+     * @return Whether the robot has seen a target at any point since the last reset
+     */
+    public boolean hasSeenTarget() {
+        return this.hasSeenTarget;
     }
 
     /**
@@ -154,6 +175,7 @@ public class Odometry {
             if (pose.isPresent()) {
                 if (c.getTargetPose().getZ() // FIXME: Fix once
                         > ConfigManager.getInstance().get("vision_cutoff_distance", 3)) return;
+                this.hasSeenTarget = true;
                 LOGGER.debug("Added vision measurement from `{}`", c.getName());
                 this.targetPose =
                         Optional.of(

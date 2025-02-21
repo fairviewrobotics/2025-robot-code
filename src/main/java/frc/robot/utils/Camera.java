@@ -49,7 +49,7 @@ public class Camera {
                         Optional.of(
                                 new PhotonPoseEstimator(
                                         AprilTagFieldLayout.loadField(
-                                                AprilTagFields.k2025Reefscape),
+                                                AprilTagFields.k2025ReefscapeWelded),
                                         PhotonPoseEstimator.PoseStrategy
                                                 .MULTI_TAG_PNP_ON_COPROCESSOR,
                                         this.camOffset));

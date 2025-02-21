@@ -80,6 +80,7 @@ public class RobotContainer {
                         new ParallelRaceGroup(
                                 new AlignCommand(
                                         swerveSubsystem,
+                                        primaryController,
                                         AlignUtils.getFirstPose(
                                                 targetPose,
                                                 ConfigManager.getInstance()
@@ -88,7 +89,12 @@ public class RobotContainer {
                                         "rough"),
                                 new BaseCommand(elevatorSubsystem, armSubsystem)),
                         new ParallelCommandGroup(
-                                new AlignCommand(swerveSubsystem, targetPose, true, "fine"),
+                                new AlignCommand(
+                                        swerveSubsystem,
+                                        primaryController,
+                                        targetPose,
+                                        true,
+                                        "fine"),
                                 new ElevatorArmCommand(
                                         elevatorSubsystem,
                                         armSubsystem,
@@ -101,6 +107,7 @@ public class RobotContainer {
                         new ParallelRaceGroup(
                                 new AlignCommand(
                                         swerveSubsystem,
+                                        primaryController,
                                         AlignUtils.getFirstPose(
                                                 targetPose,
                                                 ConfigManager.getInstance()
@@ -109,7 +116,12 @@ public class RobotContainer {
                                         "rough"),
                                 new BaseCommand(elevatorSubsystem, armSubsystem)),
                         new ParallelCommandGroup(
-                                new AlignCommand(swerveSubsystem, targetPose, true, "fine"),
+                                new AlignCommand(
+                                        swerveSubsystem,
+                                        primaryController,
+                                        targetPose,
+                                        true,
+                                        "fine"),
                                 new ElevatorArmCommand(
                                         elevatorSubsystem,
                                         armSubsystem,
@@ -122,6 +134,7 @@ public class RobotContainer {
                         new ParallelRaceGroup(
                                 new AlignCommand(
                                         swerveSubsystem,
+                                        primaryController,
                                         AlignUtils.getFirstPose(
                                                 targetPose,
                                                 ConfigManager.getInstance()
@@ -130,7 +143,12 @@ public class RobotContainer {
                                         "rough"),
                                 new BaseCommand(elevatorSubsystem, armSubsystem)),
                         new ParallelCommandGroup(
-                                new AlignCommand(swerveSubsystem, targetPose, true, "fine"),
+                                new AlignCommand(
+                                        swerveSubsystem,
+                                        primaryController,
+                                        targetPose,
+                                        true,
+                                        "fine"),
                                 new ElevatorArmCommand(
                                         elevatorSubsystem,
                                         armSubsystem,

@@ -88,9 +88,11 @@ public class ElevatorSubsystem extends SubsystemBase {
         SparkFlexConfig rightElevatorMotorConfig = new SparkFlexConfig();
         SparkFlexConfig leftElevatorMotorConfig = new SparkFlexConfig();
 
-        elevatorPID.setTolerance(
-                ConfigManager.getInstance()
-                        .get("elevator_pid_tolerance", ElevatorConstants.ELEVATOR_TOLERANCE));
+        //        elevatorPID.setTolerance(
+        //                ConfigManager.getInstance()
+        //                        .get("elevator_pid_tolerance",
+        // ElevatorConstants.ELEVATOR_TOLERANCE));
+        elevatorPID.setTolerance(0.05);
 
         leftElevatorMotorConfig.inverted(true);
         rightElevatorMotorConfig.idleMode(SparkBaseConfig.IdleMode.kBrake);
@@ -143,15 +145,17 @@ public class ElevatorSubsystem extends SubsystemBase {
         position =
                 MathUtil.clamp(
                         position, ElevatorConstants.ELEVATOR_MIN, ElevatorConstants.ELEVATOR_MAX);
+
         elevatorPID.setGoal(position);
+
         double pidCalc = elevatorPID.calculate(getElevatorPosition());
         double ffCalc = elevatorFF.calculate(0.0);
 
-        if (Math.abs(this.getLeftEncoderPosition() - this.getRightEncoderPosition())
-                > ConfigManager.getInstance().get("max_roation_diff", 1)) {
-            setVoltage(0.0);
-            return;
-        }
+        //        if (Math.abs(this.getLeftEncoderPosition() - this.getRightEncoderPosition())
+        //                > ConfigManager.getInstance().get("max_roation_diff", 1)) {
+        //            setVoltage(0.0);
+        //            return;
+        //        }
         setVoltage(pidCalc + ffCalc);
     }
 
@@ -187,7 +191,7 @@ public class ElevatorSubsystem extends SubsystemBase {
      * @return The elevator position in meters
      */
     public double getElevatorPosition() {
-        double encoderAveragePos = (leftEncoder.getPosition() + rightEncoder.getPosition()) / 2;
+        double encoderAveragePos = (rightEncoder.getPosition() + 0.0) / 1;
         // Calculates average pos
         //        double encoderAveragePos = leftEncoder.getPosition();
         return encoderAveragePos * ElevatorConstants.ROTATIONS_TO_METERS;
