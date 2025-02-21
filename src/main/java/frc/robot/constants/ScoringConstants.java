@@ -6,7 +6,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CoralQueueConstants {
+public class ScoringConstants {
     public static final Pose2d[] CORAL_POSITIONS =
             new Pose2d[] {
                 new Pose2d(5.0, 7.0, Rotation2d.fromDegrees(12.0)), // R0
@@ -35,12 +35,17 @@ public class CoralQueueConstants {
                 new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0.0)) // B11
             };
 
-    public static final double[] REEF_HEIGHTS = new double[] {1.0, 0.0, 0.0, 5.0, 0.0, 0.0};
+    public enum ScoringHeights {
+        L1,
+        L2,
+        L3,
+        L4
+    }
 
     public static final Map<String, String[]> PROFILES = new HashMap<>();
 
     static {
-        PROFILES.put("PROFILE_1", new String[] {"10H2", "9H3", "8H4", "7H2", "6H4", "5H3", "4H2"});
-        PROFILES.put("PROFILE_2", new String[] {"5H3", "4H3", "3H3", "2H3", "1H3"});
+        PROFILES.put("PROFILE_1", new String[] {"10L2", "9L3", "8L4", "7L2", "6L4", "5L3", "4L2"});
+        PROFILES.put("PROFILE_2", new String[] {"5L3", "4L3", "3L3", "2L3", "1L3"});
     }
 }

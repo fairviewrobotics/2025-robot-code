@@ -15,7 +15,7 @@ import frc.robot.utils.*;
 public class RobotContainer {
     // Subsystems
     SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
-    CoralQueue coralQueue = new CoralQueue();
+    CoralQueue coralQueue = CoralQueue.getInstance();
     ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
     ArmSubsystem armSubsystem = new ArmSubsystem();
 

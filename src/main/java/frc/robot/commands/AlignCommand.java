@@ -232,9 +232,5 @@ public class AlignCommand extends Command {
     @Override
     public void end(boolean interrupted) {
         if (stopWhenFinished) swerveSubsystem.drive(0, 0, 0, false, true, false);
-        //        else
-        //            swerveSubsystem.drive(
-        //                    configManager.get("align_end_forward", 1.0), 0.0, 0.0, false, false,
-        // false);
     }
 }
