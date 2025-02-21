@@ -4,6 +4,7 @@ package frc.robot.constants;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 
+/** Vision related constants */
 public class VisionConstants {
     public static double WHEEL_TRUST = 0.1;
     public static double VISION_TRUST = 0.5;

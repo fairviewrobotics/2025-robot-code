@@ -12,8 +12,12 @@ import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.utils.ConfigManager;
 import frc.robot.utils.Controller;
 import frc.robot.utils.NetworkTablesUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+/** Align the robot in fieldspace */
 public class AlignCommand extends Command {
+    private static final Logger LOGGER = LogManager.getLogger();
     private final SwerveSubsystem swerveSubsystem;
 
     private final Controller controller;
@@ -51,6 +55,19 @@ public class AlignCommand extends Command {
     private boolean doUpdate = true;
     private boolean stopWhenFinished;
 
+    /**
+     * Align to a fieldspace position with odometry
+     *
+     * @param swerveSubsystem The instance of swerve subsystem
+     * @param controller The primary driving {@link edu.wpi.first.wpilibj.XboxController}, used for
+     *     driver to override vision
+     * @param targetPose The target pose in fieldspace for the robot to go to
+     * @param stopWhenFinished Weather to stop swerve or not when the command is complete, set to
+     *     false if you are doing multiple paths in a row
+     * @param profile The tuning profile to use, generates separate entries in {@link ConfigManager}
+     *     for tolerances and trapezoid tuning (DON'T spell it wrong unless you want 10 extra
+     *     useless values in cfg manager!!!)
+     */
     public AlignCommand(
             SwerveSubsystem swerveSubsystem,
             Controller controller,
@@ -62,6 +79,8 @@ public class AlignCommand extends Command {
         this.targetPos = targetPose;
         this.stopWhenFinished = stopWhenFinished;
         this.profile = profile;
+
+        LOGGER.debug("Created new align command with '{}' profile", this.profile);
 
         this.xAxisPid.setTolerance(
                 configManager.get(String.format("align_%s_pos_tolerance", this.profile), 0.05));
@@ -83,9 +102,6 @@ public class AlignCommand extends Command {
         this.doUpdate = true;
 
         Pose3d robotPose = odometry.getRobotPose();
-        //        this.xAxisPid.reset(robotPose.getX());
-        //        this.yAxisPid.reset(robotPose.getY());
-        //        this.rotationPid.reset(robotPose.getRotation().getZ());
 
         // PID updates
         this.xAxisPid.setP(configManager.get("align_x_axis_p", 3));
@@ -214,6 +230,7 @@ public class AlignCommand extends Command {
         }
 
         if (xAxisPid.atGoal() && yAxisPid.atGoal() && rotationPid.atGoal() && this.doUpdate) {
+            LOGGER.debug("Hit goal, waiting for time to expire");
             this.timeSenseFinished = Timer.getFPGATimestamp() * 1000;
             this.doUpdate = false;
         }

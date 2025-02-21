@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 
+/** A wrapper class for swerve modules */
 public class MAXSwerveModule {
     private final SparkFlex drivingSpark;
     private final SparkMax turningSpark;

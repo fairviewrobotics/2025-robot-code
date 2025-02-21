@@ -302,11 +302,11 @@ public class SwerveSubsystem extends SubsystemBase {
             double elapsedTime = currentTime - previousTime;
 
             double angleDifference =
-                    SwerveUtils.AngleDifference(
+                    SwerveUtils.angleDifference(
                             inputTranslationDirection, currentTranslationDirection);
             if (angleDifference < 0.45 * Math.PI) {
                 currentTranslationDirection =
-                        SwerveUtils.StepTowardsCircular(
+                        SwerveUtils.stepTowardsCircular(
                                 currentTranslationDirection,
                                 inputTranslationDirection,
                                 directionSlewRate * elapsedTime);
@@ -317,13 +317,13 @@ public class SwerveSubsystem extends SubsystemBase {
                     currentTranslationMagnitude = magnitudeLimiter.calculate(0.0);
                 } else {
                     currentTranslationDirection =
-                            SwerveUtils.WrapAngle(currentTranslationDirection + Math.PI);
+                            SwerveUtils.wrapAngle(currentTranslationDirection + Math.PI);
                     currentTranslationMagnitude =
                             magnitudeLimiter.calculate(inputTranslationMagnitude);
                 }
             } else {
                 currentTranslationDirection =
-                        SwerveUtils.StepTowardsCircular(
+                        SwerveUtils.stepTowardsCircular(
                                 currentTranslationDirection,
                                 inputTranslationDirection,
                                 directionSlewRate * elapsedTime);

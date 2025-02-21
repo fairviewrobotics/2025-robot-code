@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import java.util.HashMap;
 import java.util.Map;
 
+/** Scoring related constants */
 public class ScoringConstants {
     public static final Pose2d[] CORAL_POSITIONS =
             new Pose2d[] {

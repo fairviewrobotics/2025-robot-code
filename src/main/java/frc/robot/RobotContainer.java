@@ -167,7 +167,6 @@ public class RobotContainer {
                         "elevator_intake"));
         primaryController.dpadDown.whileTrue(new RunCommand(() -> swerveSubsystem.zeroGyro()));
 
-        primaryController.dpadRight.whileTrue(new ElevatorPositionCommand(elevatorSubsystem, 0.4));
         //        primaryController.aButton.whileTrue(new ReefAlignCommand(swerveSubsystem));
 
         //        primaryController.rightBumper.whileTrue(

@@ -6,6 +6,7 @@ import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import java.util.EnumSet;
 
+/** Wrapper class for network tables to maker interaction easier */
 public class NetworkTablesUtils {
     private final NetworkTable table;
 

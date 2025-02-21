@@ -12,6 +12,7 @@ import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/** Keeps a list of future positions to place coral */
 public class CoralQueue {
     private static CoralQueue INSTANCE = null;
     private static final Logger LOGGER = LogManager.getLogger();

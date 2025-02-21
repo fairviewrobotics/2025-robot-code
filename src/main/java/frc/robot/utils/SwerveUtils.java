@@ -27,9 +27,7 @@ public class SwerveUtils {
         double xDiff = pose2.getX() - pose1.getX();
         double yDiff = pose2.getY() - pose1.getY();
 
-        double angle = Math.atan2(yDiff, xDiff);
-
-        return angle;
+        return Math.atan2(yDiff, xDiff);
     }
 
     /**
@@ -44,9 +42,9 @@ public class SwerveUtils {
      * @return The new angle (in radians) for `current` after performing the specified step towards
      *     the specified target. This value will always lie in the range 0 to 2*PI (exclusive).
      */
-    public static double StepTowardsCircular(double current, double target, double stepsize) {
-        current = WrapAngle(current);
-        target = WrapAngle(target);
+    public static double stepTowardsCircular(double current, double target, double stepsize) {
+        current = wrapAngle(current);
+        target = wrapAngle(target);
         double stepDirection = Math.signum(target - current);
         double difference = Math.abs(current - target);
         if (difference <= stepsize) {
@@ -58,7 +56,7 @@ public class SwerveUtils {
                     || target + 2 * Math.PI - current < stepsize) {
                 return target;
             } else {
-                return WrapAngle(
+                return wrapAngle(
                         current - stepDirection * stepsize); // this will handle wrapping gracefully
             }
         } else {
@@ -73,7 +71,7 @@ public class SwerveUtils {
      * @param angleB An angle (in radians).
      * @return The (unsigned) minimum difference between the two angles (in radians).
      */
-    public static double AngleDifference(double angleA, double angleB) {
+    public static double angleDifference(double angleA, double angleB) {
         double difference = Math.abs(angleA - angleB);
         return (difference > Math.PI) ? 2 * Math.PI - difference : difference;
     }
@@ -85,7 +83,7 @@ public class SwerveUtils {
      *     wraps outside the output range.
      * @return An angle (in radians) from 0 and 2*PI (exclusive).
      */
-    public static double WrapAngle(double angle) {
+    public static double wrapAngle(double angle) {
         double twoPi = 2 * Math.PI;
         if (angle == twoPi) { // Handle this case separately to avoid floating point errors with the
             // floor after the division in the case below

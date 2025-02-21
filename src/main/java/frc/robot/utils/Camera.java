@@ -166,7 +166,11 @@ public class Camera {
         return this.name;
     }
 
-    /** */
+    /**
+     * Get the target position, not sure if this works
+     *
+     * @return The targets pose relative to the robot
+     */
     public Pose3d getTargetPose() {
         return this.targetPose;
     }

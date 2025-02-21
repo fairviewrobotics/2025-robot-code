@@ -10,6 +10,7 @@ import frc.robot.utils.ConfigManager;
 import frc.robot.utils.Controller;
 import frc.robot.utils.NetworkTablesUtils;
 
+/** Command to set the elevator and arm */
 public class ElevatorArmCommand extends Command {
     public ElevatorSubsystem elevatorSubsystem;
     public ArmSubsystem armSubsystem;
@@ -26,6 +27,16 @@ public class ElevatorArmCommand extends Command {
                     .getBooleanTopic("AtHoldPos")
                     .getEntry(true);
 
+    /**
+     * Create an instance of the command to place the arm
+     *
+     * @param elevatorSubsystem The instance of {@link ElevatorSubsystem}
+     * @param armSubsystem The instance of {@link ArmSubsystem}
+     * @param controller A controller TODO: Stop passing in controllers!!!
+     * @param armPosKey The position key in {@link ConfigManager} for the arm, in radians
+     * @param elevatorPosKey The position key in {@link ConfigManager} for the elevator, in meters
+     *     // TODO: These could be combined into 1 parameter
+     */
     public ElevatorArmCommand(
             ElevatorSubsystem elevatorSubsystem,
             ArmSubsystem armSubsystem,
@@ -41,6 +52,7 @@ public class ElevatorArmCommand extends Command {
         addRequirements(elevatorSubsystem, armSubsystem);
     }
 
+    @Override
     public void initialize() {
         elevatorSubsystem.resetPID();
         armSubsystem.resetPID();
@@ -51,7 +63,7 @@ public class ElevatorArmCommand extends Command {
         double elevatorPos = ConfigManager.getInstance().get(elevatorPosKey, 0.0);
         double armPos = ConfigManager.getInstance().get(armPosKey, 0.0);
 
-        elevator.setEntry("setpoint", elevatorPos);
+        elevator.setEntry("Setpoint", elevatorPos);
 
         if ((armSubsystem.getPivotAngle() <= -Math.PI / 4 || armSubsystem.getPivotAngle() >= 0)
                 && elevatorSubsystem.getElevatorPosition() <= 0.24

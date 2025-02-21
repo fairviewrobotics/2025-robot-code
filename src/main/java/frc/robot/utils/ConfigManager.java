@@ -13,6 +13,14 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+/**
+ * Allows the creation of persistent (deploys, reboot, etc) tuning values by saving a json file on
+ * the robot
+ *
+ * <p><strong>NOTE:</strong> These values are stored on the RoboRIO, if you switch rios the values
+ * WILL NOT BE THE SAME and you will have to either: Renter them, or copy the file from the other
+ * rio
+ */
 public class ConfigManager {
     private static ConfigManager INSTANCE;
 
@@ -244,6 +252,12 @@ public class ConfigManager {
         return jObj;
     }
 
+    /**
+     * Check if the key exists in the json/NT if it doesn't, put the default value in
+     *
+     * @param key The key for the value
+     * @param defaultValue The default value to be set if the key doesn't exist
+     */
     @SuppressWarnings("unchecked")
     private void checkDefault(String key, Object defaultValue) {
         if (!NTTune.keyExists(key)) {
