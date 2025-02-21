@@ -19,7 +19,6 @@ public class CoralQueue {
     private Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
 
     public CoralQueue() {
-
         loadQueueFromDefault("PROFILE_2");
     }
 
@@ -71,15 +70,12 @@ public class CoralQueue {
         positionListIndex = 0;
     }
 
-    /**
-     * Convert reef position IDs to heights and positions.
-     *
-     * @param posStr
-     */
-    public void addToList(String posStr) {
+    public static CoralPosition getCoralPosition(String posStr) {
         if (posStr == null || posStr.isEmpty()) {
-            return;
+            return null;
         }
+
+        Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
 
         int splitIdx = posStr.length() - 2;
         String heightString = posStr.substring(splitIdx);
@@ -98,15 +94,32 @@ public class CoralQueue {
 
         boolean isAlgae = (heightIdx > 4);
 
-        coralPositionList.add(
-                new CoralPosition(
-                        posStr,
-                        new Pose2d(
-                                CoralQueueConstants.CORAL_POSITIONS[posIdx].getX(),
-                                CoralQueueConstants.CORAL_POSITIONS[posIdx].getY(),
-                                CoralQueueConstants.CORAL_POSITIONS[posIdx].getRotation()),
-                        CoralQueueConstants.REEF_HEIGHTS[heightIdx],
-                        isAlgae));
+        return new CoralPosition(
+                posStr,
+                new Pose2d(
+                        CoralQueueConstants.CORAL_POSITIONS[posIdx].getX(),
+                        CoralQueueConstants.CORAL_POSITIONS[posIdx].getY(),
+                        CoralQueueConstants.CORAL_POSITIONS[posIdx].getRotation()),
+                CoralQueueConstants.REEF_HEIGHTS[heightIdx],
+                isAlgae);
+    }
+
+    /**
+     * Convert reef position IDs to heights and positions.
+     *
+     * @param posStr
+     */
+    public void addToList(String posStr) {
+        if (posStr == null || posStr.isEmpty()) {
+            return;
+        }
+
+        CoralPosition pos = getCoralPosition(posStr);
+        if (pos == null) {
+            return;
+        }
+
+        coralPositionList.add(pos);
     }
 
     /** Clear the queue. */

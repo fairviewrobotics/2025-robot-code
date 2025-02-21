@@ -8,13 +8,14 @@ import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.commands.*;
 import frc.robot.commands.AlignCommand;
 import frc.robot.constants.VisionConstants;
-import frc.robot.framework.Odometry;
+import frc.robot.framework.*;
 import frc.robot.subsystems.*;
 import frc.robot.utils.*;
 
 public class RobotContainer {
     // Subsystems
     SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
+    CoralQueue coralQueue = new CoralQueue();
     ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
     ArmSubsystem armSubsystem = new ArmSubsystem();
 
@@ -47,7 +48,7 @@ public class RobotContainer {
 
     private void configureBindings() {
         // PRIMARY CONTROLLER
-
+        //Coral Queue: .onTrue(InstantCommand)
         // Default drive command
         swerveSubsystem.setDefaultCommand(
                 new DriveCommands(
@@ -205,6 +206,7 @@ public class RobotContainer {
 
     public void robotPeriodic() {
         odometry.periodic();
+        coralQueue.periodic();
     }
 
     public Command getAutonomousCommand() {
