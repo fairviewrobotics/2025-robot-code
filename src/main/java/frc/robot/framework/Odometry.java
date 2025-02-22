@@ -17,6 +17,7 @@ import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/** System for all odometry related stuff */
 public class Odometry {
     /** List of cameras used for vision-based measurements to refine odometry. */
     private ArrayList<Camera> cameras = new ArrayList<>();

@@ -15,7 +15,7 @@ import frc.robot.utils.*;
 public class RobotContainer {
     // Subsystems
     SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
-    CoralQueue coralQueue = new CoralQueue();
+    CoralQueue coralQueue = CoralQueue.getInstance();
     ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
     ArmSubsystem armSubsystem = new ArmSubsystem();
 
@@ -38,7 +38,7 @@ public class RobotContainer {
                     Camera.CameraType.PHOTONVISION,
                     VisionConstants.CENTER_CAM_TRANSFORM);
 
-    private Odometry odometry = Odometry.getInstance();
+    private final Odometry odometry = Odometry.getInstance();
     // Auto Chooser
     SendableChooser<Command> superSecretMissileTech = new SendableChooser<>();
 
@@ -167,7 +167,6 @@ public class RobotContainer {
                         "elevator_intake"));
         primaryController.dpadDown.whileTrue(new RunCommand(() -> swerveSubsystem.zeroGyro()));
 
-        primaryController.dpadRight.whileTrue(new ElevatorPositionCommand(elevatorSubsystem, 0.4));
         //        primaryController.aButton.whileTrue(new ReefAlignCommand(swerveSubsystem));
 
         //        primaryController.rightBumper.whileTrue(

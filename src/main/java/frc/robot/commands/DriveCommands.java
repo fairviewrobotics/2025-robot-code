@@ -7,6 +7,7 @@ import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.utils.ConfigManager;
 import java.util.function.DoubleSupplier;
 
+/** Command to drive swerve */
 public class DriveCommands extends Command {
     private final SwerveSubsystem swerveSubsystem;
     private final DoubleSupplier forward;

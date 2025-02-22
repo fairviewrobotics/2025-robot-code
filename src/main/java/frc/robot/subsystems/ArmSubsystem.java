@@ -18,13 +18,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.ArmConstants;
 import frc.robot.utils.ConfigManager;
 
+/** Subsystem for controlling arm */
 public class ArmSubsystem extends SubsystemBase {
     private final SparkFlex pivotMotor =
             new SparkFlex(ArmConstants.PIVOT_MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
 
     private final AbsoluteEncoder pivotAbsEncoder = pivotMotor.getAbsoluteEncoder();
-
-    private final SparkFlexConfig pivotConfig = new SparkFlexConfig();
 
     private final WPI_TalonSRX leftMotor = new WPI_TalonSRX(ArmConstants.LEFT_MOTOR_ID);
     private final WPI_TalonSRX rightMotor = new WPI_TalonSRX(ArmConstants.RIGHT_MOTOR_ID);
@@ -92,6 +91,7 @@ public class ArmSubsystem extends SubsystemBase {
         leftMotor.setInverted(false);
         rightMotor.setInverted(true);
 
+        SparkFlexConfig pivotConfig = new SparkFlexConfig();
         pivotConfig.inverted(true);
         pivotConfig.idleMode(SparkBaseConfig.IdleMode.kBrake);
         pivotConfig
@@ -145,8 +145,8 @@ public class ArmSubsystem extends SubsystemBase {
      */
     public double getPivotAngle() {
         return (pivotAbsEncoder.getPosition() >= Math.PI)
-                ? pivotAbsEncoder.getPosition() - 2 * Math.PI - ArmConstants.PIVOTENCODEROFFSET
-                : pivotAbsEncoder.getPosition() - ArmConstants.PIVOTENCODEROFFSET;
+                ? pivotAbsEncoder.getPosition() - 2 * Math.PI - ArmConstants.PIVOT_ENCODER_OFFSET
+                : pivotAbsEncoder.getPosition() - ArmConstants.PIVOT_ENCODER_OFFSET;
     }
 
     public double getPivotSpeed() {

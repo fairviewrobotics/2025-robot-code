@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 
+/** A wrapper class for {@link XboxController} to provide easier bindings */
 public class Controller extends XboxController {
 
     public JoystickButton leftBumper;
@@ -29,6 +30,11 @@ public class Controller extends XboxController {
     public POVButton dpadLeft;
     public POVButton dpadRight;
 
+    /**
+     * Create a new instance of controller
+     *
+     * @param port The port of the controller as specified on DriverStation
+     */
     public Controller(int port) {
         super(port);
 
@@ -55,6 +61,12 @@ public class Controller extends XboxController {
         dpadRight = new POVButton(this, 90);
     }
 
+    /**
+     * Check if the controller has input from the sticks
+     *
+     * @param deadzone Controller deadzone
+     * @return If the controller has input
+     */
     public boolean hasStickInput(double deadzone) {
         return Math.abs(getLeftX()) > deadzone
                 || Math.abs(getLeftY()) > deadzone

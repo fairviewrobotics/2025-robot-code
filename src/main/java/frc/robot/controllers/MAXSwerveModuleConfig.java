@@ -7,6 +7,7 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import frc.robot.constants.DrivetrainConstants;
 
+/** A config for the {@link MAXSwerveModule} */
 public class MAXSwerveModuleConfig {
     public static final SparkFlexConfig drivingConfig = new SparkFlexConfig();
     public static final SparkMaxConfig turningConfig = new SparkMaxConfig();

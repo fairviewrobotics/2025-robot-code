@@ -3,6 +3,7 @@ package frc.robot.constants;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 
+/** Elevator constants */
 public class ElevatorConstants {
 
     public static final int LEFT_MOTOR_ID = 20;
@@ -27,8 +28,6 @@ public class ElevatorConstants {
     public static final double ELEVATOR_ZEROING_VOLTAGE = 0.0;
     // 12.9 rotations to top, 0.592m to top
     public static final double ROTATIONS_TO_METERS = 0.590 / 38.32; // 0.592 / 12.9
-
-    public static final double CURRENT_MAX = 20;
 
     public static final double ELEVATOR_MIN = 0.0;
     public static final double ELEVATOR_MAX = 0.58;
