@@ -1,16 +1,16 @@
 /* Black Knights Robotics (C) 2025 */
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.commands.*;
 import frc.robot.commands.AlignCommand;
+import frc.robot.constants.ScoringConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.framework.*;
 import frc.robot.subsystems.*;
 import frc.robot.utils.*;
+import java.util.function.Supplier;
 
 public class RobotContainer {
     // Subsystems
@@ -23,20 +23,17 @@ public class RobotContainer {
     Controller primaryController = new Controller(0);
     Controller secondaryController = new Controller(1);
 
-    Pose2d targetPose = new Pose2d(12.188, 2.863, Rotation2d.fromRadians(1.052));
-    Pose2d intakePose = new Pose2d(12.785, 0.004, Rotation2d.fromRadians(-1.296));
-
     private final NetworkTablesUtils NTTune = NetworkTablesUtils.getTable("debug");
 
     private final Camera leftCam =
             new Camera(
-                    "leftCam", Camera.CameraType.PHOTONVISION, VisionConstants.LOW_CAM_TRANSFORM);
+                    "leftCam", Camera.CameraType.PHOTONVISION, VisionConstants.LEFT_CAM_TRANSFORM);
 
-    private final Camera centerCam =
+    private final Camera rightCam =
             new Camera(
-                    "centerCam",
+                    "rightCam",
                     Camera.CameraType.PHOTONVISION,
-                    VisionConstants.CENTER_CAM_TRANSFORM);
+                    VisionConstants.RIGHT_CAM_TRANSFORM);
 
     private final Odometry odometry = Odometry.getInstance();
     // Auto Chooser
@@ -61,164 +58,41 @@ public class RobotContainer {
 
         elevatorSubsystem.setDefaultCommand(new BaseCommand(elevatorSubsystem, armSubsystem));
 
-        //        primaryController.aButton.whileTrue(
-        //                new SequentialCommandGroup(
-        //                        new AlignCommand(
-        //                                swerveSubsystem,
-        //                                AlignUtils.getFirstPose(
-        //                                        targetPose,
-        //                                        ConfigManager.getInstance().get("Align/Dist_Back",
-        // 0.5)),
-        //                                "Rough"),
-        //                        new ParallelCommandGroup(
-        //                                new AlignCommand(swerveSubsystem, targetPose, "Fine"),
-        //                                new InstantCommand() // TODO: Replace with elevator
-        // command
-        //                                )));
+        primaryController.dpadLeft.whileTrue(this.getPlaceCommand(coralQueue::getNext));
 
         primaryController.aButton.whileTrue(
-                new SequentialCommandGroup(
-                        new ParallelRaceGroup(
-                                new AlignCommand(
-                                        swerveSubsystem,
-                                        primaryController,
-                                        AlignUtils.getFirstPose(
-                                                targetPose,
-                                                ConfigManager.getInstance()
-                                                        .get("align_dist_back", 0.5)),
-                                        false,
-                                        "rough"),
-                                new BaseCommand(elevatorSubsystem, armSubsystem)),
-                        new ParallelCommandGroup(
-                                new AlignCommand(
-                                        swerveSubsystem,
-                                        primaryController,
-                                        targetPose,
-                                        true,
-                                        "fine"),
-                                new ElevatorArmCommand(
-                                        elevatorSubsystem,
-                                        armSubsystem,
-                                        primaryController,
-                                        "arm_l1",
-                                        "elevator_l1"))));
-
+                this.getPlaceCommand(() -> CoralQueue.getCoralPosition("2L2")));
         primaryController.bButton.whileTrue(
-                new SequentialCommandGroup(
-                        new ParallelRaceGroup(
-                                new AlignCommand(
-                                        swerveSubsystem,
-                                        primaryController,
-                                        AlignUtils.getFirstPose(
-                                                targetPose,
-                                                ConfigManager.getInstance()
-                                                        .get("align_dist_back", 0.5)),
-                                        false,
-                                        "rough"),
-                                new BaseCommand(elevatorSubsystem, armSubsystem)),
-                        new ParallelCommandGroup(
-                                new AlignCommand(
-                                        swerveSubsystem,
-                                        primaryController,
-                                        targetPose,
-                                        true,
-                                        "fine"),
-                                new ElevatorArmCommand(
-                                        elevatorSubsystem,
-                                        armSubsystem,
-                                        primaryController,
-                                        "arm_l3",
-                                        "elevator_l3"))));
+                this.getPlaceCommand(() -> CoralQueue.getCoralPosition("3L2")));
 
         primaryController.xButton.whileTrue(
-                new SequentialCommandGroup(
-                        new ParallelRaceGroup(
-                                new AlignCommand(
-                                        swerveSubsystem,
-                                        primaryController,
-                                        AlignUtils.getFirstPose(
-                                                targetPose,
-                                                ConfigManager.getInstance()
-                                                        .get("align_dist_back", 0.5)),
-                                        false,
-                                        "rough"),
-                                new BaseCommand(elevatorSubsystem, armSubsystem)),
-                        new ParallelCommandGroup(
-                                new AlignCommand(
-                                        swerveSubsystem,
-                                        primaryController,
-                                        targetPose,
-                                        true,
-                                        "fine"),
-                                new ElevatorArmCommand(
-                                        elevatorSubsystem,
-                                        armSubsystem,
-                                        primaryController,
-                                        "arm_l2",
-                                        "elevator_l2"))));
-
-        //        primaryController.xButton.whileTrue(new DriveTestCommand(swerveSubsystem));
+                this.getPlaceCommand(() -> CoralQueue.getCoralPosition("6L2")));
         primaryController.yButton.whileTrue(
+                this.getPlaceCommand(() -> CoralQueue.getCoralPosition("7L2")));
+
+        primaryController.dpadRight.whileTrue(
                 new ElevatorArmCommand(
                         elevatorSubsystem,
                         armSubsystem,
                         primaryController,
-                        "arm_intake",
-                        "elevator_intake"));
+                        () -> ScoringConstants.ScoringHeights.INTAKE));
+
         primaryController.dpadDown.whileTrue(new RunCommand(() -> swerveSubsystem.zeroGyro()));
 
-        //        primaryController.aButton.whileTrue(new ReefAlignCommand(swerveSubsystem));
+        secondaryController.dpadRight.onTrue(
+                new InstantCommand(() -> coralQueue.loadQueueFromNT()));
 
-        //        primaryController.rightBumper.whileTrue(
-        //                new RunCommand(() -> swerveSubsystem.reconfigure(), swerveSubsystem));
-        //        elevatorSubsystem.setDefaultCommand(new BaseCommand(elevatorSubsystem,
-        // armSubsystem));
-        //
-        //        primaryController.aButton.whileTrue(
-        //                new ElevatorArmCommand(
-        //                        elevatorSubsystem,
-        //                        armSubsystem,
-        //                        primaryController,
-        //                        "arm_intake",
-        //                        "elevator_intake"));
-        //
-        //        primaryController.yButton.whileTrue(
-        //                new ElevatorArmCommand(
-        //                        elevatorSubsystem,
-        //                        armSubsystem,
-        //                        primaryController,
-        //                        "arm_l3",
-        //                        "elevator_l3"));
-        //
-        //        primaryController.xButton.whileTrue(
-        //                new ElevatorArmCommand(
-        //                        elevatorSubsystem,
-        //                        armSubsystem,
-        //                        primaryController,
-        //                        "arm_l2",
-        //                        "elevator_l2"));
-        //
-        //        primaryController.bButton.whileTrue(
-        //                new ElevatorArmCommand(
-        //                        elevatorSubsystem,
-        //                        armSubsystem,
-        //                        primaryController,
-        //                        "arm_l1",
-        //                        "elevator_l1"));
-
-        //        primaryController.bButton.whileTrue(new ArmPositionCommand(armSubsystem, -Math.PI
-        // / 4));
-        //        primaryController.xButton.whileTrue(new ArmPositionCommand(armSubsystem, Math.PI /
-        // 4));
-        //        primaryController.aButton.whileTrue(new ElevatorPositionCommand(elevatorSubsystem,
-        // 0.4));
-
-        //        primaryController.xButton.whileTrue(new )
+        secondaryController.dpadLeft.whileTrue(
+                new ElevatorArmCommand(
+                        elevatorSubsystem,
+                        armSubsystem,
+                        primaryController,
+                        () -> ScoringConstants.ScoringHeights.L2));
     }
 
     public void robotInit() {
         odometry.addCamera(leftCam);
-        odometry.addCamera(centerCam);
+        odometry.addCamera(rightCam);
     }
 
     public void robotPeriodic() {
@@ -228,5 +102,33 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         return Commands.print("No autonomous command configured");
+    }
+
+    private Command getPlaceCommand(Supplier<CoralQueue.CoralPosition> positionSupplier) {
+        return new SequentialCommandGroup(
+                new ParallelRaceGroup(
+                        new AlignCommand(
+                                swerveSubsystem,
+                                primaryController,
+                                () ->
+                                        AlignUtils.getFirstPose(
+                                                positionSupplier.get().getPose(),
+                                                ConfigManager.getInstance()
+                                                        .get("align_dist_back", 0.5)),
+                                false,
+                                "rough"),
+                        new BaseCommand(elevatorSubsystem, armSubsystem)),
+                new ParallelCommandGroup(
+                        new AlignCommand(
+                                swerveSubsystem,
+                                primaryController,
+                                () -> positionSupplier.get().getPose(),
+                                true,
+                                "fine"),
+                        new ElevatorArmCommand(
+                                elevatorSubsystem,
+                                armSubsystem,
+                                primaryController,
+                                () -> positionSupplier.get().getHeight())));
     }
 }

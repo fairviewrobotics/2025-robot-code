@@ -18,12 +18,12 @@ public class CoralQueue {
     private static final Logger LOGGER = LogManager.getLogger();
 
     private final ArrayList<CoralPosition> coralPositionList = new ArrayList<>();
-    private final NetworkTablesUtils NTUtils = NetworkTablesUtils.getTable("Coral Queue");
+    private final NetworkTablesUtils NTUtils = NetworkTablesUtils.getTable("CoralQueue");
 
     private int positionListIndex = 0;
     private CoralPosition currentPos = new CoralPosition();
 
-    /** Create a new instance of coral queue Should <strong>ONLY</strong> be used for testing */
+    /** Create a new instance of coral queue  */
     protected CoralQueue() {}
 
     /**
@@ -56,8 +56,12 @@ public class CoralQueue {
      * @return Get the current coral queue position
      */
     public CoralPosition getCurrentPosition() {
-        this.currentPos = coralPositionList.get(positionListIndex);
-        return this.currentPos;
+        if (!coralPositionList.isEmpty()) {
+            this.currentPos = coralPositionList.get(positionListIndex);
+            return this.currentPos;
+        } else {
+            return new CoralPosition();
+        }
     }
 
     /**
@@ -111,17 +115,20 @@ public class CoralQueue {
             return null;
         }
 
+        DriverStation.refreshData();
         Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
 
         int splitIdx = posStr.length() - 2;
         String heightString = posStr.substring(splitIdx);
         String posString = posStr.substring(0, splitIdx);
 
-        int posIdx = Integer.parseInt(posString);
+        int posIdx = Math.max(Math.min(Integer.parseInt(posString) - 1, 23), 0);
 
         if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Blue) {
             posIdx += 12;
         }
+
+        LOGGER.debug("CoralQ: posIdx = {}, heightString = {}", posIdx, heightString);
 
         return new CoralPosition(
                 posStr,
@@ -252,8 +259,9 @@ public class CoralQueue {
         }
 
         public boolean[] getBooleanHeights() {
-            int splitIdx = stringId.length() - 2;
-            String heightString = stringId.substring(splitIdx);
+            if (this.stringId.isBlank()) return new boolean[] {};
+            int splitIdx = this.stringId.length() - 2;
+            String heightString = this.stringId.substring(splitIdx);
 
             char heightIdxChar = heightString.charAt(1);
             int heightIdx = Character.getNumericValue(heightIdxChar) - 1;
@@ -265,7 +273,9 @@ public class CoralQueue {
 
         @Override
         public String toString() {
-            return stringId;
+            return String.format(
+                    "CoralPosition(stringId: %s, pose: %s, height: %s)",
+                    this.stringId, this.pose.toString(), this.height);
         }
 
         @Override

@@ -19,8 +19,6 @@ class ButtonBoardSubsystemTest {
 
     @BeforeEach
     void setUp() {
-        DriverStationSim.setAllianceStationId(AllianceStationID.Red1);
-        DriverStationSim.notifyNewData();
         mockHid = mock(GenericHID.class);
 
         buttonBoardSubsystem = new ButtonBoardSubsystem(mockHid);

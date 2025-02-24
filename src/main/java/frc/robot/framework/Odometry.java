@@ -29,6 +29,7 @@ public class Odometry {
     private static final Logger LOGGER = LogManager.getLogger();
 
     private final NetworkTablesUtils NTTelemetry = NetworkTablesUtils.getTable("Telemetry");
+    private final NetworkTablesUtils debug = NetworkTablesUtils.getTable("debug");
 
     private Optional<Pose3d> targetPose = Optional.of(new Pose3d());
 
@@ -174,18 +175,27 @@ public class Odometry {
         for (Camera c : this.cameras) {
             Optional<Pose3d> pose = c.getPoseFieldSpace(this.getRobotPose());
             if (pose.isPresent()) {
-                if (c.getTargetPose().getZ() // FIXME: Fix once
-                        > ConfigManager.getInstance().get("vision_cutoff_distance", 3)) return;
-                this.hasSeenTarget = true;
-                LOGGER.debug("Added vision measurement from `{}`", c.getName());
-                this.targetPose =
-                        Optional.of(
-                                new Pose3d(
-                                        c.getTargetPose().getX() + this.getRobotPose().getX(),
-                                        c.getTargetPose().getY() + this.getRobotPose().getY(),
-                                        c.getTargetPose().getZ(),
-                                        c.getTargetPose().getRotation()));
-                this.poseEstimator.addVisionMeasurement(pose.get(), c.getTimestamp());
+                double dist =
+                        Math.sqrt(
+                                Math.pow(c.getTargetPose().getX(), 2)
+                                        + Math.pow(c.getTargetPose().getY(), 2));
+
+                debug.setEntry(String.format("%s_dist_to_target", c.getName()), dist);
+
+                if (dist <= ConfigManager.getInstance().get("vision_cutoff_distance", 3)
+                        && dist > 0.1) {
+
+                    this.hasSeenTarget = true;
+                    LOGGER.debug("Added vision measurement from `{}`", c.getName());
+                    this.targetPose =
+                            Optional.of(
+                                    new Pose3d(
+                                            c.getTargetPose().getX() + this.getRobotPose().getX(),
+                                            c.getTargetPose().getY() + this.getRobotPose().getY(),
+                                            c.getTargetPose().getZ(),
+                                            c.getTargetPose().getRotation()));
+                    this.poseEstimator.addVisionMeasurement(pose.get(), c.getTimestamp());
+                }
             } else {
                 this.targetPose = Optional.empty();
             }

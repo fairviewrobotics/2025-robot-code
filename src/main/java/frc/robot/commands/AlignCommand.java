@@ -12,6 +12,7 @@ import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.utils.ConfigManager;
 import frc.robot.utils.Controller;
 import frc.robot.utils.NetworkTablesUtils;
+import java.util.function.Supplier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -46,14 +47,17 @@ public class AlignCommand extends Command {
     private final Odometry odometry = Odometry.getInstance();
     private final ConfigManager configManager = ConfigManager.getInstance();
 
-    private Pose2d targetPos;
     private final String profile;
+    private final boolean stopWhenFinished;
+
+    private final Supplier<Pose2d> pose2dSupplier;
 
     private final NetworkTablesUtils debug = NetworkTablesUtils.getTable("debug");
 
+    private Pose2d targetPos;
+
     private double timeSenseFinished = -1;
     private boolean doUpdate = true;
-    private boolean stopWhenFinished;
 
     /**
      * Align to a fieldspace position with odometry
@@ -61,7 +65,7 @@ public class AlignCommand extends Command {
      * @param swerveSubsystem The instance of swerve subsystem
      * @param controller The primary driving {@link edu.wpi.first.wpilibj.XboxController}, used for
      *     driver to override vision
-     * @param targetPose The target pose in fieldspace for the robot to go to
+     * @param poseSupplier A {@link Supplier<Pose2d>} for poses
      * @param stopWhenFinished Weather to stop swerve or not when the command is complete, set to
      *     false if you are doing multiple paths in a row
      * @param profile The tuning profile to use, generates separate entries in {@link ConfigManager}
@@ -71,12 +75,12 @@ public class AlignCommand extends Command {
     public AlignCommand(
             SwerveSubsystem swerveSubsystem,
             Controller controller,
-            Pose2d targetPose,
+            Supplier<Pose2d> poseSupplier,
             boolean stopWhenFinished,
             String profile) {
         this.swerveSubsystem = swerveSubsystem;
         this.controller = controller;
-        this.targetPos = targetPose;
+        this.pose2dSupplier = poseSupplier;
         this.stopWhenFinished = stopWhenFinished;
         this.profile = profile;
 
@@ -98,6 +102,7 @@ public class AlignCommand extends Command {
 
     @Override
     public void initialize() {
+        this.targetPos = pose2dSupplier.get();
         this.timeSenseFinished = -1;
         this.doUpdate = true;
 
