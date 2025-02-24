@@ -58,18 +58,6 @@ public class ButtonBoardSubsystem extends SubsystemBase {
                             }
                         }
                     });
-
-            //            int finalB = b;
-            //            event.ifHigh(() -> {
-            //                if (finalB > 11) {
-            //                    this.currentHeight =
-            // ScoringConstants.ScoringHeights.valueOf(String.format("L%d", finalB - 11));
-            //                } else {
-            //                    this.currentPose = ScoringConstants.CORAL_POSITIONS[finalB +
-            // (isBlue ? 12 : 0)];
-            //                }
-            //            });
-
         }
     }
 

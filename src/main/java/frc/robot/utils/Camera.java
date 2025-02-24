@@ -78,12 +78,9 @@ public class Camera {
                 PhotonPipelineResult res;
                 try {
                     res = this.photonCamera.get().getAllUnreadResults().get(0);
-                    Transform3d bestCamToTarget = res.getBestTarget().getBestCameraToTarget();
+                    Transform3d worstTarget = res.getBestTarget().getBestCameraToTarget();
                     this.targetPose =
-                            new Pose3d(
-                                            bestCamToTarget.getTranslation(),
-                                            bestCamToTarget.getRotation())
-                                    .transformBy(this.camOffset);
+                            new Pose3d(worstTarget.getTranslation(), worstTarget.getRotation());
                 } catch (Exception e) {
                     return Optional.empty();
                 }
