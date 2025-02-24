@@ -23,7 +23,7 @@ public class CoralQueue {
     private int positionListIndex = 0;
     private CoralPosition currentPos = new CoralPosition();
 
-    /** Create a new instance of coral queue  */
+    /** Create a new instance of coral queue */
     protected CoralQueue() {}
 
     /**
