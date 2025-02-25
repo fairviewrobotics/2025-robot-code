@@ -145,7 +145,7 @@ public class ArmSubsystem extends SubsystemBase {
      */
     public double getPivotAngle() {
         return (pivotAbsEncoder.getPosition() >= Math.PI)
-                ? pivotAbsEncoder.getPosition() - 2 * Math.PI - ArmConstants.PIVOT_ENCODER_OFFSET
+            ? pivotAbsEncoder.getPosition() - 2 * Math.PI - ArmConstants.PIVOT_ENCODER_OFFSET
                 : pivotAbsEncoder.getPosition() - ArmConstants.PIVOT_ENCODER_OFFSET;
     }
 
@@ -159,6 +159,11 @@ public class ArmSubsystem extends SubsystemBase {
         pivotPID.setP(ConfigManager.getInstance().get("arm_p", ArmConstants.PIVOT_P));
         pivotPID.setI(ConfigManager.getInstance().get("arm_i", ArmConstants.PIVOT_I));
         pivotPID.setD(ConfigManager.getInstance().get("arm_d", ArmConstants.PIVOT_D));
+
+        if (gamePieceLineBreak.get()) {
+            // Stop us in our place
+            setIntakeSpeed(0);
+        }
     }
 
     public void resetPID() {
