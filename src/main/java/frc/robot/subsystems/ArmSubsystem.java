@@ -25,8 +25,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     private final AbsoluteEncoder pivotAbsEncoder = pivotMotor.getAbsoluteEncoder();
 
-    private final WPI_TalonSRX leftMotor = new WPI_TalonSRX(ArmConstants.LEFT_MOTOR_ID);
-    private final WPI_TalonSRX rightMotor = new WPI_TalonSRX(ArmConstants.RIGHT_MOTOR_ID);
+    private final WPI_TalonSRX intakeMotor = new WPI_TalonSRX(ArmConstants.INTAKE_MOTOR_ID);
     private final DigitalInput gamePieceLineBreak =
             new DigitalInput(ArmConstants.HAND_LINEBREAK_ID);
 
@@ -62,13 +61,11 @@ public class ArmSubsystem extends SubsystemBase {
      * @param speed Target motor speed
      */
     public void setIntakeSpeed(double speed) {
-        leftMotor.set(speed);
-        rightMotor.set(speed);
+        intakeMotor.set(speed);
     }
 
     public void setIntakeVoltage(double voltage) {
-        leftMotor.setVoltage(voltage);
-        rightMotor.setVoltage(voltage);
+        intakeMotor.setVoltage(voltage);
     }
 
     public void setPivotVoltage(double voltage) {
@@ -85,11 +82,9 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public ArmSubsystem() {
-
         pivotPID.setTolerance(ArmConstants.PIVOT_TOLERANCE);
 
-        leftMotor.setInverted(false);
-        rightMotor.setInverted(true);
+        intakeMotor.setInverted(false);
 
         SparkFlexConfig pivotConfig = new SparkFlexConfig();
         pivotConfig.inverted(true);
