@@ -1,7 +1,6 @@
 /* Black Knights Robotics (C) 2025 */
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkFlex;
@@ -14,7 +13,6 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.ArmConstants;
 import frc.robot.utils.ConfigManager;
@@ -53,8 +51,6 @@ public class ArmSubsystem extends SubsystemBase {
                     ConfigManager.getInstance().get("arm_kg", ArmConstants.PIVOT_KG),
                     ConfigManager.getInstance().get("arm_kv", ArmConstants.PIVOT_KV),
                     ConfigManager.getInstance().get("arm_ka", ArmConstants.PIVOT_KA));
-
-
 
     public void setPivotVoltage(double voltage) {
         pivotMotor.setVoltage(voltage);

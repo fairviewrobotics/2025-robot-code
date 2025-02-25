@@ -85,18 +85,5 @@ public class ElevatorArmCommand extends Command {
             armSubsystem.setPivotAngle(armPos);
             elevatorSubsystem.setTargetPosition(elevatorPos);
         }
-        if (controller.getRightBumperButton()) {
-            this.armSubsystem.setIntakeSpeed(ConfigManager.getInstance().get("intake_speed", 0.2));
-        } else if (controller.getLeftBumperButton()) {
-            this.armSubsystem.setIntakeSpeed(
-                    ConfigManager.getInstance().get("outtake_speed", -0.2));
-        } else {
-            this.armSubsystem.setIntakeSpeed(0.0);
-        }
-    }
-
-    @Override
-    public void end(boolean interrupted) {
-        armSubsystem.setIntakeVoltage(0);
     }
 }

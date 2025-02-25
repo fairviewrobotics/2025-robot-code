@@ -1,3 +1,4 @@
+/* Black Knights Robotics (C) 2025 */
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -18,5 +19,4 @@ public class IntakeSubsystem extends SubsystemBase {
     public void setVoltage(double voltage) {
         motor.setVoltage(voltage);
     }
-
 }

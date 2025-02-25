@@ -3,7 +3,6 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.utils.ConfigManager;
 import frc.robot.utils.Controller;
 
 /** Command to position the arm */
@@ -36,16 +35,10 @@ public class ArmPositionCommand extends Command {
     @Override
     public void execute() {
         this.armSubsystem.setPivotAngle(position);
-        if (controller.getRightBumperButton()) {
-            this.armSubsystem.setIntakeSpeed(ConfigManager.getInstance().get("intake_speed", 0.2));
-        } else {
-            this.armSubsystem.setIntakeSpeed(0.0);
-        }
     }
 
     @Override
     public void end(boolean interrupted) {
         this.armSubsystem.setPivotVoltage(0);
-        this.armSubsystem.setIntakeVoltage(0);
     }
 }

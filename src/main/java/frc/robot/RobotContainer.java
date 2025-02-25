@@ -127,8 +127,10 @@ public class RobotContainer {
                                         () -> positionSupplier.get().getPose(),
                                         true,
                                         "fine"),
-                                new IntakeCommand(intakeSubsystem, IntakeCommand.IntakeMode.OUTTAKE, () -> armSubsystem.hasGamePiece())
-                        ),
+                                new IntakeCommand(
+                                        intakeSubsystem,
+                                        IntakeCommand.IntakeMode.OUTTAKE,
+                                        () -> armSubsystem.hasGamePiece())),
                         new ElevatorArmCommand(
                                 elevatorSubsystem,
                                 armSubsystem,

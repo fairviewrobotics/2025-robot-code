@@ -1,8 +1,8 @@
+/* Black Knights Robotics (C) 2025 */
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.IntakeSubsystem;
-
 import java.util.function.BooleanSupplier;
 
 public class IntakeCommand extends Command {
@@ -16,7 +16,8 @@ public class IntakeCommand extends Command {
         OUTTAKE
     }
 
-    public IntakeCommand(IntakeSubsystem intakeSubsystem, IntakeMode mode, BooleanSupplier hasGamePiece) {
+    public IntakeCommand(
+            IntakeSubsystem intakeSubsystem, IntakeMode mode, BooleanSupplier hasGamePiece) {
         this.intakeSubsystem = intakeSubsystem;
         this.mode = mode;
         this.hasGamePiece = hasGamePiece;
