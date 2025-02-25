@@ -145,7 +145,7 @@ public class ArmSubsystem extends SubsystemBase {
      */
     public double getPivotAngle() {
         return (pivotAbsEncoder.getPosition() >= Math.PI)
-            ? pivotAbsEncoder.getPosition() - 2 * Math.PI - ArmConstants.PIVOT_ENCODER_OFFSET
+                ? pivotAbsEncoder.getPosition() - 2 * Math.PI - ArmConstants.PIVOT_ENCODER_OFFSET
                 : pivotAbsEncoder.getPosition() - ArmConstants.PIVOT_ENCODER_OFFSET;
     }
 
