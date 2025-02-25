@@ -17,4 +17,8 @@ public class IntakeCommand extends Command {
     public void execute() {
         armSubsystem.setIntakeSpeed(ConfigManager.getInstance().get("intake_speed", 0.2));
     }
+
+    public void end() {
+        armSubsystem.setIntakeSpeed(0);
+    }
 }
