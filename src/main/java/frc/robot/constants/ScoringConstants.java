@@ -26,8 +26,8 @@ public class ScoringConstants {
                 getPoseFromTag("right", 7), // R7
                 getPoseFromTag("left", 6), // R8
                 getPoseFromTag("right", 6), // R9
-                getPoseFromTag("right", 11), // R10
-                getPoseFromTag("left", 11), // R11
+                getPoseFromTag("left", 11), // R10
+                getPoseFromTag("right", 11), // R11
                 getPoseFromTag("left", 10), // R12
                 getPoseFromTag("right", 21), // B1
                 getPoseFromTag("left", 22), // B2
@@ -38,8 +38,8 @@ public class ScoringConstants {
                 getPoseFromTag("right", 18), // B7
                 getPoseFromTag("left", 19), // B8
                 getPoseFromTag("right", 19), // B9
-                getPoseFromTag("right", 20), // B10
-                getPoseFromTag("left", 20), // B11
+                getPoseFromTag("left", 20), // B10
+                getPoseFromTag("right", 20), // B11
                 getPoseFromTag("left", 21), // B12
             };
 
