@@ -21,6 +21,7 @@ public class CoralQueue {
     private final NetworkTablesUtils NTUtils = NetworkTablesUtils.getTable("CoralQueue");
 
     private int positionListIndex = 0;
+    private boolean interrupt = false;
     private CoralPosition currentPos = new CoralPosition();
 
     /** Create a new instance of coral queue */
@@ -56,8 +57,11 @@ public class CoralQueue {
      * @return Get the current coral queue position
      */
     public CoralPosition getCurrentPosition() {
-        if (!coralPositionList.isEmpty()) {
+        if (!coralPositionList.isEmpty() && !this.interrupt) {
             this.currentPos = coralPositionList.get(positionListIndex);
+            return this.currentPos;
+        } else if (this.interrupt) {
+            this.interrupt = false;
             return this.currentPos;
         } else {
             return new CoralPosition();
@@ -101,6 +105,7 @@ public class CoralQueue {
      */
     public void interruptQueue(CoralPosition position) {
         this.stepBackwards();
+        this.interrupt = true;
         this.currentPos = position;
     }
 
@@ -161,6 +166,7 @@ public class CoralQueue {
     /** Clear the queue. */
     public void clearList() {
         coralPositionList.clear();
+        this.positionListIndex = 0;
     }
 
     /**
@@ -168,8 +174,8 @@ public class CoralQueue {
      * (e.g. 10L2,1L3,2L2,1L1).
      */
     public void loadQueueFromNT() {
-        clearList();
-        listToQueue(ConfigManager.getInstance().get("Coral_Queue", ""));
+        this.clearList();
+        this.listToQueue(ConfigManager.getInstance().get("Coral_Queue", "10L2,11L1"));
     }
 
     public void loadQueueFromDefault(String profile) {
@@ -191,9 +197,9 @@ public class CoralQueue {
         NTUtils.setArrayEntry(
                 "Current Reef Pose",
                 new double[] {
-                    this.getCurrentPosition().getPose().getX(),
-                    this.getCurrentPosition().getPose().getY(),
-                    this.getCurrentPosition().getPose().getRotation().getRadians()
+                    this.currentPos.getPose().getX(),
+                    this.currentPos.getPose().getY(),
+                    this.currentPos.getPose().getRotation().getRadians()
                 });
 
         NTUtils.setEntry("Current Reef Pose Name", currentPos.toString());
@@ -259,16 +265,11 @@ public class CoralQueue {
         }
 
         public boolean[] getBooleanHeights() {
-            if (this.stringId.isBlank()) return new boolean[] {};
-            int splitIdx = this.stringId.length() - 2;
-            String heightString = this.stringId.substring(splitIdx);
+            boolean[] heights = new boolean[4];
 
-            char heightIdxChar = heightString.charAt(1);
-            int heightIdx = Character.getNumericValue(heightIdxChar) - 1;
-
-            boolean[] result = new boolean[6];
-            result[heightIdx] = true;
-            return result;
+            int index = Integer.parseInt(String.valueOf(this.height.toString().charAt(1))) - 1;
+            heights[index] = true;
+            return heights;
         }
 
         @Override

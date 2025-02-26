@@ -33,7 +33,7 @@ class ButtonBoardSubsystemTest {
         buttonBoardSubsystem.periodic();
 
         ScoringConstants.ScoringHeights expectedHeight =
-                ScoringConstants.ScoringHeights.valueOf("L3");
+                ScoringConstants.ScoringHeights.valueOf("L2");
         assertEquals(expectedHeight, buttonBoardSubsystem.getCurrentHeight());
     }
 
@@ -45,7 +45,7 @@ class ButtonBoardSubsystemTest {
 
         buttonBoardSubsystem.periodic();
 
-        Pose2d expectedPose = ScoringConstants.CORAL_POSITIONS[buttonIndex];
+        Pose2d expectedPose = ScoringConstants.CORAL_POSITIONS[buttonIndex - 1];
         assertEquals(expectedPose, buttonBoardSubsystem.getCurrentPose());
     }
 
@@ -60,7 +60,7 @@ class ButtonBoardSubsystemTest {
         buttonBoardSubsystem = new ButtonBoardSubsystem(mockHid);
         buttonBoardSubsystem.periodic();
 
-        Pose2d expectedPose = ScoringConstants.CORAL_POSITIONS[buttonIndex + 12];
+        Pose2d expectedPose = ScoringConstants.CORAL_POSITIONS[buttonIndex - 1 + 12];
         assertEquals(expectedPose, buttonBoardSubsystem.getCurrentPose());
 
         DriverStationSim.setAllianceStationId(AllianceStationID.Red1); // Set back to red
