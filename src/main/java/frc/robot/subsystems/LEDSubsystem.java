@@ -5,18 +5,11 @@ import com.ctre.phoenix.led.*;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.LEDConstants;
 
-/**
-    * Subsystem for LED colors and animations
-    * Thx Matero for half the code
-*/
+/** Subsystem for LED colors and animations Thx Matero for half the code */
 public class LEDSubsystem extends SubsystemBase {
-    private final CANdle candle =
-            new CANdle(
-                    LEDConstants.DEVICE_ID,
-                    "rio");
+    private final CANdle candle = new CANdle(LEDConstants.DEVICE_ID, "rio");
 
-    private final int ledCount =
-            LEDConstants.LED_COUNT;
+    private final int ledCount = LEDConstants.LED_COUNT;
 
     private int r = 0;
     private int g = 0;
