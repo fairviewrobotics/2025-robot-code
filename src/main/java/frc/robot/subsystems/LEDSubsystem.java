@@ -48,11 +48,11 @@ public class LEDSubsystem extends SubsystemBase {
         this.r = r;
         this.g = g;
         this.b = b;
-        //        this.candle.setLEDs(r, g, b);
+        this.candle.setLEDs(r, g, b);
     }
 
     public void setAnimation(AnimationTypes toChange) {
-        currentAnimation = toChange;
+        this.currentAnimation = toChange;
         this.pureRGB = false;
 
         switch (toChange) {
@@ -67,11 +67,5 @@ public class LEDSubsystem extends SubsystemBase {
             case Off:
                 setRGB(0, 0, 0);
         }
-    }
-
-    @Override
-    public void periodic() {
-        candle.animate(animation);
-        if (this.pureRGB) candle.setLEDs(this.r, this.g, this.b);
     }
 }
