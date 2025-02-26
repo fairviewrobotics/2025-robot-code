@@ -4,19 +4,16 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.led.*;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.LEDConstants;
-import frc.robot.utils.ConfigManager;
-import org.apache.logging.log4j.core.pattern.AbstractStyleNameConverter.Green;
-import org.apache.logging.log4j.core.pattern.AbstractStyleNameConverter.Yellow;
 
 // Thx Matero for half the code
 public class LEDSubsystem extends SubsystemBase {
     private final CANdle candle =
             new CANdle(
-                    (int) ConfigManager.getInstance().get("led_device_id", LEDConstants.DEVICE_ID),
+                    LEDConstants.DEVICE_ID,
                     "rio");
 
     private final int ledCount =
-            (int) ConfigManager.getInstance().get("led_count", LEDConstants.LED_COUNT);
+            LEDConstants.LED_COUNT;
 
     private int r = 0;
     private int g = 0;
