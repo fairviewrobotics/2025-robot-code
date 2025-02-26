@@ -38,7 +38,13 @@ public class LEDSubsystem extends SubsystemBase {
         config.brightnessScalar = 0.1;
     }
 
-    /** Set LEDs to static color */
+    /**
+     * Set LEDs to static color
+     *
+     * @param r LED red value 0-255
+     * @param b LED blue value 0-255
+     * @param g LED green value 0-255
+     */
     private void setRGB(int r, int g, int b) {
         this.pureRGB = true;
         this.r = r;
@@ -47,7 +53,11 @@ public class LEDSubsystem extends SubsystemBase {
         this.candle.setLEDs(r, g, b);
     }
 
-    /** Set animation/color of LEDs */
+    /**
+     * Set animation/color of LEDs
+     *
+     * @param toChange Animation to change the animation to
+     */
     public void setAnimation(AnimationTypes toChange) {
         this.currentAnimation = toChange;
         this.pureRGB = false;
