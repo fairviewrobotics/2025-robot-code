@@ -24,11 +24,6 @@ public class LEDSubsystem extends SubsystemBase {
         Off
     }
 
-    private AnimationTypes currentAnimation = null;
-    private Animation animation = null;
-
-    private boolean pureRGB = false;
-
     /** Create new LED subsystem */
     public LEDSubsystem() {
         CANdleConfiguration config = new CANdleConfiguration();
@@ -46,7 +41,6 @@ public class LEDSubsystem extends SubsystemBase {
      * @param g LED green value 0-255
      */
     private void setRGB(int r, int g, int b) {
-        this.pureRGB = true;
         this.r = r;
         this.g = g;
         this.b = b;
@@ -59,9 +53,6 @@ public class LEDSubsystem extends SubsystemBase {
      * @param toChange Animation to change the animation to
      */
     public void setAnimation(AnimationTypes toChange) {
-        this.currentAnimation = toChange;
-        this.pureRGB = false;
-
         switch (toChange) {
             case Red:
                 setRGB(255, 0, 0);
