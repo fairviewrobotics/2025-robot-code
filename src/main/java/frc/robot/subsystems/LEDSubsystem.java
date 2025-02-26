@@ -5,7 +5,10 @@ import com.ctre.phoenix.led.*;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.LEDConstants;
 
-// Thx Matero for half the code
+/**
+    * Subsystem for LED colors and animations
+    * Thx Matero for half the code
+*/
 public class LEDSubsystem extends SubsystemBase {
     private final CANdle candle =
             new CANdle(
@@ -19,6 +22,7 @@ public class LEDSubsystem extends SubsystemBase {
     private int g = 0;
     private int b = 0;
 
+    /** Possible animation/colors */
     public enum AnimationTypes {
         Red,
         Green,
@@ -32,6 +36,7 @@ public class LEDSubsystem extends SubsystemBase {
 
     private boolean pureRGB = false;
 
+    /** Create new LED subsystem */
     public LEDSubsystem() {
         CANdleConfiguration config = new CANdleConfiguration();
         config.statusLedOffWhenActive = true;
@@ -40,6 +45,7 @@ public class LEDSubsystem extends SubsystemBase {
         config.brightnessScalar = 0.1;
     }
 
+    /** Set LEDs to static color */
     private void setRGB(int r, int g, int b) {
         this.pureRGB = true;
         this.r = r;
@@ -48,6 +54,7 @@ public class LEDSubsystem extends SubsystemBase {
         this.candle.setLEDs(r, g, b);
     }
 
+    /** Set animation/color of LEDs */
     public void setAnimation(AnimationTypes toChange) {
         this.currentAnimation = toChange;
         this.pureRGB = false;
