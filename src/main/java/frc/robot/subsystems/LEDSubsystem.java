@@ -9,12 +9,6 @@ import frc.robot.constants.LEDConstants;
 public class LEDSubsystem extends SubsystemBase {
     private final CANdle candle = new CANdle(LEDConstants.DEVICE_ID, "rio");
 
-    private final int ledCount = LEDConstants.LED_COUNT;
-
-    private int r = 0;
-    private int g = 0;
-    private int b = 0;
-
     /** Possible animation/colors */
     public enum AnimationTypes {
         Red,
@@ -41,10 +35,7 @@ public class LEDSubsystem extends SubsystemBase {
      * @param g LED green value 0-255
      */
     private void setRGB(int r, int g, int b) {
-        this.r = r;
-        this.g = g;
-        this.b = b;
-        this.candle.setLEDs(r, g, b);
+        candle.setLEDs(r, g, b);
     }
 
     /**
