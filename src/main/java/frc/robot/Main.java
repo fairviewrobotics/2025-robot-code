@@ -8,6 +8,7 @@ public final class Main {
 
     public static void main(String... args) {
         System.setProperty("log4j.configurationFile", "log4j2.xml");
+        System.setProperty("dev.blackknights.isTest", "false");
 
         RobotBase.startRobot(Robot::new);
     }

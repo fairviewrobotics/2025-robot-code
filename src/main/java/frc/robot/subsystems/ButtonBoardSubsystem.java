@@ -4,15 +4,17 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.ScoringConstants;
 import frc.robot.framework.CoralQueue;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class ButtonBoardSubsystem extends SubsystemBase {
     private final CoralQueue coralQueue = CoralQueue.getInstance();
     private final EventLoop loop = new EventLoop();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private Pose2d currentPose = null;
     private ScoringConstants.ScoringHeights currentHeight = null;
@@ -29,32 +31,29 @@ public class ButtonBoardSubsystem extends SubsystemBase {
 
         /*
            Assuming layout looks like this not sure
+           ** 16
+                           ** 12  ** 1
            ** 15
-                           ** 11  ** 0
+                     ** 11              ** 2
+                     ** 10               ** 3
            ** 14
-                     ** 10              ** 1
-                     ** 9               ** 2
+                     ** 9               ** 4
+                     ** 8               ** 5
            ** 13
-                     ** 8               ** 3
-                     ** 7               ** 4
-           ** 12
-                            ** 6   ** 5
+                            ** 7   ** 6
         */
-        for (int b = 0; b < 16; b++) {
-            BooleanEvent event = hidDevice.button(b, this.loop);
-
+        for (int b = 1; b < 17; b++) {
             int finalB = b;
             loop.bind(
                     () -> {
                         if (hidDevice.getRawButton(finalB)) {
-                            if (finalB > 11) {
+                            if (finalB > 12) {
                                 this.currentHeight =
                                         ScoringConstants.ScoringHeights.valueOf(
-                                                String.format("L%d", finalB - 11));
+                                                String.format("L%d", finalB - 12));
                             } else {
-                                this.currentPose =
-                                        ScoringConstants.CORAL_POSITIONS[
-                                                finalB + (isBlue ? 12 : 0)];
+                                int arrId = finalB + (isBlue ? 12 : 0) - 1;
+                                this.currentPose = ScoringConstants.CORAL_POSITIONS[arrId];
                             }
                         }
                     });

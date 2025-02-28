@@ -21,14 +21,13 @@ import org.json.simple.parser.ParseException;
  * rio
  */
 public class ConfigManager {
-    private static ConfigManager INSTANCE;
+    private static ConfigManager INSTANCE = null;
 
-    private final File configFile =
-            Path.of(Filesystem.getDeployDirectory().toPath().toString(), "tuning.json").toFile();
+    private final File configFile;
 
     private JSONObject json;
 
-    private NetworkTablesUtils NTTune = NetworkTablesUtils.getTable("Tune");
+    private final NetworkTablesUtils NTTune = NetworkTablesUtils.getTable("Tune");
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -39,26 +38,36 @@ public class ConfigManager {
      */
     public static synchronized ConfigManager getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new ConfigManager();
+            INSTANCE =
+                    new ConfigManager(
+                            System.getProperty("dev.blackknights.isTest") != null
+                                    ? Path.of(
+                                                    Filesystem.getDeployDirectory()
+                                                            .toPath()
+                                                            .toString(),
+                                                    "tuning.json")
+                                            .toFile()
+                                    : Path.of(System.getProperty("java.io.tmpdir"), "tuning.json")
+                                            .toFile());
         }
 
         return INSTANCE;
     }
 
     /** Util class to allow for good network table tuning */
-    private ConfigManager() {
+    private ConfigManager(File configFile) {
+        this.configFile = configFile;
         try {
             if (configFile.createNewFile() || configFile.length() == 0) {
                 LOGGER.info("Created config file");
                 this.json = this.getDefault();
-                this.saveConfig();
             }
         } catch (IOException e) {
 
             LOGGER.warn("Failed to create config file", e);
         }
 
-        this.json = parseConfig();
+        this.parseConfig();
         this.initNtValues();
         this.initListener();
     }
@@ -96,11 +105,6 @@ public class ConfigManager {
         JSONObject defaultSettings = new JSONObject();
 
         return defaultSettings;
-    }
-
-    public void saveDefault() {
-        this.json = getDefault();
-        this.saveConfig();
     }
 
     /**
@@ -164,10 +168,16 @@ public class ConfigManager {
      */
     private double getDouble(String key, double defaultValue) {
         double res = defaultValue;
-        try {
-            res = Double.parseDouble(this.json.get(key).toString());
-        } catch (Exception e) {
-            LOGGER.warn("Failed to get {} as a double", key, e);
+        Object number = this.json.get(key);
+
+        if (number != null) {
+            try {
+                res = Double.parseDouble(number.toString());
+            } catch (Exception e) {
+                LOGGER.warn("Failed to get {} as a double", key, e);
+            }
+        } else {
+            LOGGER.warn("{} is a NULL value", key);
         }
 
         return res;
@@ -225,26 +235,21 @@ public class ConfigManager {
     public synchronized void saveConfig() {
         try (PrintWriter printWriter = new PrintWriter(this.configFile)) {
             printWriter.println(this.json.toJSONString());
+            printWriter.flush();
         } catch (FileNotFoundException e) {
             LOGGER.warn("Failed to save file: {}", configFile, e);
         }
     }
 
-    /**
-     * Parse the config file
-     *
-     * @return The parsed config as a {@link JSONObject}
-     */
-    private JSONObject parseConfig() {
-        JSONObject jObj = new JSONObject();
+    /** Parse the config file */
+    private void parseConfig() {
         JSONParser parser = new JSONParser();
         try {
             Object obj = parser.parse(new FileReader(this.configFile));
-            jObj = (JSONObject) obj;
-        } catch (IOException | ParseException e) {
+            this.json = (JSONObject) obj;
+        } catch (IOException | ParseException | ClassCastException e) {
             LOGGER.error("An error occurred while parsing the config file", e);
         }
-        return jObj;
     }
 
     /**
@@ -255,7 +260,7 @@ public class ConfigManager {
      */
     @SuppressWarnings("unchecked")
     private void checkDefault(String key, Object defaultValue) {
-        if (!NTTune.keyExists(key) || !this.json.containsKey(key)) {
+        if (!this.json.containsKey(key)) {
             LOGGER.info("{} does not exist, creating a setting to {}", key, defaultValue);
             NTTune.getNetworkTable().getEntry(key).setValue(defaultValue);
             this.json.put(key, defaultValue);

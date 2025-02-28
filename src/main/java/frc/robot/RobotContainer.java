@@ -1,6 +1,7 @@
 /* Black Knights Robotics (C) 2025 */
 package frc.robot;
 
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.commands.*;
@@ -13,12 +14,15 @@ import frc.robot.utils.*;
 import java.util.function.Supplier;
 
 public class RobotContainer {
+    GenericHID buttonBoard = new GenericHID(2);
+
     // Subsystems
     SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
     CoralQueue coralQueue = CoralQueue.getInstance();
     ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
     ArmSubsystem armSubsystem = new ArmSubsystem();
     IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+    ButtonBoardSubsystem buttonBoardSubsystem = new ButtonBoardSubsystem(buttonBoard);
 
     // Controllers
     Controller primaryController = new Controller(0);
@@ -83,6 +87,9 @@ public class RobotContainer {
         secondaryController.dpadRight.onTrue(
                 new InstantCommand(() -> coralQueue.loadQueueFromNT()));
 
+        secondaryController.rightBumper.onTrue(new InstantCommand(() -> coralQueue.stepForwards()));
+        secondaryController.leftBumper.onTrue(new InstantCommand(() -> coralQueue.stepBackwards()));
+
         secondaryController.dpadLeft.whileTrue(
                 new ElevatorArmCommand(
                         elevatorSubsystem,
@@ -112,7 +119,7 @@ public class RobotContainer {
                                 swerveSubsystem,
                                 primaryController,
                                 () ->
-                                        AlignUtils.getFirstPose(
+                                        AlignUtils.getXDistBack(
                                                 positionSupplier.get().getPose(),
                                                 ConfigManager.getInstance()
                                                         .get("align_dist_back", 0.5)),
