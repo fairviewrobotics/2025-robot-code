@@ -16,11 +16,10 @@ import java.util.function.Supplier;
 public class ElevatorArmCommand extends Command {
     private final ElevatorSubsystem elevatorSubsystem;
     private final ArmSubsystem armSubsystem;
-    private final Controller controller;
 
     private final NetworkTablesUtils elevator = NetworkTablesUtils.getTable("Elevator");
 
-    private final BooleanEntry isAtHold =
+    private final BooleanEntry isAtHold = // TODO: Why??
             NetworkTableInstance.getDefault()
                     .getTable("Elevator")
                     .getBooleanTopic("AtHoldPos")
@@ -33,7 +32,6 @@ public class ElevatorArmCommand extends Command {
      *
      * @param elevatorSubsystem The instance of {@link ElevatorSubsystem}
      * @param armSubsystem The instance of {@link ArmSubsystem}
-     * @param controller A controller TODO: Stop passing in controllers!!!
      * @param targetSupplier A {@link Supplier<ScoringConstants.ScoringHeights>} for the target
      *     height and angle of the arm for the elevator
      */
@@ -44,7 +42,6 @@ public class ElevatorArmCommand extends Command {
             Supplier<ScoringConstants.ScoringHeights> targetSupplier) {
         this.elevatorSubsystem = elevatorSubsystem;
         this.armSubsystem = armSubsystem;
-        this.controller = controller;
         this.targetSupplier = targetSupplier;
 
         addRequirements(elevatorSubsystem, armSubsystem);

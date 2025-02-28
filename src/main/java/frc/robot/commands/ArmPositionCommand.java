@@ -9,20 +9,16 @@ import frc.robot.utils.Controller;
 public class ArmPositionCommand extends Command {
     private final ArmSubsystem armSubsystem;
     private final double position;
-    private final Controller controller;
 
     /**
      * Set the position of the arm/hand
      *
      * @param armSubsystem The instance of {@link ArmSubsystem}
      * @param position The target position in radians (0 is straight flat)
-     * @param controller The {@link Controller} to intake with (Right bumper) TODO: This is janky
-     *     and stupid
      */
-    public ArmPositionCommand(ArmSubsystem armSubsystem, double position, Controller controller) {
+    public ArmPositionCommand(ArmSubsystem armSubsystem, double position) {
         this.armSubsystem = armSubsystem;
         this.position = position;
-        this.controller = controller;
         this.armSubsystem.resetPID();
         addRequirements(armSubsystem);
     }
