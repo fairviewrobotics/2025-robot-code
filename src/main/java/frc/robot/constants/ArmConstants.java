@@ -26,8 +26,7 @@ public class ArmConstants {
     public static final double PIVOT_MAX_ANGLE = Math.PI / 2;
     public static final double PIVOT_MIN_ANGLE = -Math.PI / 2;
 
-    public static final int LEFT_MOTOR_ID = 18;
-    public static final int RIGHT_MOTOR_ID = 19;
+    public static final int MOTOR_ID = 18;
 
     public static final int HAND_LINEBREAK_ID = 3;
 }

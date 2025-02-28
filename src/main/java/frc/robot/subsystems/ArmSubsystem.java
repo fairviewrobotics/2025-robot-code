@@ -1,10 +1,10 @@
 /* Black Knights Robotics (C) 2025 */
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
@@ -13,7 +13,6 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.ArmConstants;
 import frc.robot.utils.ConfigManager;
@@ -25,10 +24,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     private final AbsoluteEncoder pivotAbsEncoder = pivotMotor.getAbsoluteEncoder();
 
-    private final WPI_TalonSRX leftMotor = new WPI_TalonSRX(ArmConstants.LEFT_MOTOR_ID);
-    private final WPI_TalonSRX rightMotor = new WPI_TalonSRX(ArmConstants.RIGHT_MOTOR_ID);
-    private final DigitalInput gamePieceLineBreak =
-            new DigitalInput(ArmConstants.HAND_LINEBREAK_ID);
+    private final SparkLimitSwitch armLinebreak;
 
     private final DoubleEntry armEncoderPos =
             NetworkTableInstance.getDefault()
@@ -56,21 +52,6 @@ public class ArmSubsystem extends SubsystemBase {
                     ConfigManager.getInstance().get("arm_kv", ArmConstants.PIVOT_KV),
                     ConfigManager.getInstance().get("arm_ka", ArmConstants.PIVOT_KA));
 
-    /**
-     * Sets hand motor speed
-     *
-     * @param speed Target motor speed
-     */
-    public void setIntakeSpeed(double speed) {
-        leftMotor.set(speed);
-        rightMotor.set(speed);
-    }
-
-    public void setIntakeVoltage(double voltage) {
-        leftMotor.setVoltage(voltage);
-        rightMotor.setVoltage(voltage);
-    }
-
     public void setPivotVoltage(double voltage) {
         pivotMotor.setVoltage(voltage);
     }
@@ -88,9 +69,6 @@ public class ArmSubsystem extends SubsystemBase {
 
         pivotPID.setTolerance(ArmConstants.PIVOT_TOLERANCE);
 
-        leftMotor.setInverted(false);
-        rightMotor.setInverted(true);
-
         SparkFlexConfig pivotConfig = new SparkFlexConfig();
         pivotConfig.inverted(true);
         pivotConfig.idleMode(SparkBaseConfig.IdleMode.kBrake);
@@ -104,6 +82,8 @@ public class ArmSubsystem extends SubsystemBase {
                 pivotConfig,
                 SparkBase.ResetMode.kResetSafeParameters,
                 SparkBase.PersistMode.kPersistParameters);
+
+        armLinebreak = pivotMotor.getForwardLimitSwitch();
     }
 
     /**
@@ -121,7 +101,7 @@ public class ArmSubsystem extends SubsystemBase {
      * @return returns if the hand has a game piece
      */
     public boolean hasGamePiece() {
-        return !gamePieceLineBreak.get();
+        return armLinebreak.isPressed();
     }
 
     /**

@@ -21,6 +21,7 @@ public class RobotContainer {
     CoralQueue coralQueue = CoralQueue.getInstance();
     ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
     ArmSubsystem armSubsystem = new ArmSubsystem();
+    IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     ButtonBoardSubsystem buttonBoardSubsystem = new ButtonBoardSubsystem(buttonBoard);
 
     // Controllers
@@ -126,12 +127,17 @@ public class RobotContainer {
                                 "rough"),
                         new BaseCommand(elevatorSubsystem, armSubsystem)),
                 new ParallelCommandGroup(
-                        new AlignCommand(
-                                swerveSubsystem,
-                                primaryController,
-                                () -> positionSupplier.get().getPose(),
-                                true,
-                                "fine"),
+                        new SequentialCommandGroup(
+                                new AlignCommand(
+                                        swerveSubsystem,
+                                        primaryController,
+                                        () -> positionSupplier.get().getPose(),
+                                        true,
+                                        "fine"),
+                                new IntakeCommand(
+                                        intakeSubsystem,
+                                        IntakeCommand.IntakeMode.OUTTAKE,
+                                        () -> armSubsystem.hasGamePiece())),
                         new ElevatorArmCommand(
                                 elevatorSubsystem,
                                 armSubsystem,
