@@ -5,9 +5,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.IntakeSubsystem;
 import java.util.function.BooleanSupplier;
 
-/**
- * Command to intake and outtake
- */
+/** Command to intake and outtake */
 public class IntakeCommand extends Command {
     private final IntakeSubsystem intakeSubsystem;
     private final IntakeMode mode;
@@ -15,6 +13,7 @@ public class IntakeCommand extends Command {
 
     /**
      * Create a new intake command
+     *
      * @param intakeSubsystem The instance of {@link IntakeSubsystem}
      * @param mode The intake mode ({@link IntakeMode})
      * @param hasGamePiece A {@link BooleanSupplier} supplying if we currently have a coral
@@ -47,12 +46,9 @@ public class IntakeCommand extends Command {
         return mode.equals(IntakeMode.INTAKE) && hasGamePiece.getAsBoolean();
     }
 
-    /**
-     * Enum of the different intake modes
-     */
+    /** Enum of the different intake modes */
     public enum IntakeMode {
         INTAKE,
         OUTTAKE
     }
-
 }
