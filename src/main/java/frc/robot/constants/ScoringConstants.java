@@ -5,6 +5,7 @@ import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.*;
+import frc.robot.framework.CoralQueue;
 import frc.robot.utils.ConfigManager;
 import java.util.HashMap;
 import java.util.List;
@@ -51,11 +52,11 @@ public class ScoringConstants {
         INTAKE
     }
 
-    public static final Map<String, String[]> PROFILES = new HashMap<>();
+    public static final Map<String, CoralQueue.CoralQueueProfile> PROFILES = new HashMap<>();
 
     static {
-        PROFILES.put("PROFILE_1", new String[] {"10L2", "9L3", "8L4", "7L2", "6L4", "5L3", "4L2"});
-        PROFILES.put("PROFILE_2", new String[] {"5L3", "4L3", "3L3", "2L3", "1L3"});
+        PROFILES.put("PROFILE_1", CoralQueue.CoralQueueProfile.fromString("5L1"));
+        PROFILES.put("PROFILE_2", CoralQueue.CoralQueueProfile.fromString("0L3,1L4"));
     }
 
     public static Pose2d getPoseFromTag(String side, int id) {

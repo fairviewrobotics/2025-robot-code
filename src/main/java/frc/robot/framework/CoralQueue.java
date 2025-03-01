@@ -17,7 +17,7 @@ public class CoralQueue {
     private static CoralQueue INSTANCE = null;
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final ArrayList<CoralPosition> coralPositionList = new ArrayList<>();
+    private final ArrayList<CoralPosition> coralPositions = new ArrayList<>();
     private final NetworkTablesUtils NTUtils = NetworkTablesUtils.getTable("CoralQueue");
 
     private int positionListIndex = 0;
@@ -39,26 +39,13 @@ public class CoralQueue {
     }
 
     /**
-     * Add position string to queue. No spaces, separated by commas. (e.g.
-     * B10H2,R1H3,R2H2,B1H1,B5H4).
-     *
-     * @param posStrList The list of pose strings
-     */
-    public void listToQueue(String posStrList) {
-        String[] posList = posStrList.split(",");
-        for (String i : posList) {
-            addPosition(i);
-        }
-    }
-
-    /**
      * Return next reef position in the queue
      *
      * @return Get the current coral queue position
      */
     public CoralPosition getCurrentPosition() {
-        if (!coralPositionList.isEmpty() && !this.interrupt) {
-            this.currentPos = coralPositionList.get(positionListIndex);
+        if (!coralPositions.isEmpty() && !this.interrupt) {
+            this.currentPos = coralPositions.get(positionListIndex);
             return this.currentPos;
         } else if (this.interrupt) {
             this.interrupt = false;
@@ -91,8 +78,8 @@ public class CoralQueue {
     /** Step forwards in the queue */
     public void stepForwards() {
         positionListIndex += 1;
-        if (positionListIndex > coralPositionList.size() - 1) {
-            positionListIndex = coralPositionList.size() - 1;
+        if (positionListIndex > coralPositions.size() - 1) {
+            positionListIndex = coralPositions.size() - 1;
         }
 
         getCurrentPosition();
@@ -110,41 +97,6 @@ public class CoralQueue {
     }
 
     /**
-     * Turn a string into a {@link CoralPosition}
-     *
-     * @param posStr The string position
-     * @return The corresponding {@link CoralPosition}
-     */
-    public static CoralPosition getCoralPosition(String posStr) {
-        if (posStr == null || posStr.isEmpty()) {
-            return null;
-        }
-
-        DriverStation.refreshData();
-        Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
-
-        int splitIdx = posStr.length() - 2;
-        String heightString = posStr.substring(splitIdx);
-        String posString = posStr.substring(0, splitIdx);
-
-        int posIdx = Math.max(Math.min(Integer.parseInt(posString) - 1, 23), 0);
-
-        if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Blue) {
-            posIdx += 12;
-        }
-
-        LOGGER.debug("CoralQ: posIdx = {}, heightString = {}", posIdx, heightString);
-
-        return new CoralPosition(
-                posStr,
-                new Pose2d(
-                        ScoringConstants.CORAL_POSITIONS[posIdx].getX(),
-                        ScoringConstants.CORAL_POSITIONS[posIdx].getY(),
-                        ScoringConstants.CORAL_POSITIONS[posIdx].getRotation()),
-                ScoringConstants.ScoringHeights.valueOf(heightString.toUpperCase()));
-    }
-
-    /**
      * Convert reef position IDs to heights and positions.
      *
      * @param posStr The pose string to be turned into a {@link CoralPosition}
@@ -154,42 +106,37 @@ public class CoralQueue {
             return;
         }
 
-        CoralPosition pos = getCoralPosition(posStr);
+        CoralPosition pos = CoralPosition.fromString(posStr);
         if (pos == null) {
             LOGGER.warn("getCoralPosition() returned null pose");
             return;
         }
 
-        coralPositionList.add(pos);
+        coralPositions.add(pos);
     }
 
     /** Clear the queue. */
     public void clearList() {
-        coralPositionList.clear();
+        coralPositions.clear();
         this.positionListIndex = 0;
     }
 
-    /**
-     * Input position string and add it to queue via network tables. No spaces, separated by commas.
-     * (e.g. 10L2,1L3,2L2,1L1).
-     */
+    /** Load a profile from an entry in NT */
     public void loadQueueFromNT() {
         this.clearList();
-        this.listToQueue(ConfigManager.getInstance().get("Coral_Queue", "10L2,11L1"));
+        this.loadProfile(
+                CoralQueueProfile.fromString(
+                        ConfigManager.getInstance().get("Coral_Queue", "10L2,11L1")));
     }
 
-    public void loadQueueFromDefault(String profile) {
-        String[] profileChosen = ScoringConstants.PROFILES.get(profile);
-
-        if (profileChosen == null) {
-            return;
-        }
-
-        ConfigManager.getInstance().set("Coral_Queue", String.join(",", profileChosen));
-
-        for (String i : profileChosen) {
-            addPosition(i);
-        }
+    /**
+     * Load a profile into the queue
+     *
+     * @param profile The {@link CoralQueueProfile}
+     */
+    public void loadProfile(CoralQueueProfile profile) {
+        this.clearList();
+        this.coralPositions.addAll(profile.getPositions());
     }
 
     /** Runs every 20ms to update NT position */
@@ -234,6 +181,35 @@ public class CoralQueue {
             this.stringId = "";
             this.pose = new Pose2d();
             this.height = ScoringConstants.ScoringHeights.L1;
+        }
+
+        public static CoralPosition fromString(String string) {
+            if (string == null || string.isEmpty()) {
+                return null;
+            }
+
+            DriverStation.refreshData();
+            Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
+
+            int splitIdx = string.length() - 2;
+            String heightString = string.substring(splitIdx);
+            String posString = string.substring(0, splitIdx);
+
+            int posIdx = Math.max(Math.min(Integer.parseInt(posString) - 1, 23), 0);
+
+            if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Blue) {
+                posIdx += 12;
+            }
+
+            LOGGER.debug("CoralQ: posIdx = {}, heightString = {}", posIdx, heightString);
+
+            return new CoralPosition(
+                    string,
+                    new Pose2d(
+                            ScoringConstants.CORAL_POSITIONS[posIdx].getX(),
+                            ScoringConstants.CORAL_POSITIONS[posIdx].getY(),
+                            ScoringConstants.CORAL_POSITIONS[posIdx].getRotation()),
+                    ScoringConstants.ScoringHeights.valueOf(heightString.toUpperCase()));
         }
 
         /**
@@ -292,6 +268,65 @@ public class CoralQueue {
             return Objects.equals(this.stringId, that.stringId)
                     && Objects.equals(this.pose, that.pose)
                     && this.height == that.height;
+        }
+    }
+
+    /** A simple wrapper class for a CQ profile */
+    public static class CoralQueueProfile {
+        private final ArrayList<CoralPosition> positions;
+        private final String rawString;
+
+        /**
+         * Coral Queue profile constructor
+         *
+         * @param rawString The raw string
+         */
+        private CoralQueueProfile(String rawString) {
+            this.rawString = rawString;
+            this.positions = this.parsePosString(rawString);
+        }
+
+        /**
+         * Generate a profile from a string
+         *
+         * @param string The string (comma seperated) (Ex: 2L4,5L2,10L4)
+         * @return The generated {@link CoralQueueProfile}
+         */
+        public static CoralQueueProfile fromString(String string) {
+            return new CoralQueueProfile(string);
+        }
+
+        /**
+         * Get the array of positions
+         *
+         * @return The array of {@link CoralPosition}s
+         */
+        public ArrayList<CoralPosition> getPositions() {
+            return this.positions;
+        }
+
+        /**
+         * Get the raw string used to generate the queue
+         *
+         * @return The raw string
+         */
+        public String getRawString() {
+            return this.rawString;
+        }
+
+        /**
+         * Parse a string to a list of coral profile
+         *
+         * @param posStrList The list of pose strings
+         */
+        private ArrayList<CoralPosition> parsePosString(String posStrList) {
+            ArrayList<CoralPosition> res = new ArrayList<>();
+            String[] posList = posStrList.split(",");
+            for (String i : posList) {
+                res.add(CoralPosition.fromString(i));
+            }
+
+            return res;
         }
     }
 }

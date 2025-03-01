@@ -100,11 +100,8 @@ public class ConfigManager {
      *
      * @return A default json object
      */
-    @SuppressWarnings("unchecked")
     public JSONObject getDefault() {
-        JSONObject defaultSettings = new JSONObject();
-
-        return defaultSettings;
+        return new JSONObject();
     }
 
     /**
