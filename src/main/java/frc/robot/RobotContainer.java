@@ -3,6 +3,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.commands.*;
 import frc.robot.commands.AlignCommand;
@@ -45,8 +46,18 @@ public class RobotContainer {
     // Auto Chooser
     SendableChooser<Command> superSecretMissileTech = new SendableChooser<>();
 
+    // CQ profile selector
+    private final SendableChooser<CoralQueue.CoralQueueProfile> cqProfiles =
+            new SendableChooser<>();
+
     public RobotContainer() {
         configureBindings();
+
+        for (String key : ScoringConstants.PROFILES.keySet()) {
+            cqProfiles.addOption(key, ScoringConstants.PROFILES.get(key));
+        }
+
+        SmartDashboard.putData(cqProfiles);
     }
 
     private void configureBindings() {
@@ -105,6 +116,10 @@ public class RobotContainer {
     public void robotPeriodic() {
         odometry.periodic();
         coralQueue.periodic();
+    }
+
+    public void teleopInit() {
+        CoralQueue.getInstance().loadProfile(cqProfiles.getSelected());
     }
 
     public Command getAutonomousCommand() {
