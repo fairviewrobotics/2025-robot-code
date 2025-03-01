@@ -48,7 +48,8 @@ public class ScoringConstants {
         L2,
         L3,
         L4,
-        INTAKE
+        INTAKE,
+        ALGAE
     }
 
     public static final Map<String, String[]> PROFILES = new HashMap<>();

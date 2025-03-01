@@ -9,6 +9,7 @@ import com.revrobotics.spark.config.*;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -44,8 +45,8 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     private final ElevatorFeedforward elevatorFF =
             new ElevatorFeedforward(
-                    ElevatorConstants.ELEVATOR_KS,
-                    ElevatorConstants.ELEVATOR_KG,
+                    ConfigManager.getInstance().get("elevator_ks", ElevatorConstants.ELEVATOR_KS),
+                    ConfigManager.getInstance().get("elevator_kg", ElevatorConstants.ELEVATOR_KG),
                     ElevatorConstants.ELEVATOR_KV,
                     ElevatorConstants.ELEVATOR_KA);
 
@@ -165,7 +166,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public void zeroElevator() {
-        if (getBottomLinebreak()) {
+        //        if (getBottomLinebreak() || getElevatorPosition() <= 0.05) {
+        if (getElevatorPosition() <= 0.1) {
             setVoltage(0.0);
         } else {
             setVoltage(zeroVoltage);
@@ -191,7 +193,7 @@ public class ElevatorSubsystem extends SubsystemBase {
      * @return The elevator position in meters
      */
     public double getElevatorPosition() {
-        double encoderAveragePos = (rightEncoder.getPosition() + 0.0) / 1;
+        double encoderAveragePos = (rightEncoder.getPosition() + leftEncoder.getPosition()) / 2;
         // Calculates average pos
         //        double encoderAveragePos = leftEncoder.getPosition();
         return encoderAveragePos * ElevatorConstants.ROTATIONS_TO_METERS;
@@ -230,6 +232,12 @@ public class ElevatorSubsystem extends SubsystemBase {
                 ConfigManager.getInstance().get("elevator_i", ElevatorConstants.ELEVATOR_I));
         elevatorPID.setD(
                 ConfigManager.getInstance().get("elevator_d", ElevatorConstants.ELEVATOR_D));
+        elevatorPID.setConstraints(
+                new TrapezoidProfile.Constraints(
+                        ConfigManager.getInstance()
+                                .get("elevator_max_vel", ElevatorConstants.ELEVATOR_MAX_VEL),
+                        ConfigManager.getInstance()
+                                .get("elevator_max_accel", ElevatorConstants.ELEVATOR_MAX_ACCEL)));
 
         elevatorLEncoderPos.set(leftEncoder.getPosition());
         elevatorREncoderPos.set(rightEncoder.getPosition());

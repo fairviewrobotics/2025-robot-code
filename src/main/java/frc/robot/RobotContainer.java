@@ -22,6 +22,7 @@ public class RobotContainer {
     ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
     ArmSubsystem armSubsystem = new ArmSubsystem();
     IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+    ClimberSubsystem climberSubsystem = new ClimberSubsystem();
     ButtonBoardSubsystem buttonBoardSubsystem = new ButtonBoardSubsystem(buttonBoard);
 
     // Controllers
@@ -59,43 +60,41 @@ public class RobotContainer {
                         () -> primaryController.getLeftX() * 2.5,
                         () -> -primaryController.getRightX() * Math.PI,
                         true,
-                        false));
+                        true));
+
+        primaryController.rightBumper.whileTrue(
+                getPlaceCommand(coralQueue::getNext)
+        );
+
+        primaryController.leftBumper.whileTrue(
+                new ElevatorArmCommand(
+                        elevatorSubsystem,
+                        armSubsystem,
+                        () -> ScoringConstants.ScoringHeights.INTAKE
+                )
+        );
 
         elevatorSubsystem.setDefaultCommand(new BaseCommand(elevatorSubsystem, armSubsystem));
 
-        primaryController.dpadLeft.whileTrue(this.getPlaceCommand(coralQueue::getNext));
-
-        primaryController.aButton.whileTrue(
-                this.getPlaceCommand(() -> CoralQueue.getCoralPosition("2L2")));
-        primaryController.bButton.whileTrue(
-                this.getPlaceCommand(() -> CoralQueue.getCoralPosition("3L2")));
-
-        primaryController.xButton.whileTrue(
-                this.getPlaceCommand(() -> CoralQueue.getCoralPosition("6L2")));
-        primaryController.yButton.whileTrue(
-                this.getPlaceCommand(() -> CoralQueue.getCoralPosition("7L2")));
-
-        primaryController.dpadRight.whileTrue(
-                new ElevatorArmCommand(
-                        elevatorSubsystem,
-                        armSubsystem,
-                        primaryController,
-                        () -> ScoringConstants.ScoringHeights.INTAKE));
+        climberSubsystem.setDefaultCommand(
+                new ClimberCommand(climberSubsystem, secondaryController));
 
         primaryController.dpadDown.whileTrue(new RunCommand(() -> swerveSubsystem.zeroGyro()));
 
-        secondaryController.dpadRight.onTrue(
-                new InstantCommand(() -> coralQueue.loadQueueFromNT()));
-
-        secondaryController.rightBumper.onTrue(new InstantCommand(() -> coralQueue.stepForwards()));
-        secondaryController.leftBumper.onTrue(new InstantCommand(() -> coralQueue.stepBackwards()));
-
-        secondaryController.dpadLeft.whileTrue(
-                new ElevatorArmCommand(
-                        elevatorSubsystem,
-                        armSubsystem,
-                        primaryController,
-                        () -> ScoringConstants.ScoringHeights.L2));
+        //        secondaryController.dpadRight.onTrue(
+        //                new InstantCommand(() -> coralQueue.loadQueueFromNT()));
+        //
+        //        secondaryController.rightBumper.onTrue(new InstantCommand(() ->
+        // coralQueue.stepForwards()));
+        //        secondaryController.leftBumper.onTrue(new InstantCommand(() ->
+        // coralQueue.stepBackwards()));
+        //
+        //        secondaryController.dpadLeft.whileTrue(
+        //                new ElevatorArmCommand(
+        //                        elevatorSubsystem,
+        //                        armSubsystem,
+        //                        () -> ScoringConstants.ScoringHeights.L2));
+        //    }
     }
 
     public void robotInit() {
@@ -141,7 +140,6 @@ public class RobotContainer {
                         new ElevatorArmCommand(
                                 elevatorSubsystem,
                                 armSubsystem,
-                                primaryController,
                                 () -> positionSupplier.get().getHeight())));
     }
 }

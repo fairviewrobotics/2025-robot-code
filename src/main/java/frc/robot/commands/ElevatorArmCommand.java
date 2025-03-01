@@ -8,7 +8,6 @@ import frc.robot.constants.ScoringConstants;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.utils.ConfigManager;
-import frc.robot.utils.Controller;
 import frc.robot.utils.NetworkTablesUtils;
 import java.util.function.Supplier;
 
@@ -38,7 +37,6 @@ public class ElevatorArmCommand extends Command {
     public ElevatorArmCommand(
             ElevatorSubsystem elevatorSubsystem,
             ArmSubsystem armSubsystem,
-            Controller controller,
             Supplier<ScoringConstants.ScoringHeights> targetSupplier) {
         this.elevatorSubsystem = elevatorSubsystem;
         this.armSubsystem = armSubsystem;
@@ -71,16 +69,19 @@ public class ElevatorArmCommand extends Command {
 
         elevator.setEntry("Setpoint", elevatorPos);
 
-        if ((armSubsystem.getPivotAngle() <= -Math.PI / 4 || armSubsystem.getPivotAngle() >= 0)
-                && elevatorSubsystem.getElevatorPosition() <= 0.24
-                && elevatorPos != 0) {
-            isAtHold.set(true);
-            armSubsystem.setPivotAngle(0.0);
-            elevatorSubsystem.holdPosition();
-        } else {
-            isAtHold.set(false);
-            armSubsystem.setPivotAngle(armPos);
-            elevatorSubsystem.setTargetPosition(elevatorPos);
-        }
+        //        if ((armSubsystem.getPivotAngle() <= -Math.PI / 4 || armSubsystem.getPivotAngle()
+        // >= 0)
+        //                && elevatorSubsystem.getElevatorPosition() <= 0.24
+        //                && elevatorPos != 0) {
+        //            isAtHold.set(true);
+        //            armSubsystem.setPivotAngle(0.0);
+        //            elevatorSubsystem.holdPosition();
+        //        } else {
+        //            isAtHold.set(false);
+        //            armSubsystem.setPivotAngle(armPos);
+        //            elevatorSubsystem.setTargetPosition(elevatorPos);
+        //        }
+        armSubsystem.setPivotAngle(armPos);
+        elevatorSubsystem.setTargetPosition(elevatorPos);
     }
 }

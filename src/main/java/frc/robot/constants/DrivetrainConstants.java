@@ -12,7 +12,7 @@ import edu.wpi.first.math.util.Units;
 public class DrivetrainConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
-    public static final double MAX_SPEED_METERS_PER_SECOND = Double.MAX_VALUE;
+    public static final double MAX_SPEED_METERS_PER_SECOND = 5.0;
     public static final double MAX_ANGULAR_SPEED = Double.MAX_VALUE; // radians per second
 
     public static final double DIRECTION_SLEW_RATE = 18.0; // rads/sec
@@ -32,10 +32,10 @@ public class DrivetrainConstants {
                     new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2));
 
     // Angular offsets of the modules relative to the chassis in radians
-    public static final double FRONT_LEFT_CHASSIS_ANGULAR_OFFSET = 5.835 - Math.PI / 2;
-    public static final double FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = 0.931;
-    public static final double REAR_LEFT_CHASSIS_ANGULAR_OFFSET = 1.845 + Math.PI;
-    public static final double REAR_RIGHT_CHASSIS_ANGULAR_OFFSET = 1.127 + Math.PI / 2;
+    public static final double FRONT_LEFT_CHASSIS_ANGULAR_OFFSET = 4.419 - Math.PI / 2;
+    public static final double FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = Math.PI;
+    public static final double REAR_LEFT_CHASSIS_ANGULAR_OFFSET = 1.888 + Math.PI;
+    public static final double REAR_RIGHT_CHASSIS_ANGULAR_OFFSET = 1.116 + Math.PI / 2;
 
     // SPARK MAX CAN IDs
     public static final int FRONT_LEFT_DRIVING_CAN_ID = 3;
@@ -75,13 +75,13 @@ public class DrivetrainConstants {
     public static final double DRIVE_WHEEL_FREE_SPEED_RPS =
             (DRIVING_MOTOR_FREE_SPEED_RPS * WHEEL_CIRCUMFERENCE_METERS) / DRIVING_MOTOR_REDUCTION;
 
-    public static final double ROBOT_MASS_KG = 50;
-    public static final double ROBOT_MOI = 1.0;
+    public static final double ROBOT_MASS_KG = 49.9;
+    public static final double ROBOT_MOI = 4.829;
 
-    public static final double WHEEL_RADIUS_METERS = 0.0508;
-    public static final double MAX_DRIVE_VELOCITY_MPS = 3;
-    public static final double WHEEL_COF = 0.5;
-    public static final DCMotor DRIVE_MOTOR = new DCMotor(0, 0, 0, 0, 0, 1);
+    public static final double WHEEL_RADIUS_METERS = 0.0762;
+    public static final double MAX_DRIVE_VELOCITY_MPS = 4;
+    public static final double WHEEL_COF = 1.0;
+    public static final DCMotor DRIVE_MOTOR = new DCMotor(12, 3.6, 211, 3.6, 710.42, 1);
     public static final double DRIVE_CURRENT_LIMIT = 40;
     public static final int NUM_MOTORS = 1;
 
