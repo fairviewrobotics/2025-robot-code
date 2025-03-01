@@ -48,7 +48,7 @@ class CoralQueueTest {
 
     @Test
     void testListToQueue() {
-        coralQueue.listToQueue("11L4,1L1,3L3");
+        coralQueue.loadProfile(CoralQueue.CoralQueueProfile.fromString("11L4,1L1,3L3"));
         CoralQueue.CoralPosition expected =
                 new CoralQueue.CoralPosition(
                         "11L4",
@@ -76,7 +76,7 @@ class CoralQueueTest {
 
     @Test
     void testSkipNextValue() {
-        coralQueue.listToQueue("10L4,1L1");
+        coralQueue.loadProfile(CoralQueue.CoralQueueProfile.fromString("10L4,1L1"));
         coralQueue.stepForwards();
         CoralQueue.CoralPosition expected =
                 new CoralQueue.CoralPosition(
