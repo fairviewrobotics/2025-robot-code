@@ -3,6 +3,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.commands.*;
 import frc.robot.commands.AlignCommand;
@@ -54,6 +55,8 @@ public class RobotContainer {
         for (String key : ScoringConstants.PROFILES.keySet()) {
             cqProfiles.addOption(key, ScoringConstants.PROFILES.get(key));
         }
+
+        SmartDashboard.putData(cqProfiles);
     }
 
     private void configureBindings() {
