@@ -10,7 +10,6 @@ import frc.robot.constants.AlignConstants;
 import frc.robot.framework.Odometry;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.utils.ConfigManager;
-import frc.robot.utils.Controller;
 import frc.robot.utils.NetworkTablesUtils;
 import java.util.function.Supplier;
 import org.apache.logging.log4j.LogManager;
@@ -21,7 +20,7 @@ public class AlignCommand extends Command {
     private static final Logger LOGGER = LogManager.getLogger();
     private final SwerveSubsystem swerveSubsystem;
 
-    private final Controller controller;
+    //    private final Controller controller;
 
     private final ProfiledPIDController xAxisPid =
             new ProfiledPIDController(
@@ -62,9 +61,8 @@ public class AlignCommand extends Command {
     /**
      * Align to a fieldspace position with odometry
      *
-     * @param swerveSubsystem The instance of swerve subsystem
-     * @param controller The primary driving {@link edu.wpi.first.wpilibj.XboxController}, used for
-     *     driver to override vision
+     * @param swerveSubsystem The instance of swerve subsystem // * @param controller The primary
+     *     driving {@link edu.wpi.first.wpilibj.XboxController}, used for driver to override vision
      * @param poseSupplier A {@link Supplier<Pose2d>} for poses
      * @param stopWhenFinished Weather to stop swerve or not when the command is complete, set to
      *     false if you are doing multiple paths in a row
@@ -74,12 +72,12 @@ public class AlignCommand extends Command {
      */
     public AlignCommand(
             SwerveSubsystem swerveSubsystem,
-            Controller controller,
+            //            Controller controller,
             Supplier<Pose2d> poseSupplier,
             boolean stopWhenFinished,
             String profile) {
         this.swerveSubsystem = swerveSubsystem;
-        this.controller = controller;
+        //        this.controller = controller;
         this.pose2dSupplier = poseSupplier;
         this.stopWhenFinished = stopWhenFinished;
         this.profile = profile;
@@ -106,6 +104,7 @@ public class AlignCommand extends Command {
         this.timeSenseFinished = -1;
         this.doUpdate = true;
 
+        LOGGER.info("Initializing AlignCommand");
         Pose3d robotPose = odometry.getRobotPose();
 
         // PID updates
@@ -166,7 +165,7 @@ public class AlignCommand extends Command {
         this.rotationPid.setGoal(robotPose.getRotation().getZ());
 
         this.xAxisPid.calculate(robotPose.getX());
-        this.xAxisPid.calculate(robotPose.getY());
+        this.yAxisPid.calculate(robotPose.getY());
         this.rotationPid.calculate(robotPose.getRotation().getZ());
 
         this.xAxisPid.setGoal(targetPos.getX());
@@ -206,7 +205,7 @@ public class AlignCommand extends Command {
                                 : Math.signum(xAxisCalc) * configManager.get("align_ff", 0.1));
         double finalY =
                 yAxisCalc
-                        + (xAxisPid.atGoal() || xAxisPid.atSetpoint()
+                        + (yAxisPid.atGoal() || yAxisPid.atSetpoint()
                                 ? 0
                                 : Math.signum(yAxisCalc) * configManager.get("align_ff", 0.1));
 
@@ -222,17 +221,17 @@ public class AlignCommand extends Command {
                     this.targetPos.getRotation().getRadians()
                 });
 
-        if (controller.hasStickInput(0.03) || !odometry.hasSeenTarget()) {
-            swerveSubsystem.drive(
-                    controller.getLeftX(),
-                    controller.getLeftY(),
-                    controller.getRightX(),
-                    true,
-                    true,
-                    false);
-        } else {
-            swerveSubsystem.drive(finalX, finalY, rotationPidCalc, true, true, true);
-        }
+        //        if (controller.hasStickInput(0.03) || !odometry.hasSeenTarget()) {
+        //            swerveSubsystem.drive(
+        //                    controller.getLeftX(),
+        //                    controller.getLeftY(),
+        //                    controller.getRightX(),
+        //                    true,
+        //                    true,
+        //                    false);
+        //        } else {
+        swerveSubsystem.drive(finalX, finalY, rotationPidCalc, true, true, true);
+        //        }
 
         if (xAxisPid.atGoal() && yAxisPid.atGoal() && rotationPid.atGoal() && this.doUpdate) {
             LOGGER.debug("Hit goal, waiting for time to expire");
@@ -253,6 +252,6 @@ public class AlignCommand extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        if (stopWhenFinished) swerveSubsystem.drive(0, 0, 0, false, true, false);
+        if (stopWhenFinished) swerveSubsystem.drive(0, 0, 0, false, false, false);
     }
 }

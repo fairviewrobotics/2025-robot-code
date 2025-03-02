@@ -31,17 +31,17 @@ public class IntakeCommand extends Command {
     public void execute() {
         switch (mode) {
             case INTAKE:
-            {
-                intakeSubsystem.setVoltage(
-                        ConfigManager.getInstance().get("intake_speed", 8.0));
-                break;
-            }
+                {
+                    intakeSubsystem.setVoltage(
+                            ConfigManager.getInstance().get("intake_speed", 8.0));
+                    break;
+                }
             case OUTTAKE:
-            {
-                intakeSubsystem.setVoltage(
-                        ConfigManager.getInstance().get("outtake_speed", -8.0));
-                break;
-            }
+                {
+                    intakeSubsystem.setVoltage(
+                            ConfigManager.getInstance().get("outtake_speed", -8.0));
+                    break;
+                }
         }
     }
 

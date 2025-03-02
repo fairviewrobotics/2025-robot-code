@@ -33,7 +33,7 @@ public class DrivetrainConstants {
 
     // Angular offsets of the modules relative to the chassis in radians
     public static final double FRONT_LEFT_CHASSIS_ANGULAR_OFFSET = 4.419 - Math.PI / 2;
-    public static final double FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = Math.PI;
+    public static final double FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = 0.931; // Math.PI;
     public static final double REAR_LEFT_CHASSIS_ANGULAR_OFFSET = 1.888 + Math.PI;
     public static final double REAR_RIGHT_CHASSIS_ANGULAR_OFFSET = 1.116 + Math.PI / 2;
 

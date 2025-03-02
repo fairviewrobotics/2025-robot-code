@@ -25,6 +25,7 @@ public class ElevatorArmCommand extends Command {
                     .getEntry(true);
 
     private final Supplier<ScoringConstants.ScoringHeights> targetSupplier;
+    private ScoringConstants.ScoringHeights target;
 
     /**
      * Create an instance of the command to place the arm
@@ -49,23 +50,19 @@ public class ElevatorArmCommand extends Command {
     public void initialize() {
         elevatorSubsystem.resetPID();
         armSubsystem.resetPID();
+        this.target = targetSupplier.get();
+
+        NetworkTablesUtils.getTable("debug").setEntry("Elevator target", this.target.toString());
     }
 
     @Override
     public void execute() {
         double elevatorPos =
                 ConfigManager.getInstance()
-                        .get(
-                                String.format(
-                                        "elevator_%s",
-                                        targetSupplier.get().toString().toLowerCase()),
-                                0.0);
+                        .get(String.format("elevator_%s", target.toString().toLowerCase()), 0.0);
         double armPos =
                 ConfigManager.getInstance()
-                        .get(
-                                String.format(
-                                        "arm_%s", targetSupplier.get().toString().toLowerCase()),
-                                0.0);
+                        .get(String.format("arm_%s", target.toString().toLowerCase()), 0.0);
 
         elevator.setEntry("Setpoint", elevatorPos);
 

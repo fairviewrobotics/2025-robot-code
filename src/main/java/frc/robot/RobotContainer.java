@@ -1,6 +1,8 @@
 /* Black Knights Robotics (C) 2025 */
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -58,6 +60,18 @@ public class RobotContainer {
         }
 
         SmartDashboard.putData(cqProfiles);
+        SmartDashboard.putData("Auto Chooser", superSecretMissileTech);
+
+        superSecretMissileTech.addOption(
+                "Left",
+                new SequentialCommandGroup(
+                        getAutoPlaceCommand("10L4"),
+                        getAutoIntakeCommand(),
+                        getAutoPlaceCommand("8L4"),
+                        getAutoIntakeCommand(),
+                        getAutoPlaceCommand("9L4")));
+
+        superSecretMissileTech.addOption("One pose", getAutoPlaceCommand("10L4"));
     }
 
     private void configureBindings() {
@@ -74,16 +88,16 @@ public class RobotContainer {
                         true));
 
         primaryController.rightBumper.whileTrue(
-                getPlaceCommand(coralQueue::getNext)
-        );
+                getPlaceCommand(() -> coralQueue.getCurrentPosition(), () -> coralQueue.getNext()));
 
         primaryController.leftBumper.whileTrue(
-                new ElevatorArmCommand(
-                        elevatorSubsystem,
-                        armSubsystem,
-                        () -> ScoringConstants.ScoringHeights.INTAKE
-                )
-        );
+                new ParallelCommandGroup(
+                        new ElevatorArmCommand(
+                                elevatorSubsystem,
+                                armSubsystem,
+                                () -> ScoringConstants.ScoringHeights.INTAKE),
+                        new IntakeCommand(
+                                intakeSubsystem, IntakeCommand.IntakeMode.INTAKE, () -> false)));
 
         elevatorSubsystem.setDefaultCommand(new BaseCommand(elevatorSubsystem, armSubsystem));
 
@@ -91,6 +105,11 @@ public class RobotContainer {
                 new ClimberCommand(climberSubsystem, secondaryController));
 
         primaryController.dpadDown.whileTrue(new RunCommand(() -> swerveSubsystem.zeroGyro()));
+
+        secondaryController.leftBumper.onTrue(new InstantCommand(() -> coralQueue.stepBackwards()));
+        secondaryController.rightBumper.onTrue(new InstantCommand(() -> coralQueue.stepForwards()));
+
+        secondaryController.aButton.whileTrue(getAutoPlaceCommand("10L4"));
 
         //        secondaryController.dpadRight.onTrue(
         //                new InstantCommand(() -> coralQueue.loadQueueFromNT()));
@@ -123,18 +142,20 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return Commands.print("No autonomous command configured");
+        return superSecretMissileTech.getSelected();
     }
 
-    private Command getPlaceCommand(Supplier<CoralQueue.CoralPosition> positionSupplier) {
+    private Command getPlaceCommand(
+            Supplier<CoralQueue.CoralPosition> currentSupplier,
+            Supplier<CoralQueue.CoralPosition> nextSupplier) {
         return new SequentialCommandGroup(
                 new ParallelRaceGroup(
                         new AlignCommand(
                                 swerveSubsystem,
-                                primaryController,
+                                //                                primaryController,
                                 () ->
                                         AlignUtils.getXDistBack(
-                                                positionSupplier.get().getPose(),
+                                                currentSupplier.get().getPose(),
                                                 ConfigManager.getInstance()
                                                         .get("align_dist_back", 0.5)),
                                 false,
@@ -144,8 +165,8 @@ public class RobotContainer {
                         new SequentialCommandGroup(
                                 new AlignCommand(
                                         swerveSubsystem,
-                                        primaryController,
-                                        () -> positionSupplier.get().getPose(),
+                                        //                                        primaryController,
+                                        () -> currentSupplier.get().getPose(),
                                         true,
                                         "fine"),
                                 new IntakeCommand(
@@ -155,6 +176,61 @@ public class RobotContainer {
                         new ElevatorArmCommand(
                                 elevatorSubsystem,
                                 armSubsystem,
-                                () -> positionSupplier.get().getHeight())));
+                                () -> nextSupplier.get().getHeight())));
+    }
+
+    public Command getAutoPlaceCommand(String location) {
+        return new SequentialCommandGroup(
+                new ParallelRaceGroup(
+                        new AlignCommand(
+                                swerveSubsystem,
+                                //                                primaryController,
+                                () ->
+                                        AlignUtils.getXDistBack(
+                                                CoralQueue.CoralPosition.fromString(location)
+                                                        .getPose(),
+                                                ConfigManager.getInstance()
+                                                        .get("align_dist_back", 0.5)),
+                                false,
+                                "rough"),
+                        new BaseCommand(elevatorSubsystem, armSubsystem)),
+                new ParallelRaceGroup(
+                        new SequentialCommandGroup(
+                                new AlignCommand(
+                                        swerveSubsystem,
+                                        //
+                                        () ->
+                                                CoralQueue.CoralPosition.fromString(location)
+                                                        .getPose(),
+                                        true,
+                                        "fine"),
+                                new IntakeCommand(
+                                                intakeSubsystem,
+                                                IntakeCommand.IntakeMode.OUTTAKE,
+                                                () -> armSubsystem.hasGamePiece())
+                                        .withTimeout(2)),
+                        new ElevatorArmCommand(
+                                elevatorSubsystem,
+                                armSubsystem,
+                                () -> CoralQueue.CoralPosition.fromString(location).getHeight())));
+    }
+
+    public Command getAutoIntakeCommand() {
+        return new ParallelDeadlineGroup(
+                new SequentialCommandGroup(
+                        new AlignCommand(
+                                swerveSubsystem,
+                                () -> new Pose2d(15.950, 1.395, new Rotation2d(-0.918)),
+                                true,
+                                "rough"),
+                        new IntakeCommand(
+                                        intakeSubsystem,
+                                        IntakeCommand.IntakeMode.INTAKE,
+                                        () -> armSubsystem.hasGamePiece())
+                                .withTimeout(2)),
+                new ElevatorArmCommand(
+                        elevatorSubsystem,
+                        armSubsystem,
+                        () -> ScoringConstants.ScoringHeights.INTAKE));
     }
 }
