@@ -3,6 +3,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.utils.ConfigManager;
 import java.util.function.BooleanSupplier;
 
 /** Command to intake and outtake */
@@ -30,21 +31,29 @@ public class IntakeCommand extends Command {
     public void execute() {
         switch (mode) {
             case INTAKE:
-                intakeSubsystem.setSpeed(0.5);
+                {
+                    intakeSubsystem.setVoltage(
+                            ConfigManager.getInstance().get("intake_speed", 8.0));
+                    break;
+                }
             case OUTTAKE:
-                intakeSubsystem.setSpeed(-0.5);
+                {
+                    intakeSubsystem.setVoltage(
+                            ConfigManager.getInstance().get("outtake_speed", -8.0));
+                    break;
+                }
         }
     }
 
     @Override
     public void end(boolean interrupted) {
-        intakeSubsystem.setSpeed(0);
+        intakeSubsystem.setVoltage(0);
     }
 
-    @Override
-    public boolean isFinished() {
-        return mode.equals(IntakeMode.INTAKE) && hasGamePiece.getAsBoolean();
-    }
+    //    @Override
+    //    public boolean isFinished() {
+    //        return mode.equals(IntakeMode.INTAKE) && hasGamePiece.getAsBoolean();
+    //    }
 
     /** Enum of the different intake modes */
     public enum IntakeMode {

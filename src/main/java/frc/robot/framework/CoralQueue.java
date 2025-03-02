@@ -48,7 +48,6 @@ public class CoralQueue {
             this.currentPos = coralPositions.get(positionListIndex);
             return this.currentPos;
         } else if (this.interrupt) {
-            this.interrupt = false;
             return this.currentPos;
         } else {
             return new CoralPosition();
@@ -63,6 +62,7 @@ public class CoralQueue {
     public CoralPosition getNext() {
         CoralPosition pos = this.getCurrentPosition();
         this.stepForwards();
+        if (this.interrupt) this.interrupt = false;
         return pos;
     }
 
@@ -96,25 +96,6 @@ public class CoralQueue {
         this.currentPos = position;
     }
 
-    /**
-     * Convert reef position IDs to heights and positions.
-     *
-     * @param posStr The pose string to be turned into a {@link CoralPosition}
-     */
-    public void addPosition(String posStr) {
-        if (posStr == null || posStr.isEmpty()) {
-            return;
-        }
-
-        CoralPosition pos = CoralPosition.fromString(posStr);
-        if (pos == null) {
-            LOGGER.warn("getCoralPosition() returned null pose");
-            return;
-        }
-
-        coralPositions.add(pos);
-    }
-
     /** Clear the queue. */
     public void clearList() {
         coralPositions.clear();
@@ -135,6 +116,7 @@ public class CoralQueue {
      * @param profile The {@link CoralQueueProfile}
      */
     public void loadProfile(CoralQueueProfile profile) {
+        LOGGER.info("Loading profile: {}", profile);
         this.clearList();
         this.coralPositions.addAll(profile.getPositions());
     }
@@ -152,6 +134,7 @@ public class CoralQueue {
         NTUtils.setEntry("Current Reef Pose Name", currentPos.toString());
         NTUtils.setArrayEntry("Current Reef Height", currentPos.getBooleanHeights());
         NTUtils.setEntry("Position Index", positionListIndex);
+        NTUtils.setEntry("Num positions", coralPositions.size());
     }
 
     /**

@@ -8,7 +8,6 @@ import frc.robot.constants.ScoringConstants;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.utils.ConfigManager;
-import frc.robot.utils.Controller;
 import frc.robot.utils.NetworkTablesUtils;
 import java.util.function.Supplier;
 
@@ -26,6 +25,7 @@ public class ElevatorArmCommand extends Command {
                     .getEntry(true);
 
     private final Supplier<ScoringConstants.ScoringHeights> targetSupplier;
+    private ScoringConstants.ScoringHeights target;
 
     /**
      * Create an instance of the command to place the arm
@@ -38,7 +38,6 @@ public class ElevatorArmCommand extends Command {
     public ElevatorArmCommand(
             ElevatorSubsystem elevatorSubsystem,
             ArmSubsystem armSubsystem,
-            Controller controller,
             Supplier<ScoringConstants.ScoringHeights> targetSupplier) {
         this.elevatorSubsystem = elevatorSubsystem;
         this.armSubsystem = armSubsystem;
@@ -51,36 +50,35 @@ public class ElevatorArmCommand extends Command {
     public void initialize() {
         elevatorSubsystem.resetPID();
         armSubsystem.resetPID();
+        this.target = targetSupplier.get();
+
+        NetworkTablesUtils.getTable("debug").setEntry("Elevator target", this.target.toString());
     }
 
     @Override
     public void execute() {
         double elevatorPos =
                 ConfigManager.getInstance()
-                        .get(
-                                String.format(
-                                        "elevator_%s",
-                                        targetSupplier.get().toString().toLowerCase()),
-                                0.0);
+                        .get(String.format("elevator_%s", target.toString().toLowerCase()), 0.0);
         double armPos =
                 ConfigManager.getInstance()
-                        .get(
-                                String.format(
-                                        "arm_%s", targetSupplier.get().toString().toLowerCase()),
-                                0.0);
+                        .get(String.format("arm_%s", target.toString().toLowerCase()), 0.0);
 
         elevator.setEntry("Setpoint", elevatorPos);
 
-        if ((armSubsystem.getPivotAngle() <= -Math.PI / 4 || armSubsystem.getPivotAngle() >= 0)
-                && elevatorSubsystem.getElevatorPosition() <= 0.24
-                && elevatorPos != 0) {
-            isAtHold.set(true);
-            armSubsystem.setPivotAngle(0.0);
-            elevatorSubsystem.holdPosition();
-        } else {
-            isAtHold.set(false);
-            armSubsystem.setPivotAngle(armPos);
-            elevatorSubsystem.setTargetPosition(elevatorPos);
-        }
+        //        if ((armSubsystem.getPivotAngle() <= -Math.PI / 4 || armSubsystem.getPivotAngle()
+        // >= 0)
+        //                && elevatorSubsystem.getElevatorPosition() <= 0.24
+        //                && elevatorPos != 0) {
+        //            isAtHold.set(true);
+        //            armSubsystem.setPivotAngle(0.0);
+        //            elevatorSubsystem.holdPosition();
+        //        } else {
+        //            isAtHold.set(false);
+        //            armSubsystem.setPivotAngle(armPos);
+        //            elevatorSubsystem.setTargetPosition(elevatorPos);
+        //        }
+        armSubsystem.setPivotAngle(armPos);
+        elevatorSubsystem.setTargetPosition(elevatorPos);
     }
 }

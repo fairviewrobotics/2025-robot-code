@@ -49,13 +49,15 @@ public class ScoringConstants {
         L2,
         L3,
         L4,
-        INTAKE
+        INTAKE,
+        ALGAE
     }
 
     public static final Map<String, CoralQueue.CoralQueueProfile> PROFILES = new HashMap<>();
 
     static {
-        PROFILES.put("PROFILE_1", CoralQueue.CoralQueueProfile.fromString("5L1"));
+        PROFILES.put(
+                "PROFILE_1", CoralQueue.CoralQueueProfile.fromString("6L4,7L4,8L4,9L4,10L4,11L4"));
         PROFILES.put("PROFILE_2", CoralQueue.CoralQueueProfile.fromString("0L3,1L4"));
     }
 
