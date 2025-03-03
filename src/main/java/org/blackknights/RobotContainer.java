@@ -1,8 +1,7 @@
 /* Black Knights Robotics (C) 2025 */
 package org.blackknights;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -11,7 +10,6 @@ import java.util.function.Supplier;
 import org.blackknights.commands.*;
 import org.blackknights.constants.ScoringConstants;
 import org.blackknights.constants.VisionConstants;
-import org.blackknights.framework.*;
 import org.blackknights.framework.CoralQueue;
 import org.blackknights.framework.Odometry;
 import org.blackknights.subsystems.*;
@@ -66,15 +64,18 @@ public class RobotContainer {
         superSecretMissileTech.addOption(
                 "Left",
                 new SequentialCommandGroup(
-                        getAutoPlaceCommand("10L4"),
+                        getLocationPlaceCommand(CoralQueue.CoralPosition.fromString("10L4")),
                         getAutoIntakeCommand(),
-                        getAutoPlaceCommand("8L4"),
+                        getLocationPlaceCommand(CoralQueue.CoralPosition.fromString("8L4")),
                         getAutoIntakeCommand(),
-                        getAutoPlaceCommand("9L4")));
+                        getLocationPlaceCommand(CoralQueue.CoralPosition.fromString("9L4"))));
 
-        superSecretMissileTech.addOption("One pose", getAutoPlaceCommand("10L4"));
+        superSecretMissileTech.addOption("One pose", getLocationPlaceCommand(CoralQueue.CoralPosition.fromString("10L4")));
     }
 
+    /**
+     * Configure controller bindings
+     */
     private void configureBindings() {
         // PRIMARY CONTROLLER
         // Coral Queue: .onTrue(InstantCommand)
@@ -110,42 +111,52 @@ public class RobotContainer {
         secondaryController.leftBumper.onTrue(new InstantCommand(() -> coralQueue.stepBackwards()));
         secondaryController.rightBumper.onTrue(new InstantCommand(() -> coralQueue.stepForwards()));
 
-        secondaryController.aButton.whileTrue(getAutoPlaceCommand("10L4"));
-
-        //        secondaryController.dpadRight.onTrue(
-        //                new InstantCommand(() -> coralQueue.loadQueueFromNT()));
-        //
-        //        secondaryController.rightBumper.onTrue(new InstantCommand(() ->
-        // coralQueue.stepForwards()));
-        //        secondaryController.leftBumper.onTrue(new InstantCommand(() ->
-        // coralQueue.stepBackwards()));
-        //
-        //        secondaryController.dpadLeft.whileTrue(
-        //                new ElevatorArmCommand(
-        //                        elevatorSubsystem,
-        //                        armSubsystem,
-        //                        () -> ScoringConstants.ScoringHeights.L2));
-        //    }
     }
 
+    /**
+     * Runs once when the code starts
+     */
     public void robotInit() {
         odometry.addCamera(leftCam);
         odometry.addCamera(rightCam);
     }
 
+    /**
+     * Runs every 20ms while the robot is on
+     */
     public void robotPeriodic() {
         odometry.periodic();
         coralQueue.periodic();
     }
 
+    /**
+     * Runs ones when enabled in teleop
+     */
     public void teleopInit() {
         CoralQueue.getInstance().loadProfile(cqProfiles.getSelected());
     }
 
+    /**
+     * Get the command to run in auto mode
+     * @return The command to run
+     */
     public Command getAutonomousCommand() {
         return superSecretMissileTech.getSelected();
     }
 
+    /**
+     * Get the full place command.
+     * <br />
+     * <strong>Steps</strong>
+     * <ul>
+     *     <li>Go to a position `align_dist_back` (in config manager) meters back from the scoring position</li>
+     *     <li>Raise the elevator the correct height and drive forward to the final position</li>
+     *     <li>Score the piece</li>
+     * </ul>
+     * @param currentSupplier A {@link Supplier} of {@link org.blackknights.framework.CoralQueue.CoralPosition}s that should not update the current position
+     * @param nextSupplier  A {@link Supplier} of {@link org.blackknights.framework.CoralQueue.CoralPosition}s that should update the current position
+     * @return The full command
+     */
     private Command getPlaceCommand(
             Supplier<CoralQueue.CoralPosition> currentSupplier,
             Supplier<CoralQueue.CoralPosition> nextSupplier) {
@@ -153,7 +164,6 @@ public class RobotContainer {
                 new ParallelRaceGroup(
                         new AlignCommand(
                                 swerveSubsystem,
-                                //                                primaryController,
                                 () ->
                                         AlignUtils.getXDistBack(
                                                 currentSupplier.get().getPose(),
@@ -166,62 +176,39 @@ public class RobotContainer {
                         new SequentialCommandGroup(
                                 new AlignCommand(
                                         swerveSubsystem,
-                                        //                                        primaryController,
                                         () -> currentSupplier.get().getPose(),
                                         true,
                                         "fine"),
                                 new IntakeCommand(
                                         intakeSubsystem,
                                         IntakeCommand.IntakeMode.OUTTAKE,
-                                        () -> armSubsystem.hasGamePiece())),
+                                        () -> armSubsystem.hasGamePiece())
+                                        .withTimeout(2)),
                         new ElevatorArmCommand(
                                 elevatorSubsystem,
                                 armSubsystem,
                                 () -> nextSupplier.get().getHeight())));
     }
 
-    public Command getAutoPlaceCommand(String location) {
-        return new SequentialCommandGroup(
-                new ParallelRaceGroup(
-                        new AlignCommand(
-                                swerveSubsystem,
-                                //                                primaryController,
-                                () ->
-                                        AlignUtils.getXDistBack(
-                                                CoralQueue.CoralPosition.fromString(location)
-                                                        .getPose(),
-                                                ConfigManager.getInstance()
-                                                        .get("align_dist_back", 0.5)),
-                                false,
-                                "rough"),
-                        new BaseCommand(elevatorSubsystem, armSubsystem)),
-                new ParallelRaceGroup(
-                        new SequentialCommandGroup(
-                                new AlignCommand(
-                                        swerveSubsystem,
-                                        //
-                                        () ->
-                                                CoralQueue.CoralPosition.fromString(location)
-                                                        .getPose(),
-                                        true,
-                                        "fine"),
-                                new IntakeCommand(
-                                                intakeSubsystem,
-                                                IntakeCommand.IntakeMode.OUTTAKE,
-                                                () -> armSubsystem.hasGamePiece())
-                                        .withTimeout(2)),
-                        new ElevatorArmCommand(
-                                elevatorSubsystem,
-                                armSubsystem,
-                                () -> CoralQueue.CoralPosition.fromString(location).getHeight())));
+    /**
+     * Place at a specific location
+     * @param position The target {@link org.blackknights.framework.CoralQueue.CoralPosition}
+     * @return The command to place
+     */
+    private Command getLocationPlaceCommand(CoralQueue.CoralPosition position) {
+       return getPlaceCommand(() -> position, () -> position);
     }
 
-    public Command getAutoIntakeCommand() {
+    /**
+     * Get a command to goto the feeder
+     * @return The command to goto the feeder
+     */
+    private Command getAutoIntakeCommand() {
         return new ParallelDeadlineGroup(
                 new SequentialCommandGroup(
                         new AlignCommand(
                                 swerveSubsystem,
-                                () -> new Pose2d(15.950, 1.395, new Rotation2d(-0.918)),
+                                () -> DriverStation.getAlliance().isPresent()  && DriverStation.getAlliance().get() == DriverStation.Alliance.Blue ? ScoringConstants.INTAKE_BLUE : ScoringConstants.INTAKE_RED,
                                 true,
                                 "rough"),
                         new IntakeCommand(
