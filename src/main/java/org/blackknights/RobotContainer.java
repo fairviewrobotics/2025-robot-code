@@ -102,13 +102,41 @@ public class RobotContainer {
 
         elevatorSubsystem.setDefaultCommand(new BaseCommand(elevatorSubsystem, armSubsystem));
 
+        primaryController.dpadDown.whileTrue(new RunCommand(() -> swerveSubsystem.zeroGyro()));
+
+        // SECONDARY CONTROLLER
+
         climberSubsystem.setDefaultCommand(
                 new ClimberCommand(climberSubsystem, secondaryController));
 
-        primaryController.dpadDown.whileTrue(new RunCommand(() -> swerveSubsystem.zeroGyro()));
+        //        secondaryController.leftBumper.onTrue(new InstantCommand(() ->
+        // coralQueue.stepBackwards()));
+        //        secondaryController.rightBumper.onTrue(new InstantCommand(() ->
+        // coralQueue.stepForwards()));
 
-        secondaryController.leftBumper.onTrue(new InstantCommand(() -> coralQueue.stepBackwards()));
-        secondaryController.rightBumper.onTrue(new InstantCommand(() -> coralQueue.stepForwards()));
+        secondaryController.aButton.whileTrue(
+                new ElevatorArmCommand(
+                        elevatorSubsystem,
+                        armSubsystem,
+                        () -> ScoringConstants.ScoringHeights.INTAKE));
+
+        secondaryController.bButton.whileTrue(
+                new ElevatorArmCommand(
+                        elevatorSubsystem, armSubsystem, () -> ScoringConstants.ScoringHeights.L2));
+
+        secondaryController.xButton.whileTrue(
+                new ElevatorArmCommand(
+                        elevatorSubsystem, armSubsystem, () -> ScoringConstants.ScoringHeights.L3));
+
+        secondaryController.yButton.whileTrue(
+                new ElevatorArmCommand(
+                        elevatorSubsystem, armSubsystem, () -> ScoringConstants.ScoringHeights.L4));
+
+        secondaryController.leftBumper.whileTrue(
+                new IntakeCommand(intakeSubsystem, IntakeCommand.IntakeMode.INTAKE, () -> false));
+
+        secondaryController.rightBumper.whileTrue(
+                new IntakeCommand(intakeSubsystem, IntakeCommand.IntakeMode.OUTTAKE, () -> false));
     }
 
     /** Runs once when the code starts */
