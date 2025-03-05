@@ -7,6 +7,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import java.util.function.Supplier;
+
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import org.blackknights.commands.*;
 import org.blackknights.constants.ScoringConstants;
 import org.blackknights.constants.VisionConstants;
@@ -28,8 +30,8 @@ public class RobotContainer {
     ButtonBoardSubsystem buttonBoardSubsystem = new ButtonBoardSubsystem(buttonBoard);
 
     // Controllers
-    Controller primaryController = new Controller(0);
-    Controller secondaryController = new Controller(1);
+    CommandXboxController primaryController = new CommandXboxController(0);
+    CommandXboxController secondaryController = new CommandXboxController(1);
 
     private final NetworkTablesUtils NTTune = NetworkTablesUtils.getTable("debug");
 
@@ -88,10 +90,10 @@ public class RobotContainer {
                         true,
                         true));
 
-        primaryController.leftBumper.whileTrue(
+        primaryController.leftBumper().whileTrue(
                 getPlaceCommand(() -> coralQueue.getCurrentPosition(), () -> coralQueue.getNext()));
 
-        primaryController.rightBumper.whileTrue(
+        primaryController.leftBumper().whileTrue(
                 new ParallelCommandGroup(
                         new ElevatorArmCommand(
                                 elevatorSubsystem,
@@ -101,7 +103,7 @@ public class RobotContainer {
 
         elevatorSubsystem.setDefaultCommand(new BaseCommand(elevatorSubsystem, armSubsystem));
 
-        primaryController.dpadDown.whileTrue(new RunCommand(() -> swerveSubsystem.zeroGyro()));
+        primaryController.povDown().whileTrue(new RunCommand(() -> swerveSubsystem.zeroGyro()));
 
         // SECONDARY CONTROLLER
 
@@ -113,32 +115,32 @@ public class RobotContainer {
         //        secondaryController.rightBumper.onTrue(new InstantCommand(() ->
         // coralQueue.stepForwards()));
 
-        secondaryController.aButton.whileTrue(
+        secondaryController.a().whileTrue(
                 new ElevatorArmCommand(
                         elevatorSubsystem, armSubsystem, () -> ScoringConstants.ScoringHeights.L1));
 
-        secondaryController.bButton.whileTrue(
+        secondaryController.b().whileTrue(
                 new ElevatorArmCommand(
                         elevatorSubsystem, armSubsystem, () -> ScoringConstants.ScoringHeights.L2));
 
-        secondaryController.xButton.whileTrue(
+        secondaryController.x().whileTrue(
                 new ElevatorArmCommand(
                         elevatorSubsystem, armSubsystem, () -> ScoringConstants.ScoringHeights.L3));
 
-        secondaryController.yButton.whileTrue(
+        secondaryController.y().whileTrue(
                 new ElevatorArmCommand(
                         elevatorSubsystem, armSubsystem, () -> ScoringConstants.ScoringHeights.L4));
 
-        secondaryController.leftBumper.onTrue(new InstantCommand(() -> coralQueue.stepForwards()));
+        secondaryController.leftBumper().onTrue(new InstantCommand(() -> coralQueue.stepForwards()));
 
-        secondaryController.rightBumper.whileTrue(
+        secondaryController.rightBumper().whileTrue(
                 new InstantCommand(() -> coralQueue.stepBackwards()));
 
-        //        secondaryController.rightTrigger.whileTrue(
-        //                new IntakeCommand(intakeSubsystem, IntakeCommand.IntakeMode.OUTTAKE));
-        //
-        //        secondaryController.leftTrigger.whileTrue(
-        //                new IntakeCommand(intakeSubsystem, IntakeCommand.IntakeMode.INTAKE));
+        secondaryController.rightTrigger(0.2).whileTrue(
+                new IntakeCommand(intakeSubsystem, IntakeCommand.IntakeMode.OUTTAKE));
+
+        secondaryController.leftTrigger(0.2).whileTrue(
+                new IntakeCommand(intakeSubsystem, IntakeCommand.IntakeMode.INTAKE));
     }
 
     /** Runs once when the code starts */
