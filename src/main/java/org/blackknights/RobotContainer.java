@@ -108,11 +108,6 @@ public class RobotContainer {
         climberSubsystem.setDefaultCommand(
                 new ClimberCommand(climberSubsystem, secondaryController));
 
-        //        secondaryController.leftBumper.onTrue(new InstantCommand(() ->
-        // coralQueue.stepBackwards()));
-        //        secondaryController.rightBumper.onTrue(new InstantCommand(() ->
-        // coralQueue.stepForwards()));
-
         secondaryController.aButton.whileTrue(
                 new ElevatorArmCommand(
                         elevatorSubsystem, armSubsystem, () -> ScoringConstants.ScoringHeights.L1));
