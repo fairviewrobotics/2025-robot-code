@@ -6,9 +6,8 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
-import java.util.function.Supplier;
-
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import java.util.function.Supplier;
 import org.blackknights.commands.*;
 import org.blackknights.constants.ScoringConstants;
 import org.blackknights.constants.VisionConstants;
@@ -90,16 +89,22 @@ public class RobotContainer {
                         true,
                         true));
 
-        primaryController.leftBumper().whileTrue(
-                getPlaceCommand(() -> coralQueue.getCurrentPosition(), () -> coralQueue.getNext()));
+        primaryController
+                .leftBumper()
+                .whileTrue(
+                        getPlaceCommand(
+                                () -> coralQueue.getCurrentPosition(), () -> coralQueue.getNext()));
 
-        primaryController.leftBumper().whileTrue(
-                new ParallelCommandGroup(
-                        new ElevatorArmCommand(
-                                elevatorSubsystem,
-                                armSubsystem,
-                                () -> ScoringConstants.ScoringHeights.INTAKE),
-                        new IntakeCommand(intakeSubsystem, IntakeCommand.IntakeMode.INTAKE)));
+        primaryController
+                .leftBumper()
+                .whileTrue(
+                        new ParallelCommandGroup(
+                                new ElevatorArmCommand(
+                                        elevatorSubsystem,
+                                        armSubsystem,
+                                        () -> ScoringConstants.ScoringHeights.INTAKE),
+                                new IntakeCommand(
+                                        intakeSubsystem, IntakeCommand.IntakeMode.INTAKE)));
 
         elevatorSubsystem.setDefaultCommand(new BaseCommand(elevatorSubsystem, armSubsystem));
 
@@ -115,32 +120,53 @@ public class RobotContainer {
         //        secondaryController.rightBumper.onTrue(new InstantCommand(() ->
         // coralQueue.stepForwards()));
 
-        secondaryController.a().whileTrue(
-                new ElevatorArmCommand(
-                        elevatorSubsystem, armSubsystem, () -> ScoringConstants.ScoringHeights.L1));
+        secondaryController
+                .a()
+                .whileTrue(
+                        new ElevatorArmCommand(
+                                elevatorSubsystem,
+                                armSubsystem,
+                                () -> ScoringConstants.ScoringHeights.L1));
 
-        secondaryController.b().whileTrue(
-                new ElevatorArmCommand(
-                        elevatorSubsystem, armSubsystem, () -> ScoringConstants.ScoringHeights.L2));
+        secondaryController
+                .b()
+                .whileTrue(
+                        new ElevatorArmCommand(
+                                elevatorSubsystem,
+                                armSubsystem,
+                                () -> ScoringConstants.ScoringHeights.L2));
 
-        secondaryController.x().whileTrue(
-                new ElevatorArmCommand(
-                        elevatorSubsystem, armSubsystem, () -> ScoringConstants.ScoringHeights.L3));
+        secondaryController
+                .x()
+                .whileTrue(
+                        new ElevatorArmCommand(
+                                elevatorSubsystem,
+                                armSubsystem,
+                                () -> ScoringConstants.ScoringHeights.L3));
 
-        secondaryController.y().whileTrue(
-                new ElevatorArmCommand(
-                        elevatorSubsystem, armSubsystem, () -> ScoringConstants.ScoringHeights.L4));
+        secondaryController
+                .y()
+                .whileTrue(
+                        new ElevatorArmCommand(
+                                elevatorSubsystem,
+                                armSubsystem,
+                                () -> ScoringConstants.ScoringHeights.L4));
 
-        secondaryController.leftBumper().onTrue(new InstantCommand(() -> coralQueue.stepForwards()));
+        secondaryController
+                .leftBumper()
+                .onTrue(new InstantCommand(() -> coralQueue.stepForwards()));
 
-        secondaryController.rightBumper().whileTrue(
-                new InstantCommand(() -> coralQueue.stepBackwards()));
+        secondaryController
+                .rightBumper()
+                .whileTrue(new InstantCommand(() -> coralQueue.stepBackwards()));
 
-        secondaryController.rightTrigger(0.2).whileTrue(
-                new IntakeCommand(intakeSubsystem, IntakeCommand.IntakeMode.OUTTAKE));
+        secondaryController
+                .rightTrigger(0.2)
+                .whileTrue(new IntakeCommand(intakeSubsystem, IntakeCommand.IntakeMode.OUTTAKE));
 
-        secondaryController.leftTrigger(0.2).whileTrue(
-                new IntakeCommand(intakeSubsystem, IntakeCommand.IntakeMode.INTAKE));
+        secondaryController
+                .leftTrigger(0.2)
+                .whileTrue(new IntakeCommand(intakeSubsystem, IntakeCommand.IntakeMode.INTAKE));
     }
 
     /** Runs once when the code starts */
