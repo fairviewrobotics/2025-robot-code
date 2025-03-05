@@ -2,7 +2,6 @@
 package org.blackknights.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import java.util.function.BooleanSupplier;
 import org.blackknights.subsystems.IntakeSubsystem;
 import org.blackknights.utils.ConfigManager;
 
@@ -10,20 +9,16 @@ import org.blackknights.utils.ConfigManager;
 public class IntakeCommand extends Command {
     private final IntakeSubsystem intakeSubsystem;
     private final IntakeMode mode;
-    private final BooleanSupplier hasGamePiece;
 
     /**
      * Create a new intake command
      *
      * @param intakeSubsystem The instance of {@link IntakeSubsystem}
      * @param mode The intake mode ({@link IntakeMode})
-     * @param hasGamePiece A {@link BooleanSupplier} supplying if we currently have a coral
      */
-    public IntakeCommand(
-            IntakeSubsystem intakeSubsystem, IntakeMode mode, BooleanSupplier hasGamePiece) {
+    public IntakeCommand(IntakeSubsystem intakeSubsystem, IntakeMode mode) {
         this.intakeSubsystem = intakeSubsystem;
         this.mode = mode;
-        this.hasGamePiece = hasGamePiece;
         addRequirements(intakeSubsystem);
     }
 
@@ -50,10 +45,10 @@ public class IntakeCommand extends Command {
         intakeSubsystem.setVoltage(0);
     }
 
-    //    @Override
-    //    public boolean isFinished() {
-    //        return mode.equals(IntakeMode.INTAKE) && hasGamePiece.getAsBoolean();
-    //    }
+    @Override
+    public boolean isFinished() {
+        return mode.equals(IntakeMode.INTAKE) && intakeSubsystem.getLinebreak();
+    }
 
     /** Enum of the different intake modes */
     public enum IntakeMode {

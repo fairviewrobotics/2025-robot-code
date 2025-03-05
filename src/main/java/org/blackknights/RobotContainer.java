@@ -88,17 +88,16 @@ public class RobotContainer {
                         true,
                         true));
 
-        primaryController.rightBumper.whileTrue(
+        primaryController.leftBumper.whileTrue(
                 getPlaceCommand(() -> coralQueue.getCurrentPosition(), () -> coralQueue.getNext()));
 
-        primaryController.leftBumper.whileTrue(
+        primaryController.rightBumper.whileTrue(
                 new ParallelCommandGroup(
                         new ElevatorArmCommand(
                                 elevatorSubsystem,
                                 armSubsystem,
                                 () -> ScoringConstants.ScoringHeights.INTAKE),
-                        new IntakeCommand(
-                                intakeSubsystem, IntakeCommand.IntakeMode.INTAKE, () -> false)));
+                        new IntakeCommand(intakeSubsystem, IntakeCommand.IntakeMode.INTAKE)));
 
         elevatorSubsystem.setDefaultCommand(new BaseCommand(elevatorSubsystem, armSubsystem));
 
@@ -116,9 +115,7 @@ public class RobotContainer {
 
         secondaryController.aButton.whileTrue(
                 new ElevatorArmCommand(
-                        elevatorSubsystem,
-                        armSubsystem,
-                        () -> ScoringConstants.ScoringHeights.INTAKE));
+                        elevatorSubsystem, armSubsystem, () -> ScoringConstants.ScoringHeights.L1));
 
         secondaryController.bButton.whileTrue(
                 new ElevatorArmCommand(
@@ -132,11 +129,16 @@ public class RobotContainer {
                 new ElevatorArmCommand(
                         elevatorSubsystem, armSubsystem, () -> ScoringConstants.ScoringHeights.L4));
 
-        secondaryController.leftBumper.whileTrue(
-                new IntakeCommand(intakeSubsystem, IntakeCommand.IntakeMode.INTAKE, () -> false));
+        secondaryController.leftBumper.onTrue(new InstantCommand(() -> coralQueue.stepForwards()));
 
         secondaryController.rightBumper.whileTrue(
-                new IntakeCommand(intakeSubsystem, IntakeCommand.IntakeMode.OUTTAKE, () -> false));
+                new InstantCommand(() -> coralQueue.stepBackwards()));
+
+        //        secondaryController.rightTrigger.whileTrue(
+        //                new IntakeCommand(intakeSubsystem, IntakeCommand.IntakeMode.OUTTAKE));
+        //
+        //        secondaryController.leftTrigger.whileTrue(
+        //                new IntakeCommand(intakeSubsystem, IntakeCommand.IntakeMode.INTAKE));
     }
 
     /** Runs once when the code starts */
@@ -153,7 +155,8 @@ public class RobotContainer {
 
     /** Runs ones when enabled in teleop */
     public void teleopInit() {
-        CoralQueue.getInstance().loadProfile(cqProfiles.getSelected());
+        if (cqProfiles.getSelected() != null)
+            CoralQueue.getInstance().loadProfile(cqProfiles.getSelected());
     }
 
     /**
@@ -206,10 +209,7 @@ public class RobotContainer {
                                         () -> currentSupplier.get().getPose(),
                                         true,
                                         "fine"),
-                                new IntakeCommand(
-                                                intakeSubsystem,
-                                                IntakeCommand.IntakeMode.OUTTAKE,
-                                                () -> armSubsystem.hasGamePiece())
+                                new IntakeCommand(intakeSubsystem, IntakeCommand.IntakeMode.OUTTAKE)
                                         .withTimeout(2)),
                         new ElevatorArmCommand(
                                 elevatorSubsystem,
@@ -245,10 +245,7 @@ public class RobotContainer {
                                                 : ScoringConstants.INTAKE_RED,
                                 true,
                                 "rough"),
-                        new IntakeCommand(
-                                        intakeSubsystem,
-                                        IntakeCommand.IntakeMode.INTAKE,
-                                        () -> armSubsystem.hasGamePiece())
+                        new IntakeCommand(intakeSubsystem, IntakeCommand.IntakeMode.INTAKE)
                                 .withTimeout(2)),
                 new ElevatorArmCommand(
                         elevatorSubsystem,
