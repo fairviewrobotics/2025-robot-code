@@ -38,9 +38,6 @@ public class Controller extends XboxController {
     public Controller(int port) {
         super(port);
 
-        leftTrigger = new JoystickButton(this, XboxController.Axis.kLeftTrigger.value);
-        rightTrigger = new JoystickButton(this, XboxController.Axis.kRightTrigger.value);
-
         leftBumper = new JoystickButton(this, XboxController.Button.kLeftBumper.value);
         rightBumper = new JoystickButton(this, XboxController.Button.kRightBumper.value);
 
