@@ -2,6 +2,7 @@
 package org.blackknights.subsystems;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.blackknights.constants.ArmConstants;
 
@@ -9,9 +10,11 @@ import org.blackknights.constants.ArmConstants;
 public class IntakeSubsystem extends SubsystemBase {
     private final WPI_TalonSRX motor = new WPI_TalonSRX(ArmConstants.MOTOR_ID);
 
+    private final DigitalInput intakeLinebreak = new DigitalInput(0);
+
     /** Create a new intake subsystem */
     public IntakeSubsystem() {
-        motor.setInverted(false);
+        motor.setInverted(true);
         motor.enableCurrentLimit(true);
         motor.configContinuousCurrentLimit(20);
         motor.configPeakCurrentLimit(0);
@@ -33,5 +36,9 @@ public class IntakeSubsystem extends SubsystemBase {
      */
     public void setVoltage(double voltage) {
         motor.setVoltage(voltage);
+    }
+
+    public boolean getLinebreak() {
+        return !intakeLinebreak.get();
     }
 }

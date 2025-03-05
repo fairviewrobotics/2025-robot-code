@@ -12,7 +12,6 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.blackknights.constants.ElevatorConstants;
 import org.blackknights.utils.ConfigManager;
@@ -32,9 +31,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final RelativeEncoder rightEncoder = rightElevatorMotor.getEncoder();
 
     // Linebreaks
-    private final DigitalInput topLineBreak = new DigitalInput(ElevatorConstants.TOP_LINEBREAK_ID);
-    private final DigitalInput bottomLineBreak =
-            new DigitalInput(ElevatorConstants.BOTTOM_LINEBREAK_ID);
 
     private final ProfiledPIDController elevatorPID =
             new ProfiledPIDController(
@@ -208,10 +204,6 @@ public class ElevatorSubsystem extends SubsystemBase {
         double encoderAverageVel = (leftEncoder.getVelocity() + rightEncoder.getVelocity()) / 2;
         // Calculates average pos
         return encoderAverageVel * ElevatorConstants.ROTATIONS_TO_METERS;
-    }
-
-    public boolean getBottomLinebreak() {
-        return !bottomLineBreak.get();
     }
 
     /**
