@@ -126,7 +126,7 @@ public class RobotContainer {
 
         secondaryController.leftBumper.onTrue(new InstantCommand(() -> coralQueue.stepForwards()));
 
-        secondaryController.rightBumper.onTrue(
+        secondaryController.rightBumper.whileTrue(
                 new InstantCommand(() -> coralQueue.stepBackwards()));
 
         //        secondaryController.rightTrigger.whileTrue(
