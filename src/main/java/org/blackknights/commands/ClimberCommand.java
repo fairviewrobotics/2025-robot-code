@@ -2,13 +2,14 @@
 package org.blackknights.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import org.blackknights.subsystems.ClimberSubsystem;
 import org.blackknights.utils.Controller;
 
 /** Climber command to control the climber */
 public class ClimberCommand extends Command {
     public ClimberSubsystem climberSubsystem;
-    public Controller controller;
+    public CommandXboxController controller;
 
     /**
      * Command to controller the climber, right now over pure voltage
@@ -16,7 +17,7 @@ public class ClimberCommand extends Command {
      * @param climberSubsystem The instance of {@link ClimberSubsystem}
      * @param controller A {@link Controller} to control the climber
      */
-    public ClimberCommand(ClimberSubsystem climberSubsystem, Controller controller) {
+    public ClimberCommand(ClimberSubsystem climberSubsystem, CommandXboxController controller) {
         this.climberSubsystem = climberSubsystem;
         this.controller = controller;
         addRequirements(climberSubsystem);
@@ -24,13 +25,13 @@ public class ClimberCommand extends Command {
 
     @Override
     public void execute() {
-        if (controller.dpadDown.getAsBoolean()) {
+        if (controller.povDown().getAsBoolean()) {
             climberSubsystem.setClimberSpeed(1);
-        } else if (controller.dpadUp.getAsBoolean()) {
+        } else if (controller.povUp().getAsBoolean()) {
             climberSubsystem.setClimberSpeed(-1);
-        } else if (controller.dpadLeft.getAsBoolean()) {
+        } else if (controller.povLeft().getAsBoolean()) {
             climberSubsystem.setLockSpeed(0.5);
-        } else if (controller.dpadRight.getAsBoolean()) {
+        } else if (controller.povRight().getAsBoolean()) {
             climberSubsystem.setLockSpeed(-0.5);
         } else {
             climberSubsystem.setClimberSpeed(0);
