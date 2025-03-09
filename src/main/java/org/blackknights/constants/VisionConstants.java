@@ -13,5 +13,5 @@ public class VisionConstants {
             new Transform3d(0.235, 0.36, 0.16, new Rotation3d(0.0, 0.0, Math.toRadians(-13)));
 
     public static final Transform3d RIGHT_CAM_TRANSFORM =
-            new Transform3d(0.235, -0.36, 0.16, new Rotation3d(0.0, 0.0, Math.toRadians(13)));
+            new Transform3d(0.235, -0.36, 0.16, new Rotation3d(0.0, 0.0, Math.toRadians(10)));
 }

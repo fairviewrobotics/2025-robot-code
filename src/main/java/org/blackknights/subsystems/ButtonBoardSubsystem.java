@@ -16,6 +16,8 @@ public class ButtonBoardSubsystem extends SubsystemBase {
     private final EventLoop loop = new EventLoop();
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private final GenericHID hidDevice;
+
     private Pose2d currentPose = null;
     private ScoringConstants.ScoringHeights currentHeight = null;
 
@@ -25,6 +27,26 @@ public class ButtonBoardSubsystem extends SubsystemBase {
      * @param hidDevice A {@link GenericHID} corresponding to the button board
      */
     public ButtonBoardSubsystem(GenericHID hidDevice) {
+        this.hidDevice = hidDevice;
+        this.bind();
+    }
+
+    @Override
+    public void periodic() {
+        loop.poll();
+
+        // Check if both a height and pose button has been pressed, if so, interrupt the queue then
+        // reset currentPose and currentHeight
+        if (this.currentHeight != null && this.currentPose != null) {
+            coralQueue.interruptQueue(
+                    new CoralQueue.CoralPosition(
+                            "BBInterrupt", this.currentPose, this.currentHeight));
+            this.currentPose = null;
+            this.currentHeight = null;
+        }
+    }
+
+    public void bind() {
         boolean isBlue =
                 DriverStation.getAlliance().isPresent()
                         && DriverStation.getAlliance().get() == DriverStation.Alliance.Blue;
@@ -57,21 +79,6 @@ public class ButtonBoardSubsystem extends SubsystemBase {
                             }
                         }
                     });
-        }
-    }
-
-    @Override
-    public void periodic() {
-        loop.poll();
-
-        // Check if both a height and pose button has been pressed, if so, interrupt the queue then
-        // reset currentPose and currentHeight
-        if (this.currentHeight != null && this.currentPose != null) {
-            coralQueue.interruptQueue(
-                    new CoralQueue.CoralPosition(
-                            "BBInterrupt", this.currentPose, this.currentHeight));
-            this.currentPose = null;
-            this.currentHeight = null;
         }
     }
 

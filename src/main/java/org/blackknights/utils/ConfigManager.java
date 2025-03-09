@@ -61,6 +61,7 @@ public class ConfigManager {
             if (configFile.createNewFile() || configFile.length() == 0) {
                 LOGGER.info("Created config file");
                 this.json = this.getDefault();
+                this.saveConfig();
             }
         } catch (IOException e) {
 

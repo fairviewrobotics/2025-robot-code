@@ -14,7 +14,7 @@ public class ArmConstants {
     public static final TrapezoidProfile.Constraints PIVOT_CONSTRAINTS =
             new TrapezoidProfile.Constraints(PIVOT_MAX_VELOCITY, PIVOT_MAX_ACCELERATION);
 
-    public static final double PIVOT_ENCODER_OFFSET = 5.167;
+    public static final double PIVOT_ENCODER_OFFSET = 0.0; // 1.581 - 0.092; // 5.167
 
     public static final double PIVOT_KS = 0.0;
     public static final double PIVOT_KG = 0.0;

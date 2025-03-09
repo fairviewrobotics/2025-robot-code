@@ -425,6 +425,21 @@ public class SwerveSubsystem extends SubsystemBase {
         drive(forward, sideways, rotation, false, false, true); // ratelimit was true, to be tested
     }
 
+    /** Zero the swerve via voltage */
+    public void zeroVoltage() {
+        frontLeft.setDrivingVoltage(0.0);
+        frontLeft.setTurningVoltage(0.0);
+
+        frontRight.setDrivingVoltage(0.0);
+        frontRight.setTurningVoltage(0.0);
+
+        rearLeft.setDrivingVoltage(0.0);
+        rearLeft.setTurningVoltage(0.0);
+
+        rearRight.setDrivingVoltage(0.0);
+        rearRight.setTurningVoltage(0.0);
+    }
+
     /** Reset the gyro */
     public void zeroGyro() {
         gyro.reset();

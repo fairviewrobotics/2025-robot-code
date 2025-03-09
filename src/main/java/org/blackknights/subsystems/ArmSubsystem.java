@@ -4,18 +4,17 @@ package org.blackknights.subsystems;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.networktables.DoubleEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.blackknights.constants.ArmConstants;
 import org.blackknights.utils.ConfigManager;
+import org.blackknights.utils.NetworkTablesUtils;
 
 /** Subsystem for controlling arm */
 public class ArmSubsystem extends SubsystemBase {
@@ -24,19 +23,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     private final AbsoluteEncoder pivotAbsEncoder = pivotMotor.getAbsoluteEncoder();
 
-    private final SparkLimitSwitch armLinebreak;
-
-    private final DoubleEntry armEncoderPos =
-            NetworkTableInstance.getDefault()
-                    .getTable("Arm")
-                    .getDoubleTopic("EncoderPos")
-                    .getEntry(getPivotAngle());
-
-    private final DoubleEntry armEncoderVelocity =
-            NetworkTableInstance.getDefault()
-                    .getTable("Arm")
-                    .getDoubleTopic("EncoderVelocity")
-                    .getEntry(getPivotSpeed());
+    private final NetworkTablesUtils NTDebug = NetworkTablesUtils.getTable("debug");
 
     private final ProfiledPIDController pivotPID =
             new ProfiledPIDController(
@@ -82,8 +69,6 @@ public class ArmSubsystem extends SubsystemBase {
                 pivotConfig,
                 SparkBase.ResetMode.kResetSafeParameters,
                 SparkBase.PersistMode.kPersistParameters);
-
-        armLinebreak = pivotMotor.getForwardLimitSwitch();
     }
 
     /**
@@ -96,15 +81,6 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     /**
-     * Checks if the hand has a game piece
-     *
-     * @return returns if the hand has a game piece
-     */
-    public boolean hasGamePiece() {
-        return armLinebreak.isPressed();
-    }
-
-    /**
      * moves arm to a set angle
      *
      * @param angle Target pivot angle
@@ -114,6 +90,9 @@ public class ArmSubsystem extends SubsystemBase {
 
         double pidValue = pivotPID.calculate(getPivotAngle(), angle);
         double ffValue = pivotFF.calculate(angle, 0);
+
+        NTDebug.setEntry("Arm ff out", ffValue);
+        NTDebug.setEntry("Arm pid out", ffValue);
 
         setPivotSpeed(pidValue + ffValue);
     }
@@ -128,7 +107,10 @@ public class ArmSubsystem extends SubsystemBase {
         //                ? pivotAbsEncoder.getPosition() - 2 * Math.PI -
         // ArmConstants.PIVOT_ENCODER_OFFSET
         //                : pivotAbsEncoder.getPosition() - ArmConstants.PIVOT_ENCODER_OFFSET;
-        return Math.PI * 2 - pivotAbsEncoder.getPosition() - ArmConstants.PIVOT_ENCODER_OFFSET;
+        return Math.PI * 2
+                - pivotAbsEncoder.getPosition()
+                - ConfigManager.getInstance()
+                        .get("arm_encoder_offset", ArmConstants.PIVOT_ENCODER_OFFSET);
     }
 
     public double getPivotSpeed() {
@@ -136,8 +118,28 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public void periodic() {
-        armEncoderPos.set(getPivotAngle());
-        armEncoderVelocity.set(getPivotSpeed());
+        NTDebug.setEntry("Arm Encoder Pos", getPivotAngle());
+        NTDebug.setEntry("Arm Encoder Speed", getPivotSpeed());
+
+        NTDebug.setEntry("Arm PID Error", pivotPID.getPositionError());
+        NTDebug.setEntry("Arm PID Setpoint", pivotPID.getGoal().position);
+
+        pivotPID.setConstraints(
+                new TrapezoidProfile.Constraints(
+                        Math.toRadians(
+                                ConfigManager.getInstance()
+                                        .get(
+                                                "arm_max_vel_degs",
+                                                Math.toDegrees(ArmConstants.PIVOT_MAX_VELOCITY))),
+                        ConfigManager.getInstance()
+                                .get(
+                                        "arm_max_accel_degs",
+                                        Math.toDegrees(ArmConstants.PIVOT_MAX_ACCELERATION))));
+
+        pivotPID.setTolerance(
+                Math.toRadians(
+                        ConfigManager.getInstance().get("arm_tol", ArmConstants.PIVOT_TOLERANCE)));
+
         pivotPID.setP(ConfigManager.getInstance().get("arm_p", ArmConstants.PIVOT_P));
         pivotPID.setI(ConfigManager.getInstance().get("arm_i", ArmConstants.PIVOT_I));
         pivotPID.setD(ConfigManager.getInstance().get("arm_d", ArmConstants.PIVOT_D));

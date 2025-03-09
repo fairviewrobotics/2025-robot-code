@@ -252,6 +252,6 @@ public class AlignCommand extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        if (stopWhenFinished) swerveSubsystem.drive(0, 0, 0, false, false, false);
+        if (stopWhenFinished) swerveSubsystem.zeroVoltage();
     }
 }

@@ -123,4 +123,22 @@ public class MAXSwerveModule {
     public void resetEncoders() {
         drivingEncoder.setPosition(0);
     }
+
+    /**
+     * Set the voltage of the turning motor
+     *
+     * @param voltage The target voltage
+     */
+    public void setTurningVoltage(double voltage) {
+        this.turningSpark.setVoltage(voltage);
+    }
+
+    /**
+     * Set the voltage of the driving motor
+     *
+     * @param voltage The target voltage
+     */
+    public void setDrivingVoltage(double voltage) {
+        this.drivingSpark.setVoltage(voltage);
+    }
 }
