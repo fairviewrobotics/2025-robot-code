@@ -102,9 +102,17 @@ public class RobotContainer {
         swerveSubsystem.setDefaultCommand(
                 new DriveCommands(
                         swerveSubsystem,
-                        () -> primaryController.getLeftY() * ConfigManager.getInstance().get("driver_max_speed", 3.5),
-                        () -> primaryController.getLeftX() * ConfigManager.getInstance().get("driver_max_speed", 3.5),
-                        () -> -primaryController.getRightX() * Math.toRadians(ConfigManager.getInstance().get("driver_max_speed_rot", 360)),
+                        () ->
+                                primaryController.getLeftY()
+                                        * ConfigManager.getInstance().get("driver_max_speed", 3.5),
+                        () ->
+                                primaryController.getLeftX()
+                                        * ConfigManager.getInstance().get("driver_max_speed", 3.5),
+                        () ->
+                                -primaryController.getRightX()
+                                        * Math.toRadians(
+                                                ConfigManager.getInstance()
+                                                        .get("driver_max_speed_rot", 360)),
                         true,
                         true));
 
