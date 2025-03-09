@@ -183,7 +183,7 @@ public class Odometry {
                 debug.setEntry(String.format("%s_dist_to_target", c.getName()), dist);
 
                 if (dist <= ConfigManager.getInstance().get("vision_cutoff_distance", 3)
-                        && dist > 0.1) {
+                        && dist > ConfigManager.getInstance().get("vision_min_distance", 0.5)) {
 
                     this.hasSeenTarget = true;
                     LOGGER.debug("Added vision measurement from `{}`", c.getName());
