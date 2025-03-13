@@ -22,10 +22,10 @@ public class Camera {
     private Optional<PhotonCamera> photonCamera;
     private Optional<PhotonPoseEstimator> photonPoseEstimator;
 
-    private Transform3d camOffset;
+    private final Transform3d camOffset;
     private double photonTimestamp;
     private Pose3d targetPose;
-    private String name;
+    private final String name;
 
     private final CameraType camType;
 

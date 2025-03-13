@@ -170,7 +170,6 @@ public class AlignCommand extends Command {
                         configManager.get(String.format("align_%s_y_max_vel_m", this.profile), 3.0),
                         Double.MAX_VALUE));
 
-
         this.xAxisPid.setTolerance(
                 configManager.get(String.format("align_%s_pos_tolerance", this.profile), 0.05));
         this.yAxisPid.setTolerance(
@@ -227,9 +226,10 @@ public class AlignCommand extends Command {
     public void execute() {
         Pose3d robotPose = odometry.getRobotPose();
 
-        double distToTarget = Math.sqrt(
-                Math.pow(xAxisPid.getPositionError(), 2) + Math.pow(yAxisPid.getPositionError(), 2)
-        );
+        double distToTarget =
+                Math.sqrt(
+                        Math.pow(xAxisPid.getPositionError(), 2)
+                                + Math.pow(yAxisPid.getPositionError(), 2));
 
         double xAxisCalc = this.xAxisPid.calculate(robotPose.getX());
         double yAxisCalc = this.yAxisPid.calculate(robotPose.getY());
@@ -238,6 +238,7 @@ public class AlignCommand extends Command {
         double infX = xAxisInfPid.calculate(robotPose.getX());
         double infY = yAxisInfPid.calculate(robotPose.getY());
 
+        debug.setEntry("Dist to target (Error)", distToTarget);
 
         debug.setEntry("X Pid Error", this.xAxisPid.getPositionError());
         debug.setEntry("Y Pid Error", this.yAxisPid.getPositionError());
@@ -265,9 +266,11 @@ public class AlignCommand extends Command {
                                 ? 0
                                 : Math.signum(yAxisCalc) * configManager.get("align_ff", 0.1));
 
-        if (distToTarget < ConfigManager.getInstance().get("inf_switch_dist", 1.0) && !stopWhenFinished) {
-         finalX = infX;
-         finalY = infY;
+        if (distToTarget < ConfigManager.getInstance().get("inf_switch_dist", 1.0)
+                && !stopWhenFinished) {
+            LOGGER.info("Using inf pid");
+            finalX = infX;
+            finalY = infY;
         }
 
         debug.setEntry("Xms", finalX);

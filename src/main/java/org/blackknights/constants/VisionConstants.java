@@ -3,6 +3,7 @@ package org.blackknights.constants;
 
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import org.blackknights.utils.ConfigManager;
 
 /** Vision related constants */
 public class VisionConstants {
@@ -10,8 +11,24 @@ public class VisionConstants {
     public static double VISION_TRUST = 0.5;
 
     public static final Transform3d LEFT_CAM_TRANSFORM =
-            new Transform3d(0.235, 0.36, 0.16, new Rotation3d(0.0, 0.0, Math.toRadians(-13)));
+            new Transform3d(
+                    0.253,
+                    0.336,
+                    0.229,
+                    new Rotation3d(
+                            0.0,
+                            0.0,
+                            Math.toRadians(
+                                    ConfigManager.getInstance().get("left_cam_angle", -10.0))));
 
     public static final Transform3d RIGHT_CAM_TRANSFORM =
-            new Transform3d(0.235, -0.36, 0.16, new Rotation3d(0.0, 0.0, Math.toRadians(10)));
+            new Transform3d(
+                    0.253,
+                    -0.3995,
+                    0.229,
+                    new Rotation3d(
+                            0.0,
+                            0.0,
+                            Math.toRadians(
+                                    ConfigManager.getInstance().get("right_cam_angle", 10.0))));
 }
