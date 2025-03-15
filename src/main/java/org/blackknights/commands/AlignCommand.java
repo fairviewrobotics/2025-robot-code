@@ -227,9 +227,8 @@ public class AlignCommand extends Command {
         Pose3d robotPose = odometry.getRobotPose();
 
         double distToTarget =
-                Math.sqrt(
-                        Math.pow(xAxisPid.getPositionError(), 2)
-                                + Math.pow(yAxisPid.getPositionError(), 2));
+                Math.pow(robotPose.getX() - targetPos.getX(), 2)
+                        + Math.pow(robotPose.getY() - targetPos.getY(), 2);
 
         double xAxisCalc = this.xAxisPid.calculate(robotPose.getX());
         double yAxisCalc = this.yAxisPid.calculate(robotPose.getY());
@@ -243,6 +242,9 @@ public class AlignCommand extends Command {
         debug.setEntry("X Pid Error", this.xAxisPid.getPositionError());
         debug.setEntry("Y Pid Error", this.yAxisPid.getPositionError());
         debug.setEntry("Rot Pid Error", this.rotationPid.getPositionError());
+
+        debug.setEntry("X Pid Error (inf)", this.xAxisInfPid.getPositionError());
+        debug.setEntry("Y Pid Error (inf)", this.yAxisInfPid.getPositionError());
 
         debug.setEntry("X Pid setpoint", this.xAxisPid.atSetpoint());
         debug.setEntry("X Pid goal", this.xAxisPid.atGoal());
@@ -266,9 +268,8 @@ public class AlignCommand extends Command {
                                 ? 0
                                 : Math.signum(yAxisCalc) * configManager.get("align_ff", 0.1));
 
-        if (distToTarget < ConfigManager.getInstance().get("inf_switch_dist", 1.0)
+        if (distToTarget < Math.pow(ConfigManager.getInstance().get("inf_switch_dist", 1.0), 2)
                 && !stopWhenFinished) {
-            LOGGER.info("Using inf pid");
             finalX = infX;
             finalY = infY;
         }
