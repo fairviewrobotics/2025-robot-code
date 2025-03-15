@@ -71,6 +71,12 @@ public class AlignCommand extends Command {
     private double timeSenseFinished = -1;
     private boolean doUpdate = true;
 
+    private double distToTarget = Double.MAX_VALUE;
+
+    private double finalX = 0.0;
+    private double finalY = 0.0;
+    private boolean log = true;
+
     /**
      * Align to a fieldspace position with odometry
      *
@@ -114,6 +120,10 @@ public class AlignCommand extends Command {
         this.targetPos = pose2dSupplier.get();
         this.timeSenseFinished = -1;
         this.doUpdate = true;
+        this.distToTarget = Double.MAX_VALUE;
+        this.finalX = 0.0;
+        this.finalY = 0.0;
+        this.log = true;
 
         LOGGER.info("Initializing AlignCommand");
         Pose3d robotPose = odometry.getRobotPose();
@@ -164,11 +174,11 @@ public class AlignCommand extends Command {
         this.xAxisInfPid.setConstraints(
                 new TrapezoidProfile.Constraints(
                         configManager.get(String.format("align_%s_x_max_vel_m", this.profile), 3.0),
-                        Double.MAX_VALUE));
+                        5000));
         this.yAxisInfPid.setConstraints(
                 new TrapezoidProfile.Constraints(
                         configManager.get(String.format("align_%s_y_max_vel_m", this.profile), 3.0),
-                        Double.MAX_VALUE));
+                        5000));
 
         this.xAxisPid.setTolerance(
                 configManager.get(String.format("align_%s_pos_tolerance", this.profile), 0.05));
@@ -179,8 +189,10 @@ public class AlignCommand extends Command {
                         configManager.get(
                                 String.format("align_%s_rotation_tolerance", this.profile), 1)));
 
-        this.xAxisInfPid.setTolerance(0.0);
-        this.yAxisInfPid.setTolerance(0.0);
+        this.xAxisPid.setTolerance(
+                configManager.get(String.format("align_%s_pos_tolerance", this.profile), 0.05));
+        this.yAxisPid.setTolerance(
+                configManager.get(String.format("align_%s_pos_tolerance", this.profile), 0.05));
 
         // Reset All pids
         this.xAxisPid.reset(
@@ -226,7 +238,7 @@ public class AlignCommand extends Command {
     public void execute() {
         Pose3d robotPose = odometry.getRobotPose();
 
-        double distToTarget =
+        this.distToTarget =
                 Math.pow(robotPose.getX() - targetPos.getX(), 2)
                         + Math.pow(robotPose.getY() - targetPos.getY(), 2);
 
@@ -257,12 +269,18 @@ public class AlignCommand extends Command {
         debug.setEntry("Robot rotation: ", robotPose.getRotation().getZ());
         debug.setEntry("Rot setpoint", this.rotationPid.getSetpoint().position);
 
-        double finalX =
+        debug.setEntry(
+                "Rot diff",
+                Math.abs(
+                        Math.abs(this.targetPos.getRotation().getRadians())
+                                - Math.abs(odometry.getRobotPose().getRotation().getZ())));
+
+        this.finalX =
                 xAxisCalc
                         + (xAxisPid.atGoal() || xAxisPid.atSetpoint()
                                 ? 0
                                 : Math.signum(xAxisCalc) * configManager.get("align_ff", 0.1));
-        double finalY =
+        this.finalY =
                 yAxisCalc
                         + (yAxisPid.atGoal() || yAxisPid.atSetpoint()
                                 ? 0
@@ -270,8 +288,13 @@ public class AlignCommand extends Command {
 
         if (distToTarget < Math.pow(ConfigManager.getInstance().get("inf_switch_dist", 1.0), 2)
                 && !stopWhenFinished) {
-            finalX = infX;
-            finalY = infY;
+            this.finalX = infX;
+            this.finalY = infY;
+        }
+
+        if (log) {
+            log = false;
+            LOGGER.info("First commanded speeds: {} {}", xAxisCalc, xAxisCalc);
         }
 
         debug.setEntry("Xms", finalX);
@@ -288,8 +311,8 @@ public class AlignCommand extends Command {
 
         swerveSubsystem.drive(finalX, finalY, rotationPidCalc, true, true, true);
 
-        if (xAxisPid.atGoal() && yAxisPid.atGoal() && rotationPid.atGoal() && this.doUpdate) {
-            LOGGER.debug("Hit goal, waiting for time to expire");
+        if (checkAtGoal() && doUpdate) {
+            LOGGER.info("Hit goal, waiting for time to expire");
             this.timeSenseFinished = Timer.getFPGATimestamp() * 1000;
             this.doUpdate = false;
         }
@@ -297,9 +320,7 @@ public class AlignCommand extends Command {
 
     @Override
     public boolean isFinished() {
-        return xAxisPid.atGoal()
-                && yAxisPid.atGoal()
-                && rotationPid.atGoal()
+        return checkAtGoal()
                 && Timer.getFPGATimestamp() * 1000 - this.timeSenseFinished
                         > configManager.get(
                                 String.format("align_%s_finish_time", this.profile), 200.0);
@@ -308,5 +329,20 @@ public class AlignCommand extends Command {
     @Override
     public void end(boolean interrupted) {
         if (stopWhenFinished) swerveSubsystem.zeroVoltage();
+        else swerveSubsystem.drive(this.finalX, this.finalY, 0.0, true, true, true);
+        LOGGER.info("Final commanded speeds: {} {}", this.finalX, this.finalY);
+    }
+
+    private boolean checkAtGoal() {
+        return (stopWhenFinished && xAxisPid.atGoal() && yAxisPid.atGoal() && rotationPid.atGoal())
+                || (!stopWhenFinished
+                        && this.distToTarget
+                                <= Math.pow(
+                                        configManager.get(
+                                                String.format(
+                                                        "align_%s_pos_dist_tol", this.profile),
+                                                0.05),
+                                        2)
+                        && rotationPid.atGoal());
     }
 }
