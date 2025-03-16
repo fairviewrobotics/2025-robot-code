@@ -32,7 +32,9 @@ public class BaseCommand extends Command {
     @Override
     public void execute() {
         armSubsystem.setPivotAngle(ConfigManager.getInstance().get("arm_base_angle", 0.1));
-        if (armSubsystem.getPivotAngle() <= -Math.PI / 4 || armSubsystem.getPivotAngle() >= 0.2) {
+        if (armSubsystem.getPivotAngle() <= -Math.PI / 4
+                || armSubsystem.getPivotAngle()
+                        >= ConfigManager.getInstance().get("arm_movement_max", 0.2)) {
             elevatorSubsystem.holdPosition();
         } else {
             elevatorSubsystem.zeroElevator();

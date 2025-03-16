@@ -31,4 +31,15 @@ public class VisionConstants {
                             0.0,
                             Math.toRadians(
                                     ConfigManager.getInstance().get("right_cam_angle", 10.0))));
+
+    public static final Transform3d CENTER_CAM_TRANSFORM =
+            new Transform3d(
+                    0.1, //  0.341122 0.3832
+                    0.0,
+                    0.2040382,
+                    new Rotation3d(
+                            0.0,
+                            Math.toRadians(
+                                    ConfigManager.getInstance().get("center_cam_pitch", 45.0)),
+                            0.0));
 }

@@ -1,6 +1,7 @@
 /* Black Knights Robotics (C) 2025 */
 package org.blackknights.commands;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import org.blackknights.subsystems.IntakeSubsystem;
 import org.blackknights.utils.ConfigManager;
@@ -9,6 +10,8 @@ import org.blackknights.utils.ConfigManager;
 public class IntakeCommand extends Command {
     private final IntakeSubsystem intakeSubsystem;
     private final IntakeMode mode;
+
+    private double currentTime;
 
     /**
      * Create a new intake command
@@ -20,6 +23,11 @@ public class IntakeCommand extends Command {
         this.intakeSubsystem = intakeSubsystem;
         this.mode = mode;
         addRequirements(intakeSubsystem);
+    }
+
+    @Override
+    public void initialize() {
+        this.currentTime = Timer.getFPGATimestamp() * 1000;
     }
 
     @Override
@@ -47,7 +55,11 @@ public class IntakeCommand extends Command {
 
     @Override
     public boolean isFinished() {
-        return mode.equals(IntakeMode.INTAKE) && intakeSubsystem.getLinebreak();
+        return (mode.equals(IntakeMode.INTAKE) && intakeSubsystem.getLinebreak())
+                || (mode.equals(IntakeMode.OUTTAKE)
+                        && !intakeSubsystem.getLinebreak()
+                        && Timer.getFPGATimestamp() * 1000 - this.currentTime
+                                > ConfigManager.getInstance().get("outtake_wait_time_ms", 40));
     }
 
     /** Enum of the different intake modes */
