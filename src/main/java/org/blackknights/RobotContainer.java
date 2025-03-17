@@ -1,8 +1,12 @@
 /* Black Knights Robotics (C) 2025 */
 package org.blackknights;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
@@ -44,6 +48,12 @@ public class RobotContainer {
                     Camera.CameraType.PHOTONVISION,
                     VisionConstants.RIGHT_CAM_TRANSFORM);
 
+    private final Camera centerCam =
+            new Camera(
+                    "centerCam",
+                    Camera.CameraType.PHOTONVISION,
+                    VisionConstants.CENTER_CAM_TRANSFORM);
+
     private final Odometry odometry = Odometry.getInstance();
     // Auto Chooser
     SendableChooser<Command> superSecretMissileTech = new SendableChooser<>();
@@ -62,17 +72,33 @@ public class RobotContainer {
         SmartDashboard.putData(cqProfiles);
         SmartDashboard.putData("Auto Chooser", superSecretMissileTech);
 
+        // Autos
         superSecretMissileTech.addOption(
-                "Left",
+                "LEFT_3",
                 new SequentialCommandGroup(
                         getLocationPlaceCommand(CoralQueue.CoralPosition.fromString("10L4")),
-                        getAutoIntakeCommand(),
+                        getAutoIntakeCommand(IntakeSides.LEFT),
                         getLocationPlaceCommand(CoralQueue.CoralPosition.fromString("8L4")),
-                        getAutoIntakeCommand(),
+                        getAutoIntakeCommand(IntakeSides.LEFT),
                         getLocationPlaceCommand(CoralQueue.CoralPosition.fromString("9L4"))));
 
         superSecretMissileTech.addOption(
-                "One pose", getLocationPlaceCommand(CoralQueue.CoralPosition.fromString("10L4")));
+                "RIGHT_3",
+                new SequentialCommandGroup(
+                        getLocationPlaceCommand(CoralQueue.CoralPosition.fromString("3L4")),
+                        getAutoIntakeCommand(IntakeSides.RIGHT),
+                        getLocationPlaceCommand(CoralQueue.CoralPosition.fromString("6L4")),
+                        getAutoIntakeCommand(IntakeSides.RIGHT),
+                        getLocationPlaceCommand(CoralQueue.CoralPosition.fromString("7L4"))));
+
+        superSecretMissileTech.addOption(
+                "CENTER_LEFT",
+                getLocationPlaceCommand(CoralQueue.CoralPosition.fromString("12L4")));
+        superSecretMissileTech.addOption(
+                "CENTER_RIGHT",
+                getLocationPlaceCommand(CoralQueue.CoralPosition.fromString("1L4")));
+
+        superSecretMissileTech.addOption("INTAKE_TEST", getAutoIntakeCommand(IntakeSides.RIGHT));
     }
 
     /** Configure controller bindings */
@@ -83,9 +109,17 @@ public class RobotContainer {
         swerveSubsystem.setDefaultCommand(
                 new DriveCommands(
                         swerveSubsystem,
-                        () -> primaryController.getLeftY() * 2.5,
-                        () -> primaryController.getLeftX() * 2.5,
-                        () -> -primaryController.getRightX() * Math.PI,
+                        () ->
+                                primaryController.getLeftY()
+                                        * ConfigManager.getInstance().get("driver_max_speed", 3.5),
+                        () ->
+                                primaryController.getLeftX()
+                                        * ConfigManager.getInstance().get("driver_max_speed", 3.5),
+                        () ->
+                                -primaryController.getRightX()
+                                        * Math.toRadians(
+                                                ConfigManager.getInstance()
+                                                        .get("driver_max_speed_rot", 360)),
                         true,
                         true));
 
@@ -96,29 +130,50 @@ public class RobotContainer {
                                 () -> coralQueue.getCurrentPosition(), () -> coralQueue.getNext()));
 
         primaryController
-                .leftBumper()
+                .rightBumper()
                 .whileTrue(
-                        new ParallelCommandGroup(
-                                new ElevatorArmCommand(
-                                        elevatorSubsystem,
-                                        armSubsystem,
-                                        () -> ScoringConstants.ScoringHeights.INTAKE),
-                                new IntakeCommand(
-                                        intakeSubsystem, IntakeCommand.IntakeMode.INTAKE)));
+                        new SequentialCommandGroup(
+                                new ParallelRaceGroup(
+                                        new DriveCommands(
+                                                swerveSubsystem,
+                                                primaryController::getLeftY,
+                                                primaryController::getLeftX,
+                                                () -> -primaryController.getRightX() * Math.PI,
+                                                true,
+                                                true),
+                                        new ElevatorArmCommand(
+                                                elevatorSubsystem,
+                                                armSubsystem,
+                                                () -> ScoringConstants.ScoringHeights.INTAKE),
+                                        new IntakeCommand(
+                                                intakeSubsystem, IntakeCommand.IntakeMode.INTAKE)),
+                                new RunCommand(
+                                                () ->
+                                                        swerveSubsystem.drive(
+                                                                ConfigManager.getInstance()
+                                                                        .get("back_mps", -1.0),
+                                                                0.0,
+                                                                0.0,
+                                                                false,
+                                                                false,
+                                                                false),
+                                                swerveSubsystem)
+                                        .withTimeout(
+                                                ConfigManager.getInstance()
+                                                        .get("back_time_sec", 0.2))));
 
         elevatorSubsystem.setDefaultCommand(new BaseCommand(elevatorSubsystem, armSubsystem));
 
         primaryController.povDown().whileTrue(new RunCommand(() -> swerveSubsystem.zeroGyro()));
 
+        secondaryController
+                .rightStick()
+                .onTrue(new InstantCommand(ScoringConstants::recomputeCoralPositions));
+
         // SECONDARY CONTROLLER
 
         climberSubsystem.setDefaultCommand(
                 new ClimberCommand(climberSubsystem, secondaryController));
-
-        //        secondaryController.leftBumper.onTrue(new InstantCommand(() ->
-        // coralQueue.stepBackwards()));
-        //        secondaryController.rightBumper.onTrue(new InstantCommand(() ->
-        // coralQueue.stepForwards()));
 
         secondaryController
                 .a()
@@ -154,7 +209,7 @@ public class RobotContainer {
 
         secondaryController
                 .leftBumper()
-                .onTrue(new InstantCommand(() -> coralQueue.stepForwards()));
+                .onTrue(new InstantCommand(() -> coralQueue.stepForwards())); //
 
         secondaryController
                 .rightBumper()
@@ -173,6 +228,7 @@ public class RobotContainer {
     public void robotInit() {
         odometry.addCamera(leftCam);
         odometry.addCamera(rightCam);
+        odometry.addCamera(centerCam);
     }
 
     /** Runs every 20ms while the robot is on */
@@ -183,6 +239,8 @@ public class RobotContainer {
 
     /** Runs ones when enabled in teleop */
     public void teleopInit() {
+        buttonBoardSubsystem.bind();
+
         if (cqProfiles.getSelected() != null)
             CoralQueue.getInstance().loadProfile(cqProfiles.getSelected());
     }
@@ -218,6 +276,7 @@ public class RobotContainer {
     private Command getPlaceCommand(
             Supplier<CoralQueue.CoralPosition> currentSupplier,
             Supplier<CoralQueue.CoralPosition> nextSupplier) {
+
         return new SequentialCommandGroup(
                 new ParallelRaceGroup(
                         new AlignCommand(
@@ -230,19 +289,48 @@ public class RobotContainer {
                                 false,
                                 "rough"),
                         new BaseCommand(elevatorSubsystem, armSubsystem)),
-                new ParallelCommandGroup(
-                        new SequentialCommandGroup(
-                                new AlignCommand(
+                new ParallelRaceGroup(
+                        new AlignCommand(
                                         swerveSubsystem,
                                         () -> currentSupplier.get().getPose(),
                                         true,
-                                        "fine"),
-                                new IntakeCommand(intakeSubsystem, IntakeCommand.IntakeMode.OUTTAKE)
-                                        .withTimeout(2)),
+                                        "fine")
+                                .withTimeout(
+                                        ConfigManager.getInstance()
+                                                .get("align_fine_max_time", 3.0)),
+                        new RunCommand(
+                                () ->
+                                        intakeSubsystem.setSpeed(
+                                                ConfigManager.getInstance()
+                                                        .get("intake_slow_voltage", -2.0)),
+                                intakeSubsystem),
                         new ElevatorArmCommand(
                                 elevatorSubsystem,
                                 armSubsystem,
-                                () -> nextSupplier.get().getHeight())));
+                                () -> currentSupplier.get().getHeight())),
+                new ParallelRaceGroup(
+                        new ElevatorArmCommand(
+                                elevatorSubsystem,
+                                armSubsystem,
+                                () -> nextSupplier.get().getHeight()),
+                        new IntakeCommand(intakeSubsystem, IntakeCommand.IntakeMode.OUTTAKE)
+                                .withTimeout(1)),
+                new ParallelRaceGroup(
+                        new AutoEndCommand(),
+                        new BaseCommand(elevatorSubsystem, armSubsystem),
+                        new RunCommand(
+                                        () ->
+                                                swerveSubsystem.drive(
+                                                        ConfigManager.getInstance()
+                                                                .get("back_mps", -1.0),
+                                                        0.0,
+                                                        0.0,
+                                                        false,
+                                                        false,
+                                                        false),
+                                        swerveSubsystem)
+                                .withTimeout(
+                                        ConfigManager.getInstance().get("back_time_sec", 0.2))));
     }
 
     /**
@@ -260,24 +348,59 @@ public class RobotContainer {
      *
      * @return The command to goto the feeder
      */
-    private Command getAutoIntakeCommand() {
-        return new ParallelDeadlineGroup(
-                new SequentialCommandGroup(
-                        new AlignCommand(
-                                swerveSubsystem,
-                                () ->
-                                        DriverStation.getAlliance().isPresent()
-                                                        && DriverStation.getAlliance().get()
-                                                                == DriverStation.Alliance.Blue
-                                                ? ScoringConstants.INTAKE_BLUE
-                                                : ScoringConstants.INTAKE_RED,
-                                true,
-                                "rough"),
-                        new IntakeCommand(intakeSubsystem, IntakeCommand.IntakeMode.INTAKE)
-                                .withTimeout(2)),
+    private Command getAutoIntakeCommand(IntakeSides side) {
+        Pose2d intakePose = getPose2d(side);
+
+        Pose2d intakePoseFinal =
+                intakePose.plus(new Transform2d(0, 0, Rotation2d.fromRadians(Math.PI)));
+
+        return new ParallelRaceGroup(
+                new ParallelCommandGroup(
+                        new AlignCommand(swerveSubsystem, () -> intakePoseFinal, true, "rough"),
+                        new IntakeCommand(intakeSubsystem, IntakeCommand.IntakeMode.INTAKE)),
                 new ElevatorArmCommand(
                         elevatorSubsystem,
                         armSubsystem,
                         () -> ScoringConstants.ScoringHeights.INTAKE));
+    }
+
+    private static Pose2d getPose2d(IntakeSides side) {
+        Pose2d intakePose;
+        if (DriverStation.getAlliance().isPresent()
+                && DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
+            if (side == IntakeSides.LEFT) {
+                intakePose = ScoringConstants.INTAKE_BLUE_LEFT;
+            } else {
+                intakePose = ScoringConstants.INTAKE_BLUE_RIGHT;
+            }
+        } else {
+            if (side == IntakeSides.LEFT) {
+                intakePose = ScoringConstants.INTAKE_RED_LEFT;
+            } else {
+                intakePose = ScoringConstants.INTAKE_RED_RIGHT;
+            }
+        }
+        return intakePose;
+    }
+
+    private enum IntakeSides {
+        LEFT,
+        RIGHT
+    }
+
+    private class AutoEndCommand extends Command {
+        private double currTime = Timer.getFPGATimestamp() * 1000;
+
+        @Override
+        public void initialize() {
+            this.currTime = Timer.getFPGATimestamp() * 1000;
+        }
+
+        @Override
+        public boolean isFinished() {
+            return DriverStation.isAutonomous()
+                    && Timer.getFPGATimestamp() * 1000 - this.currTime
+                            > ConfigManager.getInstance().get("auto_place_backup_time_ms", 0.2);
+        }
     }
 }
