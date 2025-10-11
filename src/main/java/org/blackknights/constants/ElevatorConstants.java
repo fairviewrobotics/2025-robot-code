@@ -30,8 +30,7 @@ public class ElevatorConstants {
 
     public static final double ELEVATOR_ZEROING_VOLTAGE = 0.0;
     // 12.9 rotations to top, 0.592m to top
-    public static final double ROTATIONS_TO_METERS =
-            1.372 / 30.643; // 0.590 / 38.32; // 0.592 / 12.9
+    public static final double ROTATIONS_TO_METERS = 0.592 / 36; // 0.590 / 38.32; // 0.592 / 12.9
 
     public static final double ELEVATOR_MIN = 0.0;
     public static final double ELEVATOR_MAX = 1.8;

@@ -15,7 +15,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     /** Create a new intake subsystem */
     public IntakeSubsystem() {
-        motor.setInverted(true);
+        motor.setInverted(false);
         motor.enableCurrentLimit(true);
         motor.configContinuousCurrentLimit(20);
         motor.configPeakCurrentLimit(0);

@@ -74,7 +74,7 @@ public class IntakeCommand extends Command {
                             && elevatorAtTargetSupplier.getAsBoolean()) {
 
                         intakeSubsystem.setVoltage(
-                                ConfigManager.getInstance().get("outtake_speed", -8.0));
+                                ConfigManager.getInstance().get("outtake_speed", 8.0));
                     }
                     break;
                 }

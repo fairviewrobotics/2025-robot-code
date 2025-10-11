@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
+import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import java.util.function.Supplier;
 import org.blackknights.commands.*;
@@ -33,7 +34,7 @@ public class RobotContainer {
     ButtonBoardSubsystem buttonBoardSubsystem = new ButtonBoardSubsystem(buttonBoard);
 
     // Controllers
-    CommandXboxController primaryController = new CommandXboxController(0);
+    CommandPS5Controller primaryController = new CommandPS5Controller(0);
     CommandXboxController secondaryController = new CommandXboxController(1);
 
     private final NetworkTablesUtils NTTune = NetworkTablesUtils.getTable("debug");
@@ -129,20 +130,20 @@ public class RobotContainer {
                         true));
 
         primaryController
-                .leftBumper()
+                .L1()
                 .whileTrue(
                         getPlaceCommand(
                                 () -> coralQueue.getCurrentPosition(), () -> coralQueue.getNext()));
 
         primaryController
-                .rightBumper()
+                .R1()
                 .whileTrue(
                         new SequentialCommandGroup(
                                 new ParallelRaceGroup(
                                         new DriveCommands(
                                                 swerveSubsystem,
-                                                primaryController::getLeftY,
-                                                primaryController::getLeftX,
+                                                () -> primaryController.getLeftY() * 2.5,
+                                                () -> primaryController.getLeftX() * 2.5,
                                                 () -> -primaryController.getRightX() * Math.PI,
                                                 true,
                                                 true),
@@ -172,7 +173,7 @@ public class RobotContainer {
         primaryController.povDown().whileTrue(new RunCommand(() -> swerveSubsystem.zeroGyro()));
 
         primaryController
-                .a()
+                .cross()
                 .whileTrue(
                         new RunCommand(
                                 () ->
@@ -182,7 +183,7 @@ public class RobotContainer {
                                 elevatorSubsystem));
 
         primaryController
-                .x()
+                .square()
                 .whileTrue(new InstantCommand(() -> elevatorSubsystem.resetEncoders()));
 
         //        primaryController
